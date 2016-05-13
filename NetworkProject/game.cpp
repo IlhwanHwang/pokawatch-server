@@ -11,6 +11,7 @@
 
 #include "game.h"
 #include "shader.h"
+#include "key.h"
 
 using namespace std;
 
@@ -46,6 +47,7 @@ void Game::draw() {
 }
 
 void Game::update() {
+	Key::keyUpdate();
 }
 
 int Game::getFrameInterval() {
