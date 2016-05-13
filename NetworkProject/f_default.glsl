@@ -1,22 +1,11 @@
-#version 150
+#version 330
 
-in vec2 pTex;
-in vec4 pCol;
-in float pDepth;
-out vec4 fColor;
+in vec2 fTex;
+layout (location = 0) out vec4 pCol;
 
 uniform sampler2D tex;
-uniform vec4 fog;
-uniform float fograte;
-uniform float zfar;
-
-vec4 lerp(vec4 a, vec4 b, float x) {
-	return x * b + (1.0 - x) * a;
-}
 
 void main()
 {
-	float d = pDepth / zfar;
-    fColor = pCol * texture2D(tex, pTex);
-	fColor = lerp(fColor, fog, min(1.0, max(0.0, (d - fograte) / (1.0 - fograte))));
+	pCol = texture2D(tex, fTex);
 }

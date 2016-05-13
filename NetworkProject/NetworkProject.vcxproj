@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="draw.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="InitShader.h" />
     <ClInclude Include="key.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="draw.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="key.cpp" />

@@ -118,4 +118,10 @@ struct protocol_command {
 	int command[UNIT_NUM_MAX];
 };
 
+#define MAP_WIDTH 15
+#define MAP_HEIGHT 15
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 960
+
 //socket [x] is mapped to unit number [x]
