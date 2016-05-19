@@ -8,7 +8,3 @@
 void Draw::init() {
 
 }
-
-void Draw::updateFrame() {
-
-}

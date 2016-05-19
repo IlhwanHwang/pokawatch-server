@@ -16,86 +16,80 @@
     <Filter Include="셰이더 파일">
       <UniqueIdentifier>{be6aa891-d270-4de4-b9c2-5697ef4f99aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\게임기반">
+      <UniqueIdentifier>{48107980-9ee8-41a7-9419-304e0f2b492b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\게임기반">
+      <UniqueIdentifier>{acd98faf-4354-4f5d-b62f-8d2971055e66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="InitShader.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="key.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="lodepng.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="mat.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="utility.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="vec.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="draw.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="unit.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="InitShader.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="key.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="lodepng.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="mat.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="vec.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="game.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="InitShader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="key.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="lodepng.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="model.cpp">
+    <ClCompile Include="draw.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="object.cpp">
+    <ClCompile Include="unit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="resource.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="shader.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="lodepng.cpp">
+      <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
     <ClCompile Include="texture.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
     <ClCompile Include="utility.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
-    <ClCompile Include="draw.cpp">
+    <ClCompile Include="key.cpp">
+      <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
+    <ClCompile Include="InitShader.cpp">
+      <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

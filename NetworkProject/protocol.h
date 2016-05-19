@@ -5,75 +5,76 @@
 
 #pragma once
 
-#define TEAM_NULL 0
-#define TEAM_POSTECH 1
-#define TEAM_KAIST 2
+typedef enum {
+	TEAM_NULL,
+	TEAM_POSTECH,
+	TEAM_KAIST
+} protocol_team;
 
-struct protocol_unit {
-	int team;
-	int dep;
-	int x;
-	int y;
-	int state;
+typedef enum {
+	DEP_NULL,
+	DEP_CSE,
+	DEP_PHYS,
+	DEP_LIFE,
+	DEP_ME,
+	DEP_CHEM
+} protocol_dep;
+
+typedef enum {
+	STATE_NULL,
+	STATE_IDLE,
+	STATE_DEAD,
+	STATE_ATTACK_RIGHT,
+	STATE_ATTACK_UP,
+	STATE_ATTACK_LEFT,
+	STATE_ATTACK_DOWN,
+	STATE_SKILL_RIGHT,
+	STATE_SKILL_UP,
+	STATE_SKILL_LEFT,
+	STATE_SKILL_DOWN,
+	STATE_STUN
+} protocol_state;
+
+typedef enum {
+	DIRECTION_RIGHT,
+	DIRECTION_UP,
+	DIRECTION_LEFT,
+	DIRECTION_DOWN,
+} protocol_direction;
+
+typedef struct {
+	protocol_team team;
+	protocol_dep dep;
+	int x, y;
+	protocol_state state;
 	int health;
-	int hero;
+	bool hero;
 	int cooltime;
 	int respawn;
-};
+	int stun;
+} protocol_unit;
 
-#define UNIT_TEAM_NONE TEAM_NULL
-#define UNIT_TEAM_POSTECH TEAM_POSTECH
-#define UNIT_TEAM_KAIST TEAM_KAIST
+typedef struct {
+	protocol_team team;
+	int x, y;
+} protocol_flag;
 
-#define UNIT_DEP_NULL 0
-#define UNIT_DEP_CSE 1
-#define UNIT_DEP_PHYS 2
-#define UNIT_DEP_LIFE 3
-#define UNIT_DEP_ME 4
-#define UNIT_DEP_CHEM 5
+typedef struct {
+	protocol_team team;
+	int x, y;
+	int span;
+} protocol_poison;
 
-#define UNIT_STATE_NULL 0
-#define UNIT_STATE_NORMAL 1
-#define UNIT_STATE_DEAD 2
-#define UNIT_STATE_ATTACK_RIGHT 0x11
-#define UNIT_STATE_ATTACK_UP 0x12
-#define UNIT_STATE_ATTACK_LEFT 0x13
-#define UNIT_STATE_ATTACK_DOWN 0x14
-#define UNIT_STATE_STUN_1 0x21
-#define UNIT_STATE_STUN_2 0x22
-#define UNIT_STATE_STUN_3 0x23
+typedef struct {
+	protocol_team team;
+	int x, y;
+	protocol_direction direction;
+} protocol_petal;
 
-#define UNIT_HERO_HERO 1
-#define UNIT_HERO_NONHERO 0
-
-struct protocol_flag {
-	int team;
-	int x;
-	int y;
-};
-
-#define FLAG_TEAM_NULL TEAM_NULL
-#define FLAG_TEAM_POSTECH TEAM_POSTECH
-#define FLAG_TEAM_KAIST TEAM_KAIST
-
-struct protocol_poison {
-	int team;
-	int x;
-	int y;
-};
-
-struct protocol_petal {
-	int team;
-	int x;
-	int y;
-	int direction;
-};
-
-struct protocol_mushroom {
-	int team;
-	int x;
-	int y;
-};
+typedef struct {
+	protocol_team team;
+	int x, y;
+} protocol_mushroom;
 
 #define UNIT_NUM_MAX 6
 #define FLAG_NUM_MAX 3
@@ -81,47 +82,47 @@ struct protocol_mushroom {
 #define PETAL_NUM_MAX 12
 #define MUSHROOM_NUM_MAX 5
 
-struct protocol_data {
-	struct protocol_unit unit[UNIT_NUM_MAX];
-	struct protocol_flag flag[FLAG_NUM_MAX];
-	struct protocol_poison poison[POISON_NUM_MAX];
-	struct protocol_petal petal[PETAL_NUM_MAX];
-	struct protocol_mushroom mushroom[MUSHROOM_NUM_MAX];
+typedef struct {
+	protocol_unit unit[UNIT_NUM_MAX];
+	protocol_flag flag[FLAG_NUM_MAX];
+	protocol_poison poison[POISON_NUM_MAX];
+	protocol_petal petal[PETAL_NUM_MAX];
+	protocol_mushroom mushroom[MUSHROOM_NUM_MAX];
 	int score[2];
 	int turnleft;
-};
+} protocol_data;
 
-#define COMMAND_MOVE_RIGHT 1
-#define COMMAND_MOVE_UP 2
-#define COMMAND_MOVE_LEFT 3
-#define COMMAND_MOVE_DOWN 4
+typedef enum {
+	COMMAND_MOVE_RIGHT,
+	COMMAND_MOVE_UP,
+	COMMAND_MOVE_LEFT,
+	COMMAND_MOVE_DOWN,
+	COMMAND_ATTACK_RIGHT,
+	COMMAND_ATTACK_UP,
+	COMMAND_ATTACK_LEFT,
+	COMMAND_ATTACK_DOWN,
+	COMMAND_SKILL_RIGHT,
+	COMMAND_SKILL_UP,
+	COMMAND_SKILL_LEFT,
+	COMMAND_SKILL_DOWN,
+	COMMAND_SPAWN_CSE,
+	COMMAND_SPAWN_PHYS,
+	COMMAND_SPAWN_LIFE,
+	COMMAND_SPAWN_ME,
+	COMMAND_SPAWN_CHEM,
+	COMMAND_FLAG
+} protocol_command;
 
-#define COMMAND_ATTACK_RIGHT 0x11
-#define COMMAND_ATTACK_UP 0x12
-#define COMMAND_ATTACK_LEFT 0x13
-#define COMMAND_ATTACK_DOWN 0x14
-
-#define COMMAND_SKILL_RIGHT 0x21
-#define COMMAND_SKILL_UP 0x22
-#define COMMAND_SKILL_LEFT 0x23
-#define COMMAND_SKILL_DOWN 0x24
-
-#define COMMAND_SPAWN_CSE 0x31
-#define COMMAND_SPAWN_PHYS 0x32
-#define COMMAND_SPAWN_LIFE 0x33
-#define COMMAND_SPAWN_ME 0x34
-#define COMMAND_SPAWN_CHEM 0x35
-
-#define COMMAND_FLAG 0x41
-
-struct protocol_command {
-	int command[UNIT_NUM_MAX];
-};
+typedef struct {
+	protocol_command command[UNIT_NUM_MAX];
+} protocol_command_array;
 
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
+
+#define RESPAWN_COOLTIME 10
 
 //socket [x] is mapped to unit number [x]

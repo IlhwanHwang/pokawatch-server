@@ -17,5 +17,5 @@ private:
 public:
 	static void init();
 	static void update();
-	static void input(struct protocol_data *data);
+	static void input(protocol_data *data);
 };
