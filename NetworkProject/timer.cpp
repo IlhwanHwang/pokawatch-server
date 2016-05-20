@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <iostream>
+#include <cstdio>
 
 #include "timer.h"
 #include "key.h"
@@ -22,19 +23,28 @@ void Timer::init(int interval, int perturn) {
 
 void Timer::turn() {
 	std::cout << "Turn!" << std::endl;
+	printf("¹¹¾ß");
 	// add any per turn action
+	
+
 }
 
 void Timer::update(int count) {
 
 	glutTimerFunc(frameInterval, update, count + 1);
-	Key::keyUpdate();
-	
+
+	if (Key::keyCheckOn('W')) printf("w was clicked");
+	else printf("%d", count);
+
 	if (count % framePerTurn == 0) {
 		turn();
 	}
 
-	std::cout << "Frame number " << count << std::endl;
+	//std::cout << "Frame number " << count << std::endl;
+	
 	// add any per frame actions
 	// such as update() and draw() for all object
+	if (Key::keyCheckPressed('a')) printf("hihi");
+
+	Key::keyUpdate();
 }

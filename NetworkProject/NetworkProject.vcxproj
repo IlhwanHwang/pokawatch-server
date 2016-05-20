@@ -153,12 +153,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="client.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="InitShader.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="server.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="timer.h" />
