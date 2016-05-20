@@ -26,7 +26,6 @@ void Timer::turn() {
 }
 
 void Timer::update(int count) {
-
 	glutTimerFunc(frameInterval, update, count + 1);
 	
 	if (count % framePerTurn == 0) {

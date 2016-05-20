@@ -3,10 +3,16 @@
 // key state control module
 //
 
+#include <GL/freeglut.h>
 #include "key.h"
 
 bool Key::keyStatePend[256] = {false};
 bool Key::keyStateAccept[256] = {false};
+
+void Key::init() {
+	glutKeyboardFunc(Key::keyPressed);
+	glutKeyboardUpFunc(Key::keyReleased);
+}
 
 void Key::keyPressed(unsigned char key, int x, int y) {
 	keyStatePend[key] = true;

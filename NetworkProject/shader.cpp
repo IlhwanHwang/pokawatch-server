@@ -20,7 +20,7 @@ std::stack<mat4> Shader::modelViewStack;
 void Shader::init() {
 	shdDefault = glCreateProgram();
 	loadShader(shdDefault, GL_VERTEX_SHADER, "default_v.glsl");
-	loadShader(shdDefault, GL_VERTEX_SHADER, "default_f.glsl");
+	loadShader(shdDefault, GL_FRAGMENT_SHADER, "default_f.glsl");
 	linkProgram(shdDefault);
 
 	glUniform1i(glGetUniformLocation(shdDefault, "tex"), 0);

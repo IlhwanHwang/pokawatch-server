@@ -11,6 +11,7 @@
 
 #include "shader.h"
 #include "timer.h"
+#include "key.h"
 
 void main(int argc, char **argv)
 {
@@ -24,6 +25,7 @@ void main(int argc, char **argv)
 
 	glewInit();
 
+	Key::init();
 	Shader::init();
 	//60fps, 0.5 second per turn
 	Timer::init(16, 30);
