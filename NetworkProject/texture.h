@@ -15,4 +15,6 @@ private:
 public:
 	void load(const char* fn);
 	void bind();
+	unsigned getWidth() { return w; }
+	unsigned getHeight() { return h; }
 };

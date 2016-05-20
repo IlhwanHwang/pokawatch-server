@@ -28,7 +28,6 @@ void Timer::turn() {
 void Timer::update(int count) {
 
 	glutTimerFunc(frameInterval, update, count + 1);
-	Key::keyUpdate();
 	
 	if (count % framePerTurn == 0) {
 		turn();
@@ -37,4 +36,6 @@ void Timer::update(int count) {
 	std::cout << "Frame number " << count << std::endl;
 	// add any per frame actions
 	// such as update() and draw() for all object
+
+	Key::keyUpdate();
 }

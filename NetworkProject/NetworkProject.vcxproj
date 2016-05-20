@@ -160,6 +160,7 @@
     <ClInclude Include="mat.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="sprite.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="unit.h" />
@@ -173,14 +174,15 @@
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="sprite.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="unit.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="f_default.glsl" />
-    <None Include="v_default.glsl" />
+    <None Include="default_f.glsl" />
+    <None Include="default_v.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
