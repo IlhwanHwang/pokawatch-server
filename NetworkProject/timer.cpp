@@ -30,11 +30,10 @@ void Timer::turn() {
 }
 
 void Timer::update(int count) {
-
 	glutTimerFunc(frameInterval, update, count + 1);
 
-	if (Key::keyCheckOn('W')) printf("w was clicked");
-	else printf("%d", count);
+	if (Key::keyCheckOn('w')) printf("w was clicked");
+	//else printf("%d", count);
 
 	if (count % framePerTurn == 0) {
 		turn();
