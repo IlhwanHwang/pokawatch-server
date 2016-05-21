@@ -27,7 +27,7 @@ SOCKET hSocket;				// of client
 SOCKADDR_IN servAddr;		// of server/client
 SOCKADDR_IN clntAddr[6];	// of server
 int szClntAddr[6];			// of server
-char messageToClient[];		// of server
+char messageToClient[3];		// of server
 char messageFromClient[][sizeof(protocol_data) + 1]; // of server
 char messageToServer[];		// of client
 int mode;					//determine server(1) client(2) or nothing (0)
@@ -39,11 +39,16 @@ char gameStart[2];				// start(1)
 void main(int argc, char **argv)
 {
 	srand(time(NULL));
+	printf("Hi");
 
 	mode = 0;
 	characterSelection = 0;
+	messageToClient[0] = 'h';
+	messageToClient[1] = 'i';
+	messageToClient[2] = '\0';
+
 	gameStart[0] = 'N';
-	gameStart[1] = '\n';
+	gameStart[1] = '\0';
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);

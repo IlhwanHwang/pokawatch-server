@@ -13,7 +13,7 @@ using namespace std;
 
 void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
 {
-	string servIpString = "119.202.87.81";
+	string servIpString = "141.223.209.208";
 	string portNumString = "2222";
 	char * servIp = (char*)servIpString.c_str();
 	char * portNum = (char*)portNumString.c_str();
@@ -36,16 +36,24 @@ void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
 	memset(servAddr, 0, sizeof(*servAddr));
 	servAddr->sin_family = AF_INET;
 	servAddr->sin_addr.s_addr = inet_addr(servIp);
-	servAddr->sin_port = htons(atoi(portNum));
-}
 
-void connectToServer(SOCKADDR_IN *servAddr, SOCKET * hSocket)
-{
+	printf("servAddr : %u", inet_addr(servIp));
+	servAddr->sin_port = htons(atoi(portNum));
+	printf("portNum : %u", htons(atoi(portNum)));
+
+	printf("conection tried");
+
 	// 서버로 연결 요청
 	if (connect(*hSocket, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
 	{
 		ErrorHandling("Connect() error");
 	}
+
+}
+
+void connectToServer(SOCKADDR_IN *servAddr, SOCKET * hSocket)
+{
+	
 }
 
 void getProtocolDataFromServer(SOCKET * hSocket, char message[])

@@ -28,7 +28,7 @@ extern SOCKET hSocket;				// of client
 extern SOCKADDR_IN servAddr;		// of server/client
 extern SOCKADDR_IN clntAddr[6];	// of server
 extern int szClntAddr[6];			// of server
-extern char messageToClient[];		// of server
+extern char messageToClient[3];		// of server
 extern char messageFromClient[][sizeof(protocol_data) + 1]; // of server
 extern char messageToServer[];		// of client
 extern int mode;					//determine server(1) client(2) or nothing (0)
@@ -60,7 +60,7 @@ void Timer::turn() {
 	}
 	if (mode == 1 && gameStart[0] != 'N')
 	{
-
+		sendToClient(messageToClient, hClntSock);
 	}
 }
 
@@ -81,6 +81,7 @@ void Timer::update(int count) {
 		mode = 1;
 		printf("mode- server chosn\n");
 		makeServerSocket(&hServSock, &servAddr);
+		printf("socket made");
 		acceptClient(&hServSock, hClntSock, clntAddr, szClntAddr);
 		char acceptMessage[2];
 		acceptMessage[0] = 'Y';

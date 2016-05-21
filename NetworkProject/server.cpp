@@ -28,9 +28,27 @@ void communicate(int cnt)
 
 void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
 {
+	string portString = "2222";
+	char * port = (char*)portString.c_str();
+	/*
+	hServSock = socket(PF_INET, SOCK_STREAM, 0);
+	if (hServSock == INVALID_SOCKET)
+		ErrorHandling("socket() error!");
 
-	string servIpString = "119.202.87.81";
-	char * servIp = (char*)servIpString.c_str();
+	// 서버   주소 구조체에 채우기
+	memset(&servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servAddr.sin_port = htons(atoi(argv[1]));
+
+	// 소켓   주소 할당
+	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+		ErrorHandling("bind() error");
+
+	// 연결   요청 상태로  대기
+	if (listen(hServSock, 5) == SOCKET_ERROR)
+		ErrorHandling("listen() error");
+	*/
 
 	WSADATA wsaData;
 
@@ -50,7 +68,7 @@ void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
 	memset(servAddr, 0, sizeof(*servAddr));
 	servAddr->sin_family = AF_INET;
 	servAddr->sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr->sin_port = htons(atoi(servIp));
+	servAddr->sin_port = htons(atoi(port));
 
 	// 소켓에 주소 할당
 	if (bind(*hServSock, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
@@ -63,6 +81,7 @@ void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
 	{
 		ErrorHandling("listen() error");
 	}
+	printf("listen");
 }
 
 void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[], int szClntAddr[])
@@ -72,10 +91,31 @@ void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[
 	{
 		szClntAddr[i] = sizeof(clntAddr[i]);
 	}
-	for (int i = 0; i < 6; i++)
-	{
-		hClntSock[i] = accept(*hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
-	}
+
+	printf("tried");
+	hClntSock[0] = accept(*hServSock, (SOCKADDR*)&clntAddr[0], &szClntAddr[0]);
+	printf("success");
+	
+	printf("tried");
+	hClntSock[1] = accept(*hServSock, (SOCKADDR*)&clntAddr[1], &szClntAddr[1]);
+	printf("success");
+
+	printf("tried");
+	hClntSock[2] = accept(*hServSock, (SOCKADDR*)&clntAddr[2], &szClntAddr[2]);
+	printf("success");
+	
+	printf("tried");
+	hClntSock[3] = accept(*hServSock, (SOCKADDR*)&clntAddr[3], &szClntAddr[3]);
+	printf("success");
+	
+	printf("tried");
+	hClntSock[4] = accept(*hServSock, (SOCKADDR*)&clntAddr[4], &szClntAddr[4]);
+	printf("success");
+
+	printf("tried");
+	hClntSock[5] = accept(*hServSock, (SOCKADDR*)&clntAddr[5], &szClntAddr[5]);
+	printf("success");
+
 
 	if ((hClntSock[0] == INVALID_SOCKET) || (hClntSock[1] == INVALID_SOCKET) || (hClntSock[2] == INVALID_SOCKET)
 		|| (hClntSock[3] == INVALID_SOCKET) || (hClntSock[4] == INVALID_SOCKET) || (hClntSock[5] == INVALID_SOCKET))
