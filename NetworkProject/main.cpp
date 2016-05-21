@@ -32,7 +32,7 @@ char messageFromClient[][sizeof(protocol_data) + 1]; // of server
 char messageToServer[];		// of client
 int mode;					//determine server(1) client(2) or nothing (0)
 int characterSelection;		//character_selection_time;
-int gameStart;				// start(1)
+char gameStart[2];				// start(1)
 
 
 
@@ -42,7 +42,8 @@ void main(int argc, char **argv)
 
 	mode = 0;
 	characterSelection = 0;
-	gameStart = 0;
+	gameStart[0] = 'N';
+	gameStart[1] = '\n';
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);

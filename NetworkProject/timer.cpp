@@ -7,16 +7,39 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <cstdio>
+#include <WinSock2.h>
+#include <string>
 
 #include "timer.h"
+#include "client.h"
+#include "server.h"
+#include "client.h"
 #include "protocol.h"
 #include "key.h"
 
+using namespace std;
+
 int Timer::frameInterval;
 int Timer::framePerTurn;
-extern int mode;
-extern int characterSelection;
+
+extern SOCKET hServSock;			// of server
+extern SOCKET hClntSock[6];		// of server
+extern SOCKET hSocket;				// of client
+extern SOCKADDR_IN servAddr;		// of server/client
+extern SOCKADDR_IN clntAddr[6];	// of server
+extern int szClntAddr[6];			// of server
+extern char messageToClient[];		// of server
+extern char messageFromClient[][sizeof(protocol_data) + 1]; // of server
+extern char messageToServer[];		// of client
+extern int mode;					//determine server(1) client(2) or nothing (0)
+extern int characterSelection;		//character_selection_time;
+extern char gameStart[2];				// start(1)
+
+
+
+
 int command;
+
 
 void Timer::init(int interval, int perturn) {
 	frameInterval = interval;
@@ -27,11 +50,14 @@ void Timer::init(int interval, int perturn) {
 
 void Timer::turn() {
 	std::cout << "Turn!" << std::endl;
-	if (mode > 0 && characterSelection > 0)
-	{
 
-	}
 	// add any per turn action
+	if (mode == 2 && gameStart[0] != 'N')
+	{
+		sendToServer(&hSocket, (char *)(to_string(command)).c_str());
+		printf("command : %d was sent", command);
+	}
+
 	
 
 }
@@ -43,7 +69,7 @@ void Timer::update(int count) {
 		turn();
 	}
 
-	if (mode > 0) printf("mode CHANGED!");
+	//if (mode > 0) printf("mode CHANGED!");
 
 	// add any per frame actions
 	// such as update() and draw() for all object
@@ -51,39 +77,56 @@ void Timer::update(int count) {
 	if (mode == 0 && Key::keyCheckPressed('1'))
 	{
 		mode = 1;
+		printf("mode- server chosn\n");
+		makeServerSocket(&hServSock, &servAddr);
 	}
+
 	if (mode == 0 && Key::keyCheckPressed('2'))
 	{
 		mode = 2;
+		printf("mode- client chose\n");
+		makeClientSocket(&hSocket, &servAddr);
+		connectToServer(&servAddr, &hSocket);
 	}// if not 1 or 2 give error message
-	
+
 
 	//if (characterSelection == 0 && Key::keyCheckPressed('a') && Key::keyCheckOn('s')) printf("hihi"); // sa
 	
 		
 	if (mode > 0)
 	{
-		if (characterSelection == 0 && Key::keyCheckPressed('1'))
+		if (mode==2 && characterSelection == 0 && Key::keyCheckPressed('1'))
 		{
 			characterSelection = COMMAND_SPAWN_CSE;
+			sendToServer(&hSocket, (char *)(to_string(characterSelection)).c_str());
+			getProtocolDataFromServer(&hSocket, gameStart);
+			printf("character chosen");
 		}
-		if (characterSelection == 0 && Key::keyCheckPressed('2'))
+		if (mode == 2 && characterSelection == 0 && Key::keyCheckPressed('2'))
 		{
 			characterSelection = COMMAND_SPAWN_PHYS;
+			sendToServer(&hSocket, (char *)(to_string(characterSelection)).c_str());
+			printf("character chosen");
 		}
-		if (characterSelection == 0 && Key::keyCheckPressed('3'))
+		if (mode == 2 && characterSelection == 0 && Key::keyCheckPressed('3'))
 		{
 			characterSelection = COMMAND_SPAWN_LIFE;
+			sendToServer(&hSocket, (char *)(to_string(characterSelection)).c_str());
+			printf("character chosen");
 		}
-		if (characterSelection == 0 && Key::keyCheckPressed('4'))
+		if (mode == 2 && characterSelection == 0 && Key::keyCheckPressed('4'))
 		{
 			characterSelection = COMMAND_SPAWN_ME;
+			sendToServer(&hSocket, (char *)(to_string(characterSelection)).c_str());
+			printf("character chosen");
 		}
-		if (characterSelection == 0 && Key::keyCheckPressed('5'))
+		if (mode == 2 && characterSelection == 0 && Key::keyCheckPressed('5'))
 		{
 			characterSelection = COMMAND_SPAWN_CHEM;
+			sendToServer(&hSocket, (char *)(to_string(characterSelection)).c_str());
+			printf("character chosen");
 		}
-		if (characterSelection > 0)
+		if (mode == 2 && characterSelection > 0 && gameStart[0] == 'Y')
 		{
 			if (Key::keyCheckPressed('d')) command = COMMAND_MOVE_RIGHT;
 			if (Key::keyCheckPressed('w')) command = COMMAND_MOVE_UP;

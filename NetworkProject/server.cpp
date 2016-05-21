@@ -26,8 +26,11 @@ void communicate(int cnt)
 }
 
 
-void makeServerSocket(SOCKET * hServSock, char * argv[], SOCKADDR_IN *servAddr)
+void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
 {
+
+	string servIpString = "119.202.87.81";
+	char * servIp = (char*)servIpString.c_str();
 
 	WSADATA wsaData;
 
@@ -47,7 +50,7 @@ void makeServerSocket(SOCKET * hServSock, char * argv[], SOCKADDR_IN *servAddr)
 	memset(servAddr, 0, sizeof(*servAddr));
 	servAddr->sin_family = AF_INET;
 	servAddr->sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr->sin_port = htons(atoi(argv[1]));
+	servAddr->sin_port = htons(atoi(servIp));
 
 	// 소켓에 주소 할당
 	if (bind(*hServSock, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
@@ -65,12 +68,17 @@ void makeServerSocket(SOCKET * hServSock, char * argv[], SOCKADDR_IN *servAddr)
 void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[], int szClntAddr[])
 {
 	// 연결 요청 수락
-	szClntAddr[0] = sizeof(clntAddr[0]);
-	szClntAddr[1] = sizeof(clntAddr[1]);
-	hClntSock[0] = accept(*hServSock, (SOCKADDR*)&clntAddr[0], &szClntAddr[0]);
-	hClntSock[1] = accept(*hServSock, (SOCKADDR*)&clntAddr[1], &szClntAddr[1]);
+	for (int i = 0; i < 6; i++)
+	{
+		szClntAddr[i] = sizeof(clntAddr[i]);
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		hClntSock[i] = accept(*hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
+	}
 
-	if ((hClntSock[0] == INVALID_SOCKET) || (hClntSock[1] == INVALID_SOCKET))
+	if ((hClntSock[0] == INVALID_SOCKET) || (hClntSock[1] == INVALID_SOCKET) || (hClntSock[2] == INVALID_SOCKET)
+		|| (hClntSock[3] == INVALID_SOCKET) || (hClntSock[4] == INVALID_SOCKET) || (hClntSock[5] == INVALID_SOCKET))
 	{
 		ErrorHandling("accept() error");
 	}
@@ -78,12 +86,7 @@ void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[
 
 void sendToClient(char messageToClient[], SOCKET  hClntSock[])
 {
-	send(hClntSock[0], messageToClient, sizeof(messageToClient), 0);
-	send(hClntSock[1], messageToClient, sizeof(messageToClient), 0);
-	send(hClntSock[2], messageToClient, sizeof(messageToClient), 0);
-	send(hClntSock[3], messageToClient, sizeof(messageToClient), 0);
-	send(hClntSock[4], messageToClient, sizeof(messageToClient), 0);
-	send(hClntSock[5], messageToClient, sizeof(messageToClient), 0);
+	for (int i = 0; i < 6; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
 }
 
 void recieveFromClient(SOCKET hClntSock[], char messageFromClient[][sizeof(protocol_data)])

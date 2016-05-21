@@ -2,17 +2,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <winsock2.h>
 
 #include <conio.h>
 #include "client.h"
 #include "server.h"
 
-void makeClientSocket(SOCKET * hSocket,char ** argv, SOCKADDR_IN *servAddr)
-{
-	WSADATA wsaData;
+using namespace std;
 
+void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
+{
+	string servIpString = "119.202.87.81";
+	string portNumString = "2222";
+	char * servIp = (char*)servIpString.c_str();
+	char * portNum = (char*)portNumString.c_str();
+
+	WSADATA wsaData;
 
 	// Load WinSocket 2.2 DLL
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -29,8 +35,8 @@ void makeClientSocket(SOCKET * hSocket,char ** argv, SOCKADDR_IN *servAddr)
 
 	memset(servAddr, 0, sizeof(*servAddr));
 	servAddr->sin_family = AF_INET;
-	servAddr->sin_addr.s_addr = inet_addr(argv[1]);
-	servAddr->sin_port = htons(atoi(argv[2]));
+	servAddr->sin_addr.s_addr = inet_addr(servIp);
+	servAddr->sin_port = htons(atoi(portNum));
 }
 
 void connectToServer(SOCKADDR_IN *servAddr, SOCKET * hSocket)
@@ -51,7 +57,7 @@ void getProtocolDataFromServer(SOCKET * hSocket, char message[])
 	{
 		ErrorHandling("read() error");
 	}
-	message[strLen] = '0';
+	message[strLen] = '\0';
 }
 
 void closeClientConnection(SOCKET * hSocket)
