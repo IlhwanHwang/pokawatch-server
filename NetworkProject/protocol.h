@@ -60,18 +60,21 @@ typedef struct {
 } protocol_flag;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 	int span;
 } protocol_poison;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 	protocol_direction direction;
 } protocol_petal;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 } protocol_mushroom;
@@ -130,7 +133,7 @@ typedef struct {
 //NETWORK PROTOCOL
 
 #define PORT_STRING "2222"
-#define SERV_IP_STRING "141.223.209.208"
+#define SERV_IP_STRING "119.202.87.65"
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
