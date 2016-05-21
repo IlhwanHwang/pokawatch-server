@@ -41,7 +41,7 @@ void Shader::init() {
 	};
 	glGenBuffers(1, &vboCanonical);
 	glBindBuffer(GL_ARRAY_BUFFER, vboCanonical);
-	glBufferData(GL_ARRAY_BUFFER, 20, (void*)data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, (void*)data, GL_STATIC_DRAW);
 
 	float data2[20] = {
 		0.0, 0.0, 0.0, 0.0, 0.0,
@@ -51,7 +51,7 @@ void Shader::init() {
 	};
 	glGenBuffers(1, &vbo4thPlane);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo4thPlane);
-	glBufferData(GL_ARRAY_BUFFER, 20, (void*)data2, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, (void*)data2, GL_STATIC_DRAW);
 
 	mat4 m;
 	modelViewStack.push(m);

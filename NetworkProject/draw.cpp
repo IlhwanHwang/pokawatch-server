@@ -13,8 +13,9 @@ int Draw::h = WINDOW_HEIGHT;
 std::priority_queue<DrawRequest> Draw::req;
 
 void Draw::init() {
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_ALPHA_TEST);
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutReshapeFunc(reshape);
@@ -31,7 +32,6 @@ DrawRequest::DrawRequest(const Sprite& spr, float depth, float x, float y, float
 
 void DrawRequest::draw() {
 	Shader::push();
-		/*
 		Shader::translate(vec3(x, y, 0.0));
 		Shader::rotateZ(a);
 		Shader::scale(vec3(sx, sy, 1.0));
@@ -39,9 +39,8 @@ void DrawRequest::draw() {
 		Shader::scale(vec3(w, h, 1.0));
 		Shader::apply();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE, buf);
+		glBindTexture(GL_TEXTURE_2D, buf);
 		Shader::setBlend(vec4(c.r, c.g, c.b, alpha));
-		*/
 		Shader::draw4thPlane();
 	Shader::pop();
 }

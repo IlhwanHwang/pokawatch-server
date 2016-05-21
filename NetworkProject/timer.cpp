@@ -41,22 +41,18 @@ void Timer::update(int count) {
 	if (count % framePerTurn == 0) {
 		turn();
 	}
+
+	if (Key::keyCheckPressed('w'))
+		errorecho("flush");
 	
 	glClearColor(0.25, 0.75, 1.0, 1.0);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Shader::projection(Matrix::Ortho2D(0.0, WINDOW_WIDTH, 0.0, WINDOW_HEIGHT));
-
-	mat4 m;
-	Shader::useDefault();
-	Shader::projection(m);
-	Shader::apply();
-	Shader::draw4thPlane();
-	Shader::drawCanonical();
-	//Draw::draw(red, 0.0, 32.0, 32.0);
-	//Draw::draw(blue, 0.0, 48.0, 48.0);
-	//Draw::flush();
+	Shader::projection(Matrix::Ortho2D(0.0, WINDOW_WIDTH, 0.0, WINDOW_HEIGHT));
+	Draw::draw(red, -1.0, 32.0, 32.0);
+	Draw::draw(blue, 0.0, 48.0, 48.0);
+	Draw::flush();
 
 	glutSwapBuffers();
 

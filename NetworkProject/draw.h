@@ -30,7 +30,7 @@ private:
 public:
 	DrawRequest(const Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha);
 	void draw();
-	bool operator< (const DrawRequest& other) const { return depth < other.depth; }
+	bool operator< (const DrawRequest& other) const { return depth > other.depth; }
 };
 
 class Draw {
