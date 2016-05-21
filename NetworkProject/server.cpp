@@ -30,25 +30,6 @@ void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
 {
 	string portString = "2222";
 	char * port = (char*)portString.c_str();
-	/*
-	hServSock = socket(PF_INET, SOCK_STREAM, 0);
-	if (hServSock == INVALID_SOCKET)
-		ErrorHandling("socket() error!");
-
-	// 서버   주소 구조체에 채우기
-	memset(&servAddr, 0, sizeof(servAddr));
-	servAddr.sin_family = AF_INET;
-	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons(atoi(argv[1]));
-
-	// 소켓   주소 할당
-	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
-		ErrorHandling("bind() error");
-
-	// 연결   요청 상태로  대기
-	if (listen(hServSock, 5) == SOCKET_ERROR)
-		ErrorHandling("listen() error");
-	*/
 
 	WSADATA wsaData;
 
@@ -92,29 +73,12 @@ void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[
 		szClntAddr[i] = sizeof(clntAddr[i]);
 	}
 
-	printf("tried");
-	hClntSock[0] = accept(*hServSock, (SOCKADDR*)&clntAddr[0], &szClntAddr[0]);
-	printf("success");
-	
-	printf("tried");
+	hClntSock[0] = accept(*hServSock, (SOCKADDR*)&clntAddr[0], &szClntAddr[0]);	
 	hClntSock[1] = accept(*hServSock, (SOCKADDR*)&clntAddr[1], &szClntAddr[1]);
-	printf("success");
-
-	printf("tried");
 	hClntSock[2] = accept(*hServSock, (SOCKADDR*)&clntAddr[2], &szClntAddr[2]);
-	printf("success");
-	
-	printf("tried");
 	hClntSock[3] = accept(*hServSock, (SOCKADDR*)&clntAddr[3], &szClntAddr[3]);
-	printf("success");
-	
-	printf("tried");
 	hClntSock[4] = accept(*hServSock, (SOCKADDR*)&clntAddr[4], &szClntAddr[4]);
-	printf("success");
-
-	printf("tried");
 	hClntSock[5] = accept(*hServSock, (SOCKADDR*)&clntAddr[5], &szClntAddr[5]);
-	printf("success");
 
 
 	if ((hClntSock[0] == INVALID_SOCKET) || (hClntSock[1] == INVALID_SOCKET) || (hClntSock[2] == INVALID_SOCKET)
@@ -129,11 +93,11 @@ void sendToClient(char messageToClient[], SOCKET  hClntSock[])
 	for (int i = 0; i < 6; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
 }
 
-void recieveFromClient(SOCKET hClntSock[], char messageFromClient[][2])
+void recieveFromClient(SOCKET hClntSock[], char messageFromClient[6][16])
 {
 	for (int i = 0; i < 6; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], 1024, 0);
+		int strLen = recv(hClntSock[i], messageFromClient[i], 2, 0);
 		messageFromClient[i][strLen] = '\0';
 	}
 

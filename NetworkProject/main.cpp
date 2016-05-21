@@ -28,7 +28,7 @@ SOCKADDR_IN servAddr;		// of server/client
 SOCKADDR_IN clntAddr[6];	// of server
 int szClntAddr[6];			// of server
 char messageToClient[3];		// of server
-char messageFromClient[][sizeof(protocol_data) + 1]; // of server
+char messageFromClient[6][16]; // of server
 char messageToServer[];		// of client
 int mode;					//determine server(1) client(2) or nothing (0)
 int characterSelection;		//character_selection_time;
@@ -43,6 +43,7 @@ void main(int argc, char **argv)
 
 	mode = 0;
 	characterSelection = 0;
+
 	messageToClient[0] = 'h';
 	messageToClient[1] = 'i';
 	messageToClient[2] = '\0';
