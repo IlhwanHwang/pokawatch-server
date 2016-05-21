@@ -1,4 +1,4 @@
-#pragma comment(lib, "ws2_32.lib")
+/*#pragma comment(lib, "ws2_32.lib")
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,14 +23,14 @@ void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
 	// Load WinSocket 2.2 DLL
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		ErrorHandling("WSAStartup(), error");
+		Network::ErrorHandling("WSAStartup(), error");
 	}
 
 	// 서버 접속을 위한 소켓 생성
 	*hSocket = socket(PF_INET, SOCK_STREAM, 0);
 	if (*hSocket == INVALID_SOCKET)
 	{
-		ErrorHandling("hSocketet(), error");
+		Network::ErrorHandling("hSocketet(), error");
 	}
 
 	memset(servAddr, 0, sizeof(*servAddr));
@@ -46,14 +46,9 @@ void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
 	// 서버로 연결 요청
 	if (connect(*hSocket, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
 	{
-		ErrorHandling("Connect() error");
+		Network::ErrorHandling("Connect() error");
 	}
 
-}
-
-void connectToServer(SOCKADDR_IN *servAddr, SOCKET * hSocket)
-{
-	
 }
 
 void getProtocolDataFromServer(SOCKET * hSocket, char message[])

@@ -129,6 +129,9 @@ typedef struct {
 
 //NETWORK PROTOCOL
 
+#define PORT_STRING "2222"
+#define SERV_IP_STRING "141.223.209.208"
+
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
 #define MODE_CLIENT 8

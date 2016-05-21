@@ -159,6 +159,7 @@
     <ClInclude Include="key.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="mat.h" />
+    <ClInclude Include="network.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="shader.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="key.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sprite.cpp" />

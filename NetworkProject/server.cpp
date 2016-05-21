@@ -7,115 +7,87 @@
 #include <string>
 #include "server.h"
 #include "protocol.h"
+/*
 using namespace std;
 
 
-/*==================================================
-Error Message print
-==================================================*/
-void ErrorHandling(char *message)
+
+Server::Server() {}
+
+void Server::ErrorHandling(char *message)
 {
 	fputs(message, stderr);
 	fputc('\n', stderr);
 	exit(1);
 }
 
-void communicate(int cnt)
+void Server::communicate(int cnt)
 {
 	printf("와우 오졌따리");
 }
 
-
-void makeServerSocket(SOCKET * hServSock, SOCKADDR_IN *servAddr)
+void Server::makeServerSocket()
 {
-	string portString = "2222";
+	string portString = PORT_STRING;
 	char * port = (char*)portString.c_str();
-
+	
 	WSADATA wsaData;
 
 	// Load Winsock 2.2 DLL
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-	{
-		ErrorHandling("WSAStartup() error!");
-	}
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) ErrorHandling("WSAStartup() error!");
 
 	// 서버 소켓 생성
-	*hServSock = socket(PF_INET, SOCK_STREAM, 0);
-	if (*hServSock == INVALID_SOCKET)
-	{
-		ErrorHandling("socket() error");
-	}
+	hServSock = socket(PF_INET, SOCK_STREAM, 0);
+	if (hServSock == INVALID_SOCKET) ErrorHandling("socket() error");
 
-	memset(servAddr, 0, sizeof(*servAddr));
-	servAddr->sin_family = AF_INET;
-	servAddr->sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr->sin_port = htons(atoi(port));
+	memset(&servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servAddr.sin_port = htons(atoi(port));
 
 	// 소켓에 주소 할당
-	if (bind(*hServSock, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
-	{
-		ErrorHandling("bind() error");
-	}
+	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) ErrorHandling("bind() error");
 
 	// 연결 요청 대기 상태
-	if (listen(*hServSock, 6) == SOCKET_ERROR)
-	{
-		ErrorHandling("listen() error");
-	}
+	if (listen(hServSock, UNIT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
+
 	printf("listen");
 }
 
-void acceptClient(SOCKET * hServSock, SOCKET  hClntSock[], SOCKADDR_IN clntAddr[], int szClntAddr[])
+void Server::acceptClient()
 {
 	// 연결 요청 수락
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < UNIT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		szClntAddr[i] = sizeof(clntAddr[i]);
-	}
-
-	hClntSock[0] = accept(*hServSock, (SOCKADDR*)&clntAddr[0], &szClntAddr[0]);	
-	hClntSock[1] = accept(*hServSock, (SOCKADDR*)&clntAddr[1], &szClntAddr[1]);
-	hClntSock[2] = accept(*hServSock, (SOCKADDR*)&clntAddr[2], &szClntAddr[2]);
-	hClntSock[3] = accept(*hServSock, (SOCKADDR*)&clntAddr[3], &szClntAddr[3]);
-	hClntSock[4] = accept(*hServSock, (SOCKADDR*)&clntAddr[4], &szClntAddr[4]);
-	hClntSock[5] = accept(*hServSock, (SOCKADDR*)&clntAddr[5], &szClntAddr[5]);
-
-
-	if ((hClntSock[0] == INVALID_SOCKET) || (hClntSock[1] == INVALID_SOCKET) || (hClntSock[2] == INVALID_SOCKET)
-		|| (hClntSock[3] == INVALID_SOCKET) || (hClntSock[4] == INVALID_SOCKET) || (hClntSock[5] == INVALID_SOCKET))
-	{
-		ErrorHandling("accept() error");
+		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
+		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
 	}
 }
 
-void sendToClient(char messageToClient[], SOCKET  hClntSock[])
+void Server::sendToClient(char messageToClient[])
 {
-	for (int i = 0; i < 6; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
+	for (int i = 0; i < UNIT_NUM_MAX; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
 }
 
-void recieveFromClient(SOCKET hClntSock[], char messageFromClient[6][16])
+void Server::recieveFromClient()
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], 2, 0);
+		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE, 0);
 		messageFromClient[i][strLen] = '\0';
 	}
-
 }
 
-void closeServerConnection(SOCKET  hClntSock[])
+void Server::closeServerConnection()
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		closesocket(hClntSock[i]);
 	}
 	WSACleanup();
 }
 
-
-/*==================================================
-Entry Point
-==================================================*/
 
 
 
@@ -211,4 +183,3 @@ WSACleanup();
 return 0;
 }
 */
-
