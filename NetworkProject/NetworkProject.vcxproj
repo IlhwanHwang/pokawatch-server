@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClCompile Include="client.cpp" />
     <ClCompile Include="draw.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="key.cpp" />
     <ClCompile Include="lodepng.cpp" />

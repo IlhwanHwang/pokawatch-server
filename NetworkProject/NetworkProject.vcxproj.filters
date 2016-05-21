@@ -66,6 +66,9 @@
     <ClInclude Include="client.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -104,13 +107,15 @@
     <ClCompile Include="client.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="f_default.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
-    <None Include="v_default.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
+    <None Include="default_f.glsl" />
+    <None Include="default_v.glsl" />
   </ItemGroup>
 </Project>
