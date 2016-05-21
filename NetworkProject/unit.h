@@ -20,15 +20,6 @@ public:
 	virtual void draw() const = 0; // called every frame (draw event)
 };
 
-class Expierable : public Object {
-protected:
-	bool valid;
-
-public:
-	Expierable() : valid(true) {}
-	bool isValid() { return valid; }
-};
-
 // Recommended flow
 // 1. turn() for all unit
 // 2. parse and input commands
@@ -115,13 +106,14 @@ public:
 	int getY() { return p.y; }
 };
 
-class Poison : public Expierable {
+class Poison : public Object {
 private:
 	protocol_poison p;
 
 public:
-	Poison(protocol_team team, int x, int y);
+	Poison();
 
+	void spawn(protocol_team team, int x, int y);
 	void turn();
 	void update();
 	void draw() const;
@@ -134,13 +126,14 @@ public:
 	int getSpan() { return p.span; }
 };
 
-class Petal : public Expierable {
+class Petal : public Object {
 private:
 	protocol_petal p;
 
 public:
-	Petal(protocol_team team, int x, int y, protocol_direction direction);
+	Petal();
 
+	void spawn(protocol_team team, int x, int y, protocol_direction direction);
 	void turn();
 	void update();
 	void draw() const;
@@ -153,13 +146,14 @@ public:
 	int getDirection() { return p.direction; }
 };
 
-class Mushroom : public Expierable {
+class Mushroom : public Object {
 private:
 	protocol_mushroom p;
 
 public:
-	Mushroom(protocol_team team, int x, int y);
+	Mushroom();
 
+	void spawn(protocol_team team, int x, int y);
 	void turn();
 	void update();
 	void draw() const;

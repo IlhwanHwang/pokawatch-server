@@ -60,18 +60,21 @@ typedef struct {
 } protocol_flag;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 	int span;
 } protocol_poison;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 	protocol_direction direction;
 } protocol_petal;
 
 typedef struct {
+	bool valid;
 	protocol_team team;
 	int x, y;
 } protocol_mushroom;
