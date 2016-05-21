@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="draw.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="InitShader.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="lodepng.h" />

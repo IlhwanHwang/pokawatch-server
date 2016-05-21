@@ -20,16 +20,7 @@
 #include "protocol.h"
 #include "unit.h"
 #include "network.h"
-
-Unit unitArray[UNIT_NUM_MAX] = {Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST)};
-Flag flagArray[FLAG_NUM_MAX] = {Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
-//Poison poisonArray[POISON_NUM_MAX];
-//Petal petalArray[PETAL_NUM_MAX];
-//Mushroom mushroomArray[MUSHROOM_NUM_MAX];
-
-int score[2];
-int turnleft;
-
+#include "game.h"
 
 void main(int argc, char **argv)
 {
@@ -47,6 +38,8 @@ void main(int argc, char **argv)
 	Timer::init(16, 30);
 	Key::init();
 	Network::init();
+	Game::init();
+
 
 	glutMainLoop();
 }

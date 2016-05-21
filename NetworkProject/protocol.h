@@ -161,3 +161,5 @@ typedef struct {
 #define FLAG4_Y 650
 #define FLAG5_X 500
 #define FLAG5_Y 850
+
+#define TURN_MAX 300
