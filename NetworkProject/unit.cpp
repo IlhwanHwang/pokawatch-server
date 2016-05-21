@@ -209,42 +209,60 @@ void Flag::draw() const {
 
 }
 
-Poison::Poison(protocol_team team, int x, int y) : Expierable() {
+Poison::Poison() {
+	p.valid = false;
+	name = "Poison";
+}
+
+void Poison::spawn(protocol_team team, int x, int y) {
 	p.team = team;
 	p.x = x;
 	p.y = y;
 	p.span = 4;
-	valid = true;
-	name = "Poison";
+	p.valid = true;
 }
 
 void Poison::turn() {
+	if (!p.valid)
+		return;
+
 	if (p.span > 0) {
 		p.span--;
 	}
 	else {
-		valid = false;
+		p.valid = false;
 	}
 }
 
 void Poison::update() {
+	if (!p.valid)
+		return;
 
 }
 
 void Poison::draw() const {
+	if (!p.valid)
+		return;
 
 }
 
-Petal::Petal(protocol_team team, int x, int y, protocol_direction direction) : Expierable() {
+Petal::Petal() {
+	p.valid = false;
+	name = "Petal";
+}
+
+void Petal::spawn(protocol_team team, int x, int y, protocol_direction direction) {
 	p.team = team;
 	p.x = x;
 	p.y = y;
 	p.direction = direction;
-	valid = true;
-	name = "Petal";
+	p.valid = true;
 }
 
 void Petal::turn() {
+	if (!p.valid)
+		return;
+
 	int dx = 0;
 	int dy = 0;
 
@@ -260,34 +278,48 @@ void Petal::turn() {
 	p.y += dy;
 
 	if (p.x < 0 || p.x >= MAP_WIDTH || p.y < 0 || p.y >= MAP_HEIGHT) {
-		valid = false;
+		p.valid = false;
 	}
 }
 
 void Petal::update() {
+	if (!p.valid)
+		return;
 
 }
 
 void Petal::draw() const {
+	if (!p.valid)
+		return;
 
 }
 
-Mushroom::Mushroom(protocol_team team, int x, int y) : Expierable() {
-	p.team = team;
-	p.x = x;
-	p.y = y;
-	valid = true;
+Mushroom::Mushroom() {
+	p.valid = false;
 	name = "Mushroom";
 }
 
+void Mushroom::spawn(protocol_team team, int x, int y) {
+	p.team = team;
+	p.x = x;
+	p.y = y;
+	p.valid = true;
+}
+
 void Mushroom::turn() {
+	if (!p.valid)
+		return;
 
 }
 
 void Mushroom::update() {
+	if (!p.valid)
+		return;
 
 }
 
 void Mushroom::draw() const {
+	if (!p.valid)
+		return;
 
 }
