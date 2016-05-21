@@ -89,7 +89,7 @@ void sendToClient(char messageToClient[], SOCKET  hClntSock[])
 	for (int i = 0; i < 6; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
 }
 
-void recieveFromClient(SOCKET hClntSock[], char messageFromClient[][sizeof(protocol_data)])
+void recieveFromClient(SOCKET hClntSock[], char messageFromClient[][2])
 {
 	for (int i = 0; i < 6; i++)
 	{

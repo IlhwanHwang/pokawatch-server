@@ -52,14 +52,16 @@ void Timer::turn() {
 	std::cout << "Turn!" << std::endl;
 
 	// add any per turn action
+
 	if (mode == 2 && gameStart[0] != 'N')
 	{
 		sendToServer(&hSocket, (char *)(to_string(command)).c_str());
 		printf("command : %d was sent", command);
 	}
+	if (mode == 1 && gameStart[0] != 'N')
+	{
 
-	
-
+	}
 }
 
 void Timer::update(int count) {
@@ -79,6 +81,12 @@ void Timer::update(int count) {
 		mode = 1;
 		printf("mode- server chosn\n");
 		makeServerSocket(&hServSock, &servAddr);
+		acceptClient(&hServSock, hClntSock, clntAddr, szClntAddr);
+		char acceptMessage[2];
+		acceptMessage[0] = 'Y';
+		acceptMessage[1] = '\0';
+		sendToClient(acceptMessage, hClntSock);
+		gameStart[0] = 'Y';
 	}
 
 	if (mode == 0 && Key::keyCheckPressed('2'))
@@ -150,33 +158,6 @@ void Timer::update(int count) {
 
 	if (Key::keyCheckOn('w')) printf("w was clicked");
 
-
-	/*
-	
-	COMMAND_MOVE_RIGHT,
-	COMMAND_MOVE_UP,
-	COMMAND_MOVE_LEFT,
-	COMMAND_MOVE_DOWN,
-	
-	COMMAND_ATTACK_RIGHT,
-	COMMAND_ATTACK_UP,
-	COMMAND_ATTACK_LEFT,
-	COMMAND_ATTACK_DOWN,
-	
-	COMMAND_SKILL_RIGHT,
-	COMMAND_SKILL_UP,
-	COMMAND_SKILL_LEFT,
-	COMMAND_SKILL_DOWN,
-	
-	COMMAND_SPAWN_CSE,
-	COMMAND_SPAWN_PHYS,
-	COMMAND_SPAWN_LIFE,
-	COMMAND_SPAWN_ME,
-	COMMAND_SPAWN_CHEM,
-	
-	COMMAND_FLAG
-	
-	*/
 
 	Key::keyUpdate();
 }
