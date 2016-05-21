@@ -51,6 +51,7 @@ void Timer::update(int count) {
 	mat4 m;
 	Shader::useDefault();
 	Shader::projection(m);
+	Shader::apply();
 	Shader::draw4thPlane();
 	Shader::drawCanonical();
 	//Draw::draw(red, 0.0, 32.0, 32.0);

@@ -52,7 +52,7 @@ void Draw::reshape(int w, int h) {
 
 void Draw::flush() {
 	while (!req.empty()) {
-		req.top().draw();
+		(const_cast<DrawRequest&>(req.top())).draw();
 		req.pop();
 	}
 }
