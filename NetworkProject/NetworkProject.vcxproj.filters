@@ -48,9 +48,6 @@
     <ClInclude Include="vec.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>헤더 파일\게임기반</Filter>
-    </ClInclude>
     <ClInclude Include="shader.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
@@ -66,6 +63,12 @@
     <ClInclude Include="client.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,9 +81,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="lodepng.cpp">
-      <Filter>소스 파일\게임기반</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
       <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
     <ClCompile Include="utility.cpp">
@@ -104,13 +104,15 @@
     <ClCompile Include="client.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="f_default.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
-    <None Include="v_default.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
+    <None Include="default_f.glsl" />
+    <None Include="default_v.glsl" />
   </ItemGroup>
 </Project>

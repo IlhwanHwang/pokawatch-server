@@ -10,8 +10,8 @@ bool Key::keyStatePend[256] = {false};
 bool Key::keyStateAccept[256] = {false};
 
 void Key::init() {
-	glutKeyboardFunc(Key::keyPressed);
-	glutKeyboardUpFunc(Key::keyReleased);
+	glutKeyboardFunc(keyPressed);
+	glutKeyboardUpFunc(keyReleased);
 }
 
 void Key::keyPressed(unsigned char key, int x, int y) {
