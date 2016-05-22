@@ -48,6 +48,9 @@
     <ClInclude Include="vec.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
     <ClInclude Include="shader.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
@@ -57,13 +60,13 @@
     <ClInclude Include="timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="server.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="client.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="sprite.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="network.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="debug.h">
@@ -89,6 +92,9 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
     <ClCompile Include="utility.cpp">
       <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
@@ -104,13 +110,13 @@
     <ClCompile Include="timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="server.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="client.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="sprite.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="network.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="debug.cpp">
@@ -121,12 +127,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="default_v.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
-    <None Include="default_f.glsl">
-      <Filter>셰이더 파일</Filter>
-    </None>
+    <None Include="default_f.glsl" />
+    <None Include="default_v.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="temp.png">

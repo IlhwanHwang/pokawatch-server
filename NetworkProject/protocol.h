@@ -129,3 +129,37 @@ typedef struct {
 #define RESPAWN_COOLTIME 10
 
 //socket [x] is mapped to unit number [x]
+
+//NETWORK PROTOCOL
+
+#define PORT_STRING "2222"
+#define SERV_IP_STRING "141.223.208.207"
+
+#define MODE_NOTHING 7
+#define MODE_SERVER 9
+#define MODE_CLIENT 8
+#define MODE_SERVER_KEY '9'
+#define MODE_CLIENT_KEY '8'
+
+#define MESSAGE_T0_CLIENT_SIZE sizeof(protocol_data)
+#define MESSAGE_TO_SERVER_SIZE 16
+
+#define GAME_START_CHAR 'G'
+
+#define TEAM_POSTECH_SPAWN_X 0
+#define TEAM_POSTECH_SPAWN_Y 0
+#define TEAM_KAIST_SPAWN_X 1000
+#define TEAM_KAIST_SPAWN_Y 900
+
+#define FLAG1_X 500
+#define FLAG1_Y 50
+#define FLAG2_X 500
+#define FLAG2_Y 250
+#define FLAG3_X 500
+#define FLAG3_Y 450
+#define FLAG4_X 500
+#define FLAG4_Y 650
+#define FLAG5_X 500
+#define FLAG5_Y 850
+
+#define TURN_MAX 300

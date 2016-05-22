@@ -1,45 +1,54 @@
-#pragma comment(lib, "ws2_32.lib")
+/*#pragma comment(lib, "ws2_32.lib")
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <winsock2.h>
 
 #include <conio.h>
 #include "client.h"
 #include "server.h"
 
-void makeClientSocket(SOCKET * hSocket,char ** argv, SOCKADDR_IN *servAddr)
-{
-	WSADATA wsaData;
+using namespace std;
 
+void makeClientSocket(SOCKET * hSocket, SOCKADDR_IN *servAddr)
+{
+	string servIpString = "141.223.209.208";
+	string portNumString = "2222";
+	char * servIp = (char*)servIpString.c_str();
+	char * portNum = (char*)portNumString.c_str();
+
+	WSADATA wsaData;
 
 	// Load WinSocket 2.2 DLL
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		ErrorHandling("WSAStartup(), error");
+		Network::ErrorHandling("WSAStartup(), error");
 	}
 
 	// 서버 접속을 위한 소켓 생성
 	*hSocket = socket(PF_INET, SOCK_STREAM, 0);
 	if (*hSocket == INVALID_SOCKET)
 	{
-		ErrorHandling("hSocketet(), error");
+		Network::ErrorHandling("hSocketet(), error");
 	}
 
 	memset(servAddr, 0, sizeof(*servAddr));
 	servAddr->sin_family = AF_INET;
-	servAddr->sin_addr.s_addr = inet_addr(argv[1]);
-	servAddr->sin_port = htons(atoi(argv[2]));
-}
+	servAddr->sin_addr.s_addr = inet_addr(servIp);
 
-void connectToServer(SOCKADDR_IN *servAddr, SOCKET * hSocket)
-{
+	printf("servAddr : %u", inet_addr(servIp));
+	servAddr->sin_port = htons(atoi(portNum));
+	printf("portNum : %u", htons(atoi(portNum)));
+
+	printf("conection tried");
+
 	// 서버로 연결 요청
 	if (connect(*hSocket, (SOCKADDR*)servAddr, sizeof(*servAddr)) == SOCKET_ERROR)
 	{
-		ErrorHandling("Connect() error");
+		Network::ErrorHandling("Connect() error");
 	}
+
 }
 
 void getProtocolDataFromServer(SOCKET * hSocket, char message[])
@@ -51,7 +60,7 @@ void getProtocolDataFromServer(SOCKET * hSocket, char message[])
 	{
 		ErrorHandling("read() error");
 	}
-	message[strLen] = '0';
+	message[strLen] = '\0';
 }
 
 void closeClientConnection(SOCKET * hSocket)

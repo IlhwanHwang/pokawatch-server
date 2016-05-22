@@ -1,9 +1,14 @@
+//
+// CNH 2016.05.19
+// network module
+//
+
 #pragma once
-/*
+
 #include <WinSock2.h>
 #include "protocol.h"
 
-class Server {
+class Network {
 private:
 	static SOCKET hServSock;												// of server
 	static SOCKET hClntSock[UNIT_NUM_MAX];									// of server
@@ -20,7 +25,14 @@ private:
 	static int command;
 
 public:
-	Server();
+
+	static void init()
+	{
+		mode = MODE_NOTHING;
+		characterSelection = 0;
+		gameStart[0] = 'N';
+		gameStart[1] = '\0';
+	}
 	static void ErrorHandling(char *message);
 	static void communicate(int cnt);
 	static void makeServerSocket();
@@ -28,8 +40,21 @@ public:
 	static void sendToClient(char messageToClient[]);
 	static void recieveFromClient();
 	static void closeServerConnection();
+	
+	static void makeClientSocket();
+	static void connectToServer(){}
+	static void getProtocolDataFromServer();
+	static void closeClientConnection();
+	static void sendToServer(char message[]);
+	static void recieveGameStart();
+
 	static int getMode() { return mode; }
 	static int getCommand() { return command; }
+	static int getCharacterSelection() { return characterSelection; }
 	static char *getGameStart() { return gameStart; }
+
+	static void setMode(int x) { mode = x; }
+	static void setCommand(int x) { command = x; }
+	static void setGameStart(int index, char x) { gameStart[index] = x; }
+	static void setCharacterSelection(int x) { characterSelection = x; }
 };
-*/
