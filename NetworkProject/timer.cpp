@@ -18,6 +18,7 @@
 #include "unit.h"
 #include "key.h"
 #include "network.h"
+#include "game.h"
 
 using namespace std;
 
@@ -40,13 +41,23 @@ void Timer::turn() {
 	{
 		Network::sendToServer((char *)(to_string(Network::getCommand())).c_str());
 		printf("command : %d was sent\n", Network::getCommand());
+		Network::getProtocolDataFromServer();
 	}
 	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR)
 	{
-		char protocolToSend[sizeof(protocol_data)];
-
-		Network::sendToClient(protocolToSend);
+		char *protocolToSend;
 		Network::recieveFromClient();	// recieve data;
+		protocolToSend = (char*)(Game::getProtocolPointer());
+		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
+		
+		Network::sendToClient(protocolToSend);
+
+		for (int i = 0; i < MESSAGE_T0_CLIENT_SIZE; i=i+4)
+		{
+			printf("%d ", ((int*)protocolToSend)[i]);
+		}
+		printf("\n");
+
 	}
 }
 

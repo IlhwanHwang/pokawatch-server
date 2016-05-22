@@ -75,9 +75,9 @@ void Network::acceptClient()
 	}
 }
 
-void Network::sendToClient(char messageToClient[])
+void Network::sendToClient(char *messageToClient)
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)	send(hClntSock[i], messageToClient, sizeof(messageToClient), 0);
+	for (int i = 0; i < UNIT_NUM_MAX; i++)	send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE, 0);
 }
 
 void Network::recieveFromClient()
@@ -144,6 +144,13 @@ void Network::getProtocolDataFromServer()
 		Network::ErrorHandling("read() error");
 	}
 	messageToClient[strLen] = '\0';
+
+	for (int i = 0; i < MESSAGE_T0_CLIENT_SIZE; i = i + 4)
+	{
+		printf("%d ", ((int*)messageToClient)[i]);
+	}
+	printf("\n");
+
 }
 
 void Network::recieveGameStart()

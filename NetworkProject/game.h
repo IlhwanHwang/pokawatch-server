@@ -12,7 +12,11 @@ private:
 	static Mushroom mushroomArray[MUSHROOM_NUM_MAX];
 	static int score[2];
 	static int turnleft;
-
+	static protocol_data protocolToSend;
+	static protocol_data *protocolPointer;
 public:
 	static void init();
+	static void makeProtocol();
+	static protocol_data getProtocol() { return protocolToSend; }
+	static protocol_data* getProtocolPointer() { return protocolPointer; }
 };
