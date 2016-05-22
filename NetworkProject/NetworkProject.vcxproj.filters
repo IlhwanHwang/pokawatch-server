@@ -69,6 +69,12 @@
     <ClInclude Include="debug.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -110,6 +116,9 @@
     <ClCompile Include="debug.cpp">
       <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
+    <ClCompile Include="resource.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default_v.glsl">
@@ -118,5 +127,10 @@
     <None Include="default_f.glsl">
       <Filter>셰이더 파일</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="temp.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

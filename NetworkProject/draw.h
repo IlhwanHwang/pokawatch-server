@@ -12,6 +12,7 @@
 
 #include "protocol.h"
 #include "sprite.h"
+#include "gui.h"
 
 struct Color {
 	static Color white;
@@ -56,5 +57,11 @@ public:
 	}
 	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c) {
 		req.push(DrawRequest(spr, depth, x, y, sx, sy, a, c, 1.0));
+	}
+	static void onmap(Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {
+		draw(spr, depth, Gui::unitX(x), Gui::unitY(y), sx, sy, a, c, alpha);
+	}
+	static void onmap(Sprite& spr, float depth, float x, float y) {
+		onmap(spr, depth, x, y, 1.0, 1.0, 0.0, Color::white, 1.0);
 	}
 };

@@ -13,6 +13,7 @@
 #include "timer.h"
 #include "key.h"
 #include "draw.h"
+#include "resource.h"
 
 void main(int argc, char **argv)
 {
@@ -30,6 +31,7 @@ void main(int argc, char **argv)
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	Resource::init();
 	Key::init();
 	Shader::init();
 	Draw::init();

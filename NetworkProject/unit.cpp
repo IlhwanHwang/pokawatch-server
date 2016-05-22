@@ -4,6 +4,8 @@
 //
 
 #include "unit.h"
+#include "resource.h"
+#include "draw.h"
 
 void Unit::init() {
 	switch (p.dep) {
@@ -194,7 +196,10 @@ void Unit::update() {
 }
 
 void Unit::draw() const {
+	if (p.state == STATE_DEAD)
+		return;
 
+	Draw::onmap(Rspr::temp, 0.0, p.x, p.y);
 }
 
 void Flag::turn() {
