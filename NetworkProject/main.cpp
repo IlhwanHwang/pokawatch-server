@@ -28,18 +28,23 @@ void main(int argc, char **argv)
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(512, 512);
+	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	glutInitContextVersion(3, 3);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
 
 	glutCreateWindow("CNH - Network Project");
 
+	glewExperimental = GL_TRUE;
 	glewInit();
 	Shader::init();
 	//60fps, 0.5 second per turn
-	Timer::init(16, 30);
 	Key::init();
 	Network::init();
 	Game::init();
 
+	Draw::init();
+	Timer::init(16, 60);
 
 	glutMainLoop();
 }

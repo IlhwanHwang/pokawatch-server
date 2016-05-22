@@ -19,12 +19,14 @@
 #include "key.h"
 #include "network.h"
 #include "game.h"
+#include "draw.h"
+#include "shader.h"
+#include "debug.h"
 
 using namespace std;
 
 int Timer::frameInterval;
 int Timer::framePerTurn;
-
 
 void Timer::init(int interval, int perturn) {
 	frameInterval = interval;

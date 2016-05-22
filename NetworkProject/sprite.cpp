@@ -5,13 +5,37 @@
 
 #include "shader.h"
 #include "sprite.h"
-
-Color Color::white(1.0, 1.0, 1.0);
+#include "lodepng.h"
 
 void Sprite::load(const char* fn) {
-	t.load(fn);
-	w = (float)t.getWidth();
-	h = (float)t.getHeight();
+	std::vector<unsigned char> png;
+	std::vector<unsigned char> image;
+	unsigned error;
+
+	error = lodepng::load_file(png, fn);
+	if (error) {
+		std::cout << "Error " << error << " loading image " << fn << std::endl;
+		return;
+	}
+
+	error = lodepng::decode(image, uw, uh, png);
+	if (error) {
+		std::cout << "Error " << error << " loading image " << fn << std::endl;
+		return;
+	}
+
+	glGenTextures(1, &buf);
+	glBindTexture(GL_TEXTURE_2D, buf);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uw, uh, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	std::cout << "Sprite: " << fn << " is successfully loaded" << std::endl;
+
+	w = (float)uw;
+	h = (float)uh;
 	ofx = w * 0.5;
 	ofy = h * 0.5;
 }
@@ -19,19 +43,4 @@ void Sprite::load(const char* fn) {
 void Sprite::setOffset(float ofx, float ofy) {
 	this->ofx = ofx;
 	this->ofy = ofy;
-}
-
-void Sprite::drawGeneral(float x, float y, float sx, float sy, float a, Color& c, float alpha) {
-	Shader::push();
-		Shader::translate(vec3(x, y, 0.0));
-		Shader::rotateZ(a);
-		Shader::scale(vec3(sx, sy, 1.0));
-		Shader::translate(vec3(-ofx, -ofy, 0.0));
-		Shader::scale(vec3(w, h, 1.0));
-		Shader::apply();
-		glActiveTexture(GL_TEXTURE0);
-		t.bind();
-		Shader::setBlend(vec4(c.r, c.g, c.b, alpha));
-		Shader::draw4thPlane();
-	Shader::pop();
 }
