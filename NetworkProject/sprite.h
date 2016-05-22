@@ -6,6 +6,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <vector>
 
 class Sprite {
 private:
@@ -14,9 +15,11 @@ private:
 	unsigned uw, uh;
 	GLuint buf;
 
+
 public:
-	void load(const char* fn);
-	void setOffset(float x, float y);
+	Sprite& load(const char* fn, int num);
+	Sprite& load(const char* fn);
+	Sprite& setOffset(float x, float y);
 	GLuint getBuf() const { return buf; }
 	float getW() const { return w; }
 	float getH() const { return h; }

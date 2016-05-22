@@ -193,9 +193,10 @@
     <None Include="default_v.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="cse_temp.png" />
     <Image Include="temp.png" />
-    <Image Include="tile_gray.png" />
-    <Image Include="tile_lightgray.png" />
+    <Image Include="tile_dark.png" />
+    <Image Include="tile_light.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

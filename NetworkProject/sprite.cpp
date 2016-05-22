@@ -7,7 +7,7 @@
 #include "sprite.h"
 #include "lodepng.h"
 
-void Sprite::load(const char* fn) {
+Sprite& Sprite::load(const char* fn, int num) {
 	std::vector<unsigned char> png;
 	std::vector<unsigned char> image;
 	unsigned error;
@@ -15,13 +15,13 @@ void Sprite::load(const char* fn) {
 	error = lodepng::load_file(png, fn);
 	if (error) {
 		std::cout << "Error " << error << " loading image " << fn << std::endl;
-		return;
+		return (*this);
 	}
 
 	error = lodepng::decode(image, uw, uh, png);
 	if (error) {
 		std::cout << "Error " << error << " loading image " << fn << std::endl;
-		return;
+		return (*this);
 	}
 
 	glGenTextures(1, &buf);
@@ -38,9 +38,18 @@ void Sprite::load(const char* fn) {
 	h = (float)uh;
 	ofx = w * 0.5;
 	ofy = h * 0.5;
+
+	return (*this);
 }
 
-void Sprite::setOffset(float ofx, float ofy) {
+
+Sprite& Sprite::load(const char* fn) {
+	return load(fn, 1);
+}
+
+Sprite& Sprite::setOffset(float ofx, float ofy) {
 	this->ofx = ofx;
-	this->ofy = ofy;
+	this->ofy = h - ofy;
+
+	return (*this);
 }

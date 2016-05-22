@@ -1,6 +1,8 @@
 #include "game.h"
 #include "protocol.h"
 #include "network.h"
+#include "draw.h"
+#include "resource.h"
 
 Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
 Flag Game::flagArray[FLAG_NUM_MAX] = { Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
@@ -47,6 +49,14 @@ void Game::update() {
 }
 
 void Game::draw() {
+	for (int i = 0; i < MAP_WIDTH; i++) {
+		for (int j = 0; j < MAP_HEIGHT; j++) {
+			Sprite& light = Rspr::tileLight;
+			Sprite& dark = Rspr::tileDark;
+			Draw::onmap((i + j) % 2 == 0 ? light : dark, -100.0, i, j);
+		}
+	}
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
 	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
