@@ -94,6 +94,8 @@ void Network::recieveFromClient()
 	{
 		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE-1, 0);
 		messageFromClient[i][strLen] = '\0';
+		printf("%s WAS COMMAND %c%c\n", messageFromClient[i], messageFromClient[i][0], messageFromClient[i][1]);
+
 	}
 }
 
@@ -204,7 +206,7 @@ void Network::turn()
 
 		for (int i = 0; i < MESSAGE_T0_CLIENT_SIZE; i=i+4)
 		{
-			printf("%d ", ((int*)protocolToSend)[i]);
+			//printf("%d ", ((int*)protocolToSend)[i]);
 		}
 		printf("\n");
 	}

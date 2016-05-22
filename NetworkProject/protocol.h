@@ -138,7 +138,8 @@ typedef struct {
 
 #define PORT_STRING "2222"
 //#define SERV_IP_STRING "141.223.208.207"
-#define SERV_IP_STRING "141.223.85.241"
+#define SERV_IP_STRING "119.202.87.115"
+//#define SERV_IP_STRING "141.223.85.241"
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9

@@ -21,7 +21,6 @@ void Game::init()
 	score[1] = 0;
 	turnleft = TURN_MAX;
 	makeProtocol();
-
 	/*
 	unitArray[0].spawn(0, 0, DEP_CSE);
 	unitArray[1].spawn(1, 0, DEP_CSE);
@@ -71,7 +70,9 @@ void Game::turn() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
+		printf("HIHIHI %d\n", c);
 
+		/*
 		switch (rand() % 4) {
 		case 0:
 			c = COMMAND_MOVE_RIGHT;
@@ -86,6 +87,7 @@ void Game::turn() {
 			c = COMMAND_MOVE_DOWN;
 			break;
 		}
+		*/
 
 		switch (c) {
 		case COMMAND_MOVE_RIGHT:

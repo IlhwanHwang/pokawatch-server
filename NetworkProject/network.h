@@ -7,7 +7,7 @@
 
 #include <WinSock2.h>
 #include "protocol.h"
-
+#include <string>
 class Network {
 private:
 	static SOCKET hServSock;												// of server
@@ -61,6 +61,6 @@ public:
 	static void update();
 	static void turn();
 
-	static protocol_command getCommand(int index) { return *((protocol_command*)messageFromClient[index]); }
+	static protocol_command getCommand(int index) {return (protocol_command)atoi(messageFromClient[index]); }
 
 };
