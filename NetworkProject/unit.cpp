@@ -37,9 +37,13 @@ void Unit::spawn(int x, int y, protocol_dep dep) {
 	p.x = x;
 	p.y = y;
 	p.dep = dep;
+	p.state = STATE_IDLE;
 }
 
 void Unit::move(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
 		return;
@@ -78,6 +82,9 @@ void Unit::move(protocol_direction direction) {
 }
 
 void Unit::attack(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (p.state == STATE_DEAD) {
 		error("Tried to attack when dead");
 		return;
@@ -114,6 +121,9 @@ void Unit::attack(protocol_direction direction) {
 }
 
 void Unit::skill(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (p.state == STATE_DEAD) {
 		error("Tried to use hero skill when dead");
 		return;
@@ -139,6 +149,9 @@ void Unit::skill(protocol_direction direction) {
 }
 
 void Unit::damage(int h) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.health -= h;
 
 	if (p.health <= 0) {
@@ -148,6 +161,9 @@ void Unit::damage(int h) {
 }
 
 void Unit::heal(int h) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.health += h;
 
 	if (p.health > healthMax) {
@@ -156,6 +172,9 @@ void Unit::heal(int h) {
 }
 
 void Unit::stun(int s) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.stun = s;
 	if (s > 0) {
 		p.state = STATE_STUN;
@@ -163,6 +182,9 @@ void Unit::stun(int s) {
 }
 
 void Unit::turn() {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.state = STATE_IDLE;
 
 	if (p.respawn > 0) {
@@ -195,6 +217,9 @@ void Unit::turn() {
 }
 
 void Unit::update() {
+	if (p.state == STATE_NULL)
+		return;
+
 	// Animation by moving
 	if (moveOffPhase > 0.0) {
 		moveOffPhase -= DELTA_PER_TURN;
@@ -230,6 +255,9 @@ void Unit::update() {
 }
 
 void Unit::draw() const {
+	if (p.state == STATE_NULL)
+		return;
+
 	//if (p.state == STATE_DEAD)
 	//	return;
 
