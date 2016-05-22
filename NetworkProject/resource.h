@@ -10,6 +10,8 @@
 class Rspr {
 public:
 	static Sprite temp;
+	static Sprite tileLight;
+	static Sprite tileDark;
 };
 
 class Resource {

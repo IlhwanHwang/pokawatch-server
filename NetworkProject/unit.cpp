@@ -6,6 +6,7 @@
 #include "unit.h"
 #include "resource.h"
 #include "draw.h"
+#include "spline.h"
 
 void Unit::init() {
 	switch (p.dep) {
@@ -36,9 +37,13 @@ void Unit::spawn(int x, int y, protocol_dep dep) {
 	p.x = x;
 	p.y = y;
 	p.dep = dep;
+	p.state = STATE_IDLE;
 }
 
 void Unit::move(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
 		return;
@@ -68,6 +73,8 @@ void Unit::move(protocol_direction direction) {
 		error("Tried to move to the outside of the map");
 	}
 	else {
+		moveOffDirection = direction;
+		moveOffPhase = 1.0;
 		if (p.dep == DEP_ME) {
 			moveStun = 1;
 		}
@@ -75,6 +82,9 @@ void Unit::move(protocol_direction direction) {
 }
 
 void Unit::attack(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (p.state == STATE_DEAD) {
 		error("Tried to attack when dead");
 		return;
@@ -111,6 +121,9 @@ void Unit::attack(protocol_direction direction) {
 }
 
 void Unit::skill(protocol_direction direction) {
+	if (p.state == STATE_NULL)
+		return;
+
 	if (p.state == STATE_DEAD) {
 		error("Tried to use hero skill when dead");
 		return;
@@ -136,6 +149,9 @@ void Unit::skill(protocol_direction direction) {
 }
 
 void Unit::damage(int h) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.health -= h;
 
 	if (p.health <= 0) {
@@ -145,6 +161,9 @@ void Unit::damage(int h) {
 }
 
 void Unit::heal(int h) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.health += h;
 
 	if (p.health > healthMax) {
@@ -153,6 +172,9 @@ void Unit::heal(int h) {
 }
 
 void Unit::stun(int s) {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.stun = s;
 	if (s > 0) {
 		p.state = STATE_STUN;
@@ -160,6 +182,9 @@ void Unit::stun(int s) {
 }
 
 void Unit::turn() {
+	if (p.state == STATE_NULL)
+		return;
+
 	p.state = STATE_IDLE;
 
 	if (p.respawn > 0) {
@@ -192,14 +217,51 @@ void Unit::turn() {
 }
 
 void Unit::update() {
+	if (p.state == STATE_NULL)
+		return;
 
+	// Animation by moving
+	if (moveOffPhase > 0.0) {
+		moveOffPhase -= DELTA_PER_TURN;
+		
+		float dx = 0.0, dy = 0.0;
+		switch (moveOffDirection) {
+		case DIRECTION_RIGHT: dx = -1.0; break;
+		case DIRECTION_UP: dy = -1.0; break;
+		case DIRECTION_LEFT: dx = 1.0; break;
+		case DIRECTION_DOWN: dy = 1.0; break;
+		}
+
+		float aniPhase;
+		if (moveOffPhase > 0.5)
+			aniPhase = 1.0;
+		else
+			aniPhase = moveOffPhase * 2.0;
+
+		float mag = Spline::accandfric(aniPhase);
+		dx *= mag;
+		dy *= mag;
+
+		moveOffX = dx;
+		moveOffY = dy;
+		moveOffY += Spline::accjump(aniPhase) * 0.2;
+	}
+	else {
+		moveOffPhase = 0.0;
+		moveOffX = 0.0;
+		moveOffY = 0.0;
+	}
+	// End of animation by moving
 }
 
 void Unit::draw() const {
+	if (p.state == STATE_NULL)
+		return;
+
 	//if (p.state == STATE_DEAD)
 	//	return;
 
-	Draw::onmap(Rspr::temp, 0.0, (float)p.x, (float)p.y);
+	Draw::onmap(Rspr::temp, 0.0, (float)p.x + moveOffX, (float)p.y + moveOffY);
 }
 
 void Flag::turn() {

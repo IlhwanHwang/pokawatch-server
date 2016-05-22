@@ -7,10 +7,10 @@
 
 #include "protocol.h"
 
-#define GUI_CELL_WIDTH 64.0
-#define GUI_CELL_HEIGHT 64.0
+#define GUI_CELL_WIDTH 48.0
+#define GUI_CELL_HEIGHT 48.0
 #define GUI_MAP_X (WINDOW_WIDTH / 2.0)
-#define GUI_MAP_Y (WINDOW_WIDTH / 2.0)
+#define GUI_MAP_Y (WINDOW_HEIGHT / 2.0)
 
 class Gui {
 public:

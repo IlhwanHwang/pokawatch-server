@@ -126,6 +126,10 @@ typedef struct {
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
 
+#define FRAME_INTERVAL 16
+#define FRAME_PER_TURN 60
+#define DELTA_PER_TURN (1.0 / FRAME_PER_TURN)
+
 #define RESPAWN_COOLTIME 10
 
 //socket [x] is mapped to unit number [x]
@@ -133,7 +137,8 @@ typedef struct {
 //NETWORK PROTOCOL
 
 #define PORT_STRING "2222"
-#define SERV_IP_STRING "141.223.208.207"
+//#define SERV_IP_STRING "141.223.208.207"
+#define SERV_IP_STRING "141.223.85.241"
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9

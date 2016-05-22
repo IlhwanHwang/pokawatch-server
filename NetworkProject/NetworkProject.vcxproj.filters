@@ -75,6 +75,9 @@
     <ClInclude Include="game.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="spline.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -130,6 +133,15 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="temp.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="tile_dark.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="tile_light.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="cse_temp.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
