@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <GL/glew.h>
+
 class Sprite {
 private:
 	float ofx, ofy;

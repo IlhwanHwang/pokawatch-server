@@ -21,6 +21,8 @@
 #include "unit.h"
 #include "network.h"
 #include "game.h"
+#include "draw.h"
+#include "resource.h"
 
 void main(int argc, char **argv)
 {
