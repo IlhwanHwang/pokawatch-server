@@ -40,7 +40,7 @@ void Timer::turn() {
 	//std::cout << "Turn!" << std::endl;
 	// add any per turn action
 	Network::turn();
-	
+	Game::turn();
 }
 
 void Timer::update(int count) {
@@ -54,6 +54,7 @@ void Timer::update(int count) {
 	// such as update() and draw() for all object
 
 	Network::update();
+	Game::update();
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);

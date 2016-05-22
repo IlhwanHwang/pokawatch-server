@@ -17,7 +17,9 @@ private:
 public:
 	static void init();
 	static void makeProtocol();
+	static void update();
 	static void draw();
+	static void turn();
 	static protocol_data getProtocol() { return protocolToSend; }
 	static protocol_data* getProtocolPointer() { return protocolPointer; }
 };

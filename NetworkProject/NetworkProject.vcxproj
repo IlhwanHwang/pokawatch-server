@@ -165,6 +165,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="spline.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="unit.h" />
@@ -193,6 +194,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="temp.png" />
+    <Image Include="tile_gray.png" />
+    <Image Include="tile_lightgray.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
