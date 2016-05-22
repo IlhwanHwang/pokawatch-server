@@ -208,7 +208,6 @@ void Network::turn()
 		}
 		printf("\n");
 	}
-
 }
 
 
@@ -224,25 +223,29 @@ void Network::update()
 		Network::setMode(MODE_SERVER);
 		printf("mode- server chosn\n");
 		Network::makeServerSocket();
+		printf("소켓 만들어 짐\n");
 		Network::acceptClient();
+		printf("accepted\n");
+
 		Network::recieveFromClient();			// recieve spawn
 		printf("SELECTED : \n");
-		/*
+
+	
 		for (int i = 0; i < UNIT_NUM_MAX; i++)
 		{
-		if (unitArray[i].getTeam() == TEAM_POSTECH)
-		{
-		unitArray[i].spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
-		printf("%d! ", atoi(messageFromClient[i]));
+			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
+			{
+				Game::getUnit(i).spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
+				printf("%d! ", atoi(messageFromClient[i]));
+			}
+			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))
+			{
+				Game::getUnit(i).spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
+				printf("%d! ", atoi(messageFromClient[i]));
+			}
 		}
-		else if ((unitArray[i].getTeam() == TEAM_KAIST))
-		{
-		unitArray[i].spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
-		printf("%d! ", atoi(messageFromClient[i]));
-		}
-		}*/
-
-		Network::sendToClient(gameStartMessage);		// accept clients
+	
+		Network::sendToClient(gameStartMessage);		// start to clients
 		Network::setGameStart(0, GAME_START_CHAR);		// game started
 	}
 

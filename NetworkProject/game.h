@@ -20,4 +20,5 @@ public:
 	static void draw();
 	static protocol_data getProtocol() { return protocolToSend; }
 	static protocol_data* getProtocolPointer() { return protocolPointer; }
+	static Unit &getUnit(int index) { return unitArray[index]; }
 };

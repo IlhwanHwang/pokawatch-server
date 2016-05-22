@@ -79,7 +79,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
-#define UNIT_NUM_MAX 1
+#define UNIT_NUM_MAX 2
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -133,7 +133,7 @@ typedef struct {
 //NETWORK PROTOCOL
 
 #define PORT_STRING "2222"
-#define SERV_IP_STRING "141.223.85.241"
+#define SERV_IP_STRING "141.223.208.207"
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
@@ -148,18 +148,18 @@ typedef struct {
 
 #define TEAM_POSTECH_SPAWN_X 0
 #define TEAM_POSTECH_SPAWN_Y 0
-#define TEAM_KAIST_SPAWN_X 1000
-#define TEAM_KAIST_SPAWN_Y 900
+#define TEAM_KAIST_SPAWN_X 3
+#define TEAM_KAIST_SPAWN_Y 0
 
-#define FLAG1_X 500
-#define FLAG1_Y 50
-#define FLAG2_X 500
-#define FLAG2_Y 250
-#define FLAG3_X 500
-#define FLAG3_Y 450
-#define FLAG4_X 500
-#define FLAG4_Y 650
-#define FLAG5_X 500
-#define FLAG5_Y 850
+#define FLAG1_X 8
+#define FLAG1_Y 1
+#define FLAG2_X 8
+#define FLAG2_Y 2
+#define FLAG3_X 8
+#define FLAG3_Y 3
+#define FLAG4_X 8
+#define FLAG4_Y 4
+#define FLAG5_X 8
+#define FLAG5_Y 5
 
 #define TURN_MAX 300

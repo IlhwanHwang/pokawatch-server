@@ -1,7 +1,7 @@
 #include "game.h"
 #include "protocol.h"
 
-Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH) };
+Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH) , Unit(TEAM_KAIST)};
 //, Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
 Flag Game::flagArray[FLAG_NUM_MAX] = { Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
 Poison Game::poisonArray[POISON_NUM_MAX];
@@ -19,12 +19,14 @@ void Game::init()
 	turnleft = TURN_MAX;
 	makeProtocol();
 
+	/*
 	unitArray[0].spawn(0, 0, DEP_CSE);
 	unitArray[1].spawn(1, 0, DEP_CSE);
 	unitArray[2].spawn(2, 0, DEP_CSE);
 	unitArray[3].spawn(3, 0, DEP_CSE);
 	unitArray[4].spawn(4, 0, DEP_CSE);
 	unitArray[5].spawn(5, 0, DEP_CSE);
+	*/
 }
 
 void Game::makeProtocol()
