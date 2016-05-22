@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "debug.h"
+
 using namespace std;
 
 void loadShader(GLuint program, GLenum type, const char* fn) {

@@ -7,6 +7,7 @@
 
 #include "InitShader.h"
 #include "shader.h"
+#include "debug.h"
 
 GLuint Shader::shdDefault;
 GLuint Shader::defBlend;
@@ -40,7 +41,7 @@ void Shader::init() {
 	};
 	glGenBuffers(1, &vboCanonical);
 	glBindBuffer(GL_ARRAY_BUFFER, vboCanonical);
-	glBufferData(GL_ARRAY_BUFFER, 20, (void*)data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, (void*)data, GL_STATIC_DRAW);
 
 	float data2[20] = {
 		0.0, 0.0, 0.0, 0.0, 0.0,
@@ -50,7 +51,10 @@ void Shader::init() {
 	};
 	glGenBuffers(1, &vbo4thPlane);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo4thPlane);
-	glBufferData(GL_ARRAY_BUFFER, 20, (void*)data2, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, (void*)data2, GL_STATIC_DRAW);
+
+	mat4 m;
+	modelViewStack.push(m);
 }
 
 void Shader::drawCanonical() {
@@ -58,7 +62,7 @@ void Shader::drawCanonical() {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)3);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -69,7 +73,7 @@ void Shader::draw4thPlane() {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)3);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
