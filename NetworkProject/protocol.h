@@ -170,3 +170,6 @@ typedef struct {
 #define FLAG5_Y 5
 
 #define TURN_MAX 300
+
+#define INVALID_POISON_INDEX -1
+#define BLACKHOLE_DAMAGE 10
