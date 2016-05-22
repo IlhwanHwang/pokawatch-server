@@ -13,14 +13,12 @@ private:
 	float ofx, ofy;
 	float w, h;
 	unsigned uw, uh;
-	GLuint buf;
-
+	std::vector<GLuint> bufs;
 
 public:
-	Sprite& load(const char* fn, int num);
 	Sprite& load(const char* fn);
 	Sprite& setOffset(float x, float y);
-	GLuint getBuf() const { return buf; }
+	GLuint getBuf(int i) const { return bufs[i]; }
 	float getW() const { return w; }
 	float getH() const { return h; }
 	float getOfx() const { return ofx; }

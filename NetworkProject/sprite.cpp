@@ -7,7 +7,7 @@
 #include "sprite.h"
 #include "lodepng.h"
 
-Sprite& Sprite::load(const char* fn, int num) {
+Sprite& Sprite::load(const char* fn) {
 	std::vector<unsigned char> png;
 	std::vector<unsigned char> image;
 	unsigned error;
@@ -24,6 +24,7 @@ Sprite& Sprite::load(const char* fn, int num) {
 		return (*this);
 	}
 
+	GLuint buf;
 	glGenTextures(1, &buf);
 	glBindTexture(GL_TEXTURE_2D, buf);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uw, uh, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
@@ -32,6 +33,7 @@ Sprite& Sprite::load(const char* fn, int num) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
+	bufs.push_back(buf);
 	std::cout << "Sprite: " << fn << " is successfully loaded" << std::endl;
 
 	w = (float)uw;
@@ -40,11 +42,6 @@ Sprite& Sprite::load(const char* fn, int num) {
 	ofy = h * 0.5;
 
 	return (*this);
-}
-
-
-Sprite& Sprite::load(const char* fn) {
-	return load(fn, 1);
 }
 
 Sprite& Sprite::setOffset(float ofx, float ofy) {

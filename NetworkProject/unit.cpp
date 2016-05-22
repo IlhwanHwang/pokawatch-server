@@ -258,8 +258,8 @@ void Unit::draw() const {
 	if (p.state == STATE_NULL)
 		return;
 
-	//if (p.state == STATE_DEAD)
-	//	return;
+	if (p.state == STATE_DEAD)
+		return;
 
 	Draw::onmap(Rspr::temp, 0.0, (float)p.x + moveOffX, (float)p.y + moveOffY);
 }
@@ -273,7 +273,9 @@ void Flag::update() {
 }
 
 void Flag::draw() const {
-
+	Sprite& n = Rspr::flagNull;
+	Sprite& f = Rspr::flagFlag;
+	Draw::onmap(p.team == TEAM_NULL ? n : f, 0.0, (float)p.x, (float)p.y);
 }
 
 Poison::Poison() {

@@ -36,6 +36,7 @@ typedef enum {
 } protocol_state;
 
 typedef enum {
+	DIRECTION_NULL,
 	DIRECTION_RIGHT,
 	DIRECTION_UP,
 	DIRECTION_LEFT,
