@@ -42,6 +42,10 @@ public:
 class Unit : public Object {
 private:
 	protocol_unit p;
+	
+	float moveOffX, moveOffY, moveOffPhase;
+	protocol_direction moveOffDirection;
+
 	int moveStun;
 	int healthMax;
 	

@@ -1,5 +1,8 @@
 #include "game.h"
 #include "protocol.h"
+#include "network.h"
+#include "draw.h"
+#include "resource.h"
 
 Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH) , Unit(TEAM_KAIST)};
 //, Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
@@ -40,10 +43,63 @@ void Game::makeProtocol()
 	protocolPointer = &protocolToSend;
 }
 
+void Game::update() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].update();
+	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].update();
+	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].update();
+	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].update();
+	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].update();
+}
+
 void Game::draw() {
+	for (int i = 0; i < MAP_WIDTH; i++) {
+		for (int j = 0; j < MAP_HEIGHT; j++) {
+			Sprite& light = Rspr::tileLight;
+			Sprite& dark = Rspr::tileDark;
+			Draw::onmap((i + j) % 2 == 0 ? light : dark, -100.0, i, j);
+		}
+	}
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
 	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
+}
+
+void Game::turn() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		protocol_command c = Network::getCommand(i);
+
+		switch (rand() % 4) {
+		case 0:
+			c = COMMAND_MOVE_RIGHT;
+			break;
+		case 1:
+			c = COMMAND_MOVE_UP;
+			break;
+		case 2:
+			c = COMMAND_MOVE_LEFT;
+			break;
+		case 3:
+			c = COMMAND_MOVE_DOWN;
+			break;
+		}
+
+		switch (c) {
+		case COMMAND_MOVE_RIGHT:
+			u.move(DIRECTION_RIGHT);
+			break;
+		case COMMAND_MOVE_UP:
+			u.move(DIRECTION_UP);
+			break;
+		case COMMAND_MOVE_LEFT:
+			u.move(DIRECTION_LEFT);
+			break;
+		case COMMAND_MOVE_DOWN:
+			u.move(DIRECTION_DOWN);
+			break;
+		}
+	}
 }

@@ -126,6 +126,10 @@ typedef struct {
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
 
+#define FRAME_INTERVAL 16
+#define FRAME_PER_TURN 60
+#define DELTA_PER_TURN (1.0 / FRAME_PER_TURN)
+
 #define RESPAWN_COOLTIME 10
 
 //socket [x] is mapped to unit number [x]
