@@ -9,6 +9,7 @@
 #include <GL/freeglut.h>
 
 #include <queue>
+#include <iostream>
 
 #include "protocol.h"
 #include "sprite.h"
