@@ -79,7 +79,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
-#define UNIT_NUM_MAX 6
+#define UNIT_NUM_MAX 1
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -141,7 +141,7 @@ typedef struct {
 #define MODE_SERVER_KEY '9'
 #define MODE_CLIENT_KEY '8'
 
-#define MESSAGE_T0_CLIENT_SIZE sizeof(protocol_data)
+#define MESSAGE_T0_CLIENT_SIZE sizeof(protocol_data)+1
 #define MESSAGE_TO_SERVER_SIZE 16
 
 #define GAME_START_CHAR 'G'

@@ -50,13 +50,13 @@ void Timer::turn() {
 		char *protocolToSend;
 		Network::recieveFromClient();	// recieve data;
 		protocolToSend = (char*)(Game::getProtocolPointer());
-		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
+		protocolToSend[MESSAGE_T0_CLIENT_SIZE-1] = '\0';
 		
 		Network::sendToClient(protocolToSend);
 
 		for (int i = 0; i < MESSAGE_T0_CLIENT_SIZE; i=i+4)
 		{
-			printf("%d ", ((int*)protocolToSend)[i]);
+			//printf("%d ", ((int*)protocolToSend)[i]);
 		}
 		printf("\n");
 
