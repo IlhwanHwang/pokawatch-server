@@ -258,8 +258,8 @@ void Unit::draw() const {
 	if (p.state == STATE_NULL)
 		return;
 
-	//if (p.state == STATE_DEAD)
-	//	return;
+	if (p.state == STATE_DEAD)
+		return;
 
 	Draw::onmap(Rspr::temp, 0.0, (float)p.x + moveOffX, (float)p.y + moveOffY);
 }
