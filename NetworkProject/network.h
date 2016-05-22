@@ -57,4 +57,10 @@ public:
 	static void setCommand(int x) { command = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
 	static void setCharacterSelection(int x) { characterSelection = x; }
+
+	static void update();
+	static void turn();
+
+	static protocol_command getCommand(int index) { return *((protocol_command*)messageFromClient[index]); }
+
 };

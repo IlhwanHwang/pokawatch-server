@@ -196,10 +196,10 @@ void Unit::update() {
 }
 
 void Unit::draw() const {
-	if (p.state == STATE_DEAD)
-		return;
+	//if (p.state == STATE_DEAD)
+	//	return;
 
-	Draw::onmap(Rspr::temp, 0.0, p.x, p.y);
+	Draw::onmap(Rspr::temp, 0.0, (float)p.x, (float)p.y);
 }
 
 void Flag::turn() {

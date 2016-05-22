@@ -34,20 +34,20 @@ void Shader::init() {
 	glBindVertexArray(vao);
 
 	float data[20] = {
-		-1.0, -1.0, 0.0, 0.0, 0.0,
-		1.0, -1.0, 0.0, 1.0, 0.0,
-		-1.0, 1.0, 0.0, 0.0, 1.0,
-		1.0, 1.0, 0.0, 1.0, 1.0
+		-1.0, -1.0, 0.0, 0.0, 1.0,
+		1.0, -1.0, 0.0, 1.0, 1.0,
+		-1.0, 1.0, 0.0, 0.0, 0.0,
+		1.0, 1.0, 0.0, 1.0, 0.0
 	};
 	glGenBuffers(1, &vboCanonical);
 	glBindBuffer(GL_ARRAY_BUFFER, vboCanonical);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 20, (void*)data, GL_STATIC_DRAW);
 
 	float data2[20] = {
-		0.0, 0.0, 0.0, 0.0, 0.0,
-		1.0, 0.0, 0.0, 1.0, 0.0,
-		0.0, 1.0, 0.0, 0.0, 1.0,
-		1.0, 1.0, 0.0, 1.0, 1.0
+		0.0, 0.0, 0.0, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0, 1.0,
+		0.0, 1.0, 0.0, 0.0, 0.0,
+		1.0, 1.0, 0.0, 1.0, 0.0
 	};
 	glGenBuffers(1, &vbo4thPlane);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo4thPlane);

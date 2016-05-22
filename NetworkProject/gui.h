@@ -9,8 +9,8 @@
 
 #define GUI_CELL_WIDTH 64.0
 #define GUI_CELL_HEIGHT 64.0
-#define GUI_MAP_X 640.0
-#define GUI_MAP_Y 360.0
+#define GUI_MAP_X (WINDOW_WIDTH / 2.0)
+#define GUI_MAP_Y (WINDOW_WIDTH / 2.0)
 
 class Gui {
 public:

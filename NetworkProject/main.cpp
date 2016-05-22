@@ -32,7 +32,7 @@ void main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	glutInitContextVersion(3, 3);
+	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
 	glutCreateWindow("CNH - Network Project");

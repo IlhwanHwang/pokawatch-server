@@ -18,6 +18,13 @@ void Game::init()
 	score[1] = 0;
 	turnleft = TURN_MAX;
 	makeProtocol();
+
+	unitArray[0].spawn(0, 0, DEP_CSE);
+	unitArray[1].spawn(1, 0, DEP_CSE);
+	unitArray[2].spawn(2, 0, DEP_CSE);
+	unitArray[3].spawn(3, 0, DEP_CSE);
+	unitArray[4].spawn(4, 0, DEP_CSE);
+	unitArray[5].spawn(5, 0, DEP_CSE);
 }
 
 void Game::makeProtocol()
@@ -31,3 +38,10 @@ void Game::makeProtocol()
 	protocolPointer = &protocolToSend;
 }
 
+void Game::draw() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
+	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
+	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
+	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
+	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
+}
