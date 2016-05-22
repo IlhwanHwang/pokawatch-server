@@ -273,7 +273,9 @@ void Flag::update() {
 }
 
 void Flag::draw() const {
-
+	Sprite& n = Rspr::flagNull;
+	Sprite& f = Rspr::flagFlag;
+	Draw::onmap(p.team == TEAM_NULL ? n : f, 0.0, (float)p.x, (float)p.y);
 }
 
 Poison::Poison() {

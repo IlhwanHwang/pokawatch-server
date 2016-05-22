@@ -12,6 +12,8 @@ public:
 	static Sprite temp;
 	static Sprite tileLight;
 	static Sprite tileDark;
+	static Sprite flagNull;
+	static Sprite flagFlag;
 };
 
 class Resource {
