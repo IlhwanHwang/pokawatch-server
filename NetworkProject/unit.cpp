@@ -37,7 +37,6 @@ void Unit::spawn(int x, int y, protocol_dep dep) {
 	p.x = x;
 	p.y = y;
 	p.dep = dep;
-	p.state = STATE_IDLE;
 }
 
 void Unit::move(protocol_direction direction) {
@@ -46,6 +45,7 @@ void Unit::move(protocol_direction direction) {
 
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
+		std::cout << moveStun << " turns left to move" << std::endl;
 		return;
 	}
 	if (p.state == STATE_STUN) {
@@ -76,7 +76,7 @@ void Unit::move(protocol_direction direction) {
 		moveOffDirection = direction;
 		moveOffPhase = 1.0;
 		if (p.dep == DEP_ME) {
-			moveStun = 1;
+			moveStun = 2;
 		}
 	}
 }
@@ -261,7 +261,26 @@ void Unit::draw() const {
 	if (p.state == STATE_DEAD)
 		return;
 
-	Draw::onmap(Rspr::temp, 0.0, (float)p.x + moveOffX, (float)p.y + moveOffY);
+	float dx = (float)p.x + moveOffX;
+	float dy = (float)p.y + moveOffY;
+
+	switch (p.dep) {
+	case DEP_CSE:
+		Draw::onmap(Rspr::unitCSE, 0.0, dx, dy);
+		break;
+	case DEP_CHEM:
+		Draw::onmap(Rspr::unitCHEM, 0.0, dx, dy);
+		break;
+	case DEP_ME:
+		Draw::onmap(Rspr::unitME, 0, 0.0, dx, dy, 1.0, 1.0, 0.0, moveStun > 1 ? Color(1.0, 0.5, 0.5) : Color(1.0, 1.0, 1.0), 1.0);
+		break;
+	case DEP_LIFE:
+		Draw::onmap(Rspr::unitLIFE, 0.0, dx, dy);
+		break;
+	case DEP_PHYS:
+		Draw::onmap(Rspr::unitPHYS, 0.0, dx, dy);
+		break;
+	}
 }
 
 void Flag::turn() {

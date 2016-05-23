@@ -5,8 +5,7 @@
 #include "draw.h"
 #include "resource.h"
 
-Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH) , Unit(TEAM_KAIST)};
-//, Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
+Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
 Flag Game::flagArray[FLAG_NUM_MAX] = { Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
@@ -70,12 +69,33 @@ void Game::draw() {
 void Game::turn() {
 	int turnLeft = 0;
 
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		u.turn();
+	}
+
 	// Move command
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
+
+		//c = (protocol_command)(rand() % (COMMAND_FLAG + 1));
+		switch (rand() % 4) {
+		case 0:
+			c = COMMAND_MOVE_RIGHT;
+			break;
+		case 1:
+			c = COMMAND_MOVE_UP;
+			break;
+		case 2:
+			c = COMMAND_MOVE_LEFT;
+			break;
+		case 3:
+			c = COMMAND_MOVE_DOWN;
+			break;
+		}
 
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||

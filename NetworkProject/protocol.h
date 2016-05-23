@@ -80,7 +80,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
-#define UNIT_NUM_MAX 2
+#define UNIT_NUM_MAX 6
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -128,7 +128,7 @@ typedef struct {
 #define WINDOW_HEIGHT 960
 
 #define FRAME_INTERVAL 16
-#define FRAME_PER_TURN 60
+#define FRAME_PER_TURN 30
 #define DELTA_PER_TURN (1.0 / FRAME_PER_TURN)
 
 #define RESPAWN_COOLTIME 10
@@ -158,16 +158,16 @@ typedef struct {
 #define TEAM_KAIST_SPAWN_X 3
 #define TEAM_KAIST_SPAWN_Y 0
 
-#define FLAG1_X 8
+#define FLAG1_X 7
 #define FLAG1_Y 1
-#define FLAG2_X 8
-#define FLAG2_Y 2
-#define FLAG3_X 8
-#define FLAG3_Y 3
-#define FLAG4_X 8
-#define FLAG4_Y 4
-#define FLAG5_X 8
-#define FLAG5_Y 5
+#define FLAG2_X 7
+#define FLAG2_Y 4
+#define FLAG3_X 7
+#define FLAG3_Y 7
+#define FLAG4_X 7
+#define FLAG4_Y 10
+#define FLAG5_X 7
+#define FLAG5_Y 13
 
 #define TURN_MAX 300
 
