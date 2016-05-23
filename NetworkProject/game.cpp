@@ -6,8 +6,21 @@
 #include "draw.h"
 #include "resource.h"
 
-Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
-Flag Game::flagArray[FLAG_NUM_MAX] = { Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
+Unit Game::unitArray[UNIT_NUM_MAX] = { 
+	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
+	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
+	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
+};
+Flag Game::flagArray[FLAG_NUM_MAX] = { 
+	Flag(FLAG1_X, FLAG1_Y), 
+	Flag(FLAG2_X, FLAG2_Y) , 
+	Flag(FLAG3_X, FLAG3_Y) , 
+	Flag(FLAG4_X, FLAG4_Y) , 
+	Flag(FLAG5_X, FLAG5_Y) 
+};
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
 Mushroom Game::mushroomArray[MUSHROOM_NUM_MAX];

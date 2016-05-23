@@ -42,7 +42,10 @@ public:
 class Unit : public Object {
 private:
 	protocol_unit p;
-	
+	int orgx, orgy;
+
+	int death;
+
 	float moveOffX, moveOffY, moveOffPhase;
 	protocol_direction moveOffDirection;
 
@@ -52,10 +55,10 @@ private:
 	void init();
 
 public:
-	Unit(protocol_team team);
-	Unit(protocol_team team, const char* name);
+	Unit(int x, int y, protocol_team team);
+	Unit(int x, int y, protocol_team team, const char* name);
 
-	void spawn(int x, int y, protocol_dep dep); // spawn as specified dep
+	void spawn(protocol_dep dep); // spawn as specified dep
 	void move(protocol_direction direction); // move 1 cell toward the direction
 	void attack(protocol_direction direction); // attack toward the direction
 	void skill(protocol_direction direction); // use hero skill toward the direction
@@ -82,6 +85,7 @@ public:
 	bool getHero() { return p.hero; }
 	int getCooltime() { return p.cooltime; }
 	int getRespawn() { return p.respawn; }
+	int getDeath() { return death; }
 
 	// bypassing all constraints and animations.
 	// just use it for very exceptional cases.
