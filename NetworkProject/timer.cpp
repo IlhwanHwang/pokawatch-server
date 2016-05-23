@@ -42,7 +42,13 @@ void Timer::turn() {
 	//std::cout << "Turn!" << std::endl;
 	// add any per turn action
 	Network::turn();
-	if(Network::getGameStart()[0]==GAME_START_CHAR) Game::turn();
+	if(Network::getGameStart()[0]==GAME_START_CHAR && Game::getTurnLeft()>0) Game::turn();
+	if (Game::getTurnLeft <= 0)
+	{
+		if (Game::getScore(TEAM_POSTECH - 1) > Game::getScore(TEAM_KAIST - 1)) printf("POSTECH WIN !\n");
+		if (Game::getScore(TEAM_POSTECH - 1) < Game::getScore(TEAM_KAIST - 1)) printf("KAIST WIN !\n");
+		if (Game::getScore(TEAM_POSTECH - 1) == Game::getScore(TEAM_KAIST - 1)) printf("DRAW !\n");
+	}
 }
 
 void Timer::update(int count) {

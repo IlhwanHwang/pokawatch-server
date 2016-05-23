@@ -40,4 +40,6 @@ public:
 	static int getValidMushroomIndex();
 	static int getDeath(int ind) { return death[ind]; }
 	static void setDeath(int ind, int x) { death[ind] = x; }
+	static int getTurnLeft() { return turnleft; }
+	static int getScore(int ind) { return score[ind]; }
 };

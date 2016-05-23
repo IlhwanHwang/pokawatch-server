@@ -636,11 +636,11 @@ void Game::ruleSpawn()
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 
-		if (c == COMMAND_SPAWN_CSE ||
+		if ((c == COMMAND_SPAWN_CSE ||
 			c == COMMAND_SPAWN_PHYS ||
 			c == COMMAND_SPAWN_LIFE ||
 			c == COMMAND_SPAWN_ME ||
-			c == COMMAND_SPAWN_CHEM)
+			c == COMMAND_SPAWN_CHEM)&&u.getRespawn()>0)
 		{
 			int b;
 			spawn[u.getTeam() - 1]++;
@@ -699,7 +699,7 @@ void Game::ruleFlag()
 }
 void Game::turn() {
 	turnleft--;
-	if (turnleft == 0) return;
+	if (turnleft <= 0) return;
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
 		u.turn();
@@ -715,21 +715,21 @@ void Game::turn() {
 	{
 		for (int b = 0; b < PETAL_NUM_MAX; b++) // petal confliction check
 		{
-			if (unitArray[a].getY() == petalArray[b].getY() && unitArray[a].getX() == petalArray[b].getX())
+			if (petalArray[b].getProtocol()->valid && unitArray[a].getY() == petalArray[b].getY() && unitArray[a].getX() == petalArray[b].getX())
 			{
 				if (unitArray[a].getTeam() != petalArray[b].getTeam()) unitArray[a].damage(1);
 			}
 		}
 		for (int b = 0; b < POISON_NUM_MAX; b++) // poison confliction check
 		{
-			if (unitArray[a].getY() == poisonArray[b].getY() && unitArray[a].getX() == poisonArray[b].getX())
+			if (poisonArray[b].getProtocol()->valid && unitArray[a].getY() == poisonArray[b].getY() && unitArray[a].getX() == poisonArray[b].getX())
 			{
 				if (unitArray[a].getTeam() != poisonArray[b].getTeam()) unitArray[a].damage(1);
 			}
 		}
 		for (int b = 0; b < MUSHROOM_NUM_MAX; b++) // mushroom confliction check
 		{
-			if (unitArray[a].getY() == mushroomArray[b].getY() && unitArray[a].getX() == mushroomArray[b].getX())
+			if (mushroomArray[b].getProtocol()->valid && unitArray[a].getY() == mushroomArray[b].getY() && unitArray[a].getX() == mushroomArray[b].getX())
 			{
 				if (unitArray[a].getTeam() != mushroomArray[b].getTeam()) unitArray[a].damage(1);
 			}
