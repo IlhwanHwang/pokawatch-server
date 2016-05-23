@@ -8,6 +8,7 @@
 #include "draw.h"
 #include "spline.h"
 #include "game.h"
+#include "key.h"
 
 void Unit::init() {
 	switch (p.dep) {
@@ -51,7 +52,6 @@ bool Unit::move(protocol_direction direction) {
 
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
-		std::cout << moveStun << " turns left to move" << std::endl;
 		return false;
 	}
 	if (p.state == STATE_STUN) {
@@ -162,6 +162,11 @@ void Unit::damage(int h) {
 	if (p.state == STATE_NULL)
 		return;
 
+	if (p.state == STATE_DEAD) {
+		error("Cannot damage dead unit");
+		return;
+	}
+
 	p.health -= h;
 
 	if (p.health <= 0) {
@@ -170,12 +175,18 @@ void Unit::damage(int h) {
 		death++;
 		if (p.team == TEAM_POSTECH) Game::setDeath(TEAM_POSTECH - 1, Game::getDeath(TEAM_POSTECH-1) + 1);
 		if (p.team == TEAM_KAIST) Game::setDeath(TEAM_KAIST - 1, Game::getDeath(TEAM_KAIST - 1) + 1);
+		p.dep = DEP_NULL;
 	}
 }
 
 void Unit::heal(int h) {
 	if (p.state == STATE_NULL)
 		return;
+	
+	if (p.state == STATE_DEAD) {
+		error("Cannot heal dead unit");
+		return;
+	}
 
 	p.health += h;
 
@@ -198,33 +209,34 @@ void Unit::turn() {
 	if (p.state == STATE_NULL)
 		return;
 
-	p.state = STATE_IDLE;
-
-	if (p.respawn > 0) {
-		p.respawn--;
+	if (p.state == STATE_DEAD) {
+		p.health = 0;
 		if (p.respawn > 0) {
-			p.state = STATE_DEAD;
-			p.health = 0;
-			return;
+			p.respawn--;
 		}
 		else {
-			init();
+			if (p.dep != DEP_NULL) {
+				init();
+			}
 		}
 	}
+	else {
+		p.state = STATE_IDLE;
 
-	if (p.cooltime > 0) {
-		p.cooltime--;
-	}
+		if (p.cooltime > 0) {
+			p.cooltime--;
+		}
 
-	if (moveStun > 0) {
-		moveStun--;
-	}
+		if (moveStun > 0) {
+			moveStun--;
+		}
 
-	if (p.stun > 0) {
-		p.stun--;
 		if (p.stun > 0) {
-			p.state = STATE_STUN;
-			return;
+			p.stun--;
+			if (p.stun > 0) {
+				p.state = STATE_STUN;
+				return;
+			}
 		}
 	}
 }
@@ -268,36 +280,46 @@ void Unit::update() {
 }
 
 void Unit::draw() const {
-	if (p.state == STATE_NULL)
-		return;
+	Sprite* face = &Rspr::error;
+	Sprite* body = &Rspr::error;;
 
-	if (p.state == STATE_DEAD)
+	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
+		face = &Rspr::faceDEAD;
+	}
+	else {
+		switch (p.dep) {
+		case DEP_CSE: face = &Rspr::faceCSE; break;
+		case DEP_CHEM: face = &Rspr::faceCHEM; break;
+		case DEP_ME: face = &Rspr::faceME; break;
+		case DEP_LIFE: face = &Rspr::faceLIFE; break;
+		case DEP_PHYS: face = &Rspr::facePHYS; break;
+		}
+	}
+
+	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + WINDOW_WIDTH / 2.0;
+	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + WINDOW_HEIGHT / 2.0;
+
+	Draw::draw(*face, x, y);
+
+	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
+	}
 
 	float drawx = (float)p.x + moveOffX;
 	float drawy = (float)p.y + moveOffY;
 
 	switch (p.dep) {
-	case DEP_CSE:
-		Draw::qonmap(Rspr::unitCSE, 0.0, drawx, drawy);
-		break;
-	case DEP_CHEM:
-		Draw::qonmap(Rspr::unitCHEM, 0.0, drawx, drawy);
-		break;
-	case DEP_ME:
-		Draw::qonmap(Rspr::unitME, 0, 0.0, drawx, drawy, moveStun > 1 ? Color(1.0, 0.5, 0.5) : Color(1.0, 1.0, 1.0), 1.0);
-		break;
-	case DEP_LIFE:
-		Draw::qonmap(Rspr::unitLIFE, 0.0, drawx, drawy);
-		break;
-	case DEP_PHYS:
-		Draw::qonmap(Rspr::unitPHYS, 0.0, drawx, drawy);
-		break;
+	case DEP_CSE: body = &Rspr::unitCSE; break;
+	case DEP_CHEM: body = &Rspr::unitCHEM; break;
+	case DEP_ME: body = &Rspr::unitME; break;
+	case DEP_LIFE: body = &Rspr::unitLIFE; break;
+	case DEP_PHYS: body = &Rspr::unitPHYS; break;
 	}
+
+	Draw::qonmap(*body, 0.0, drawx, drawy);
 
 	float ddx = 20 / GUI_CELL_WIDTH;
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;
-
 	for (int i = 0; i < p.health; i++) {
 		Draw::qonmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 2.0);
 		dx += ddx;
@@ -315,7 +337,7 @@ void Flag::update() {
 void Flag::draw() const {
 	Sprite& n = Rspr::flagNull;
 	Sprite& f = Rspr::flagFlag;
-	Draw::onmap(p.team == TEAM_NULL ? n : f, -1.0, (float)p.x, (float)p.y);
+	Draw::onmap(p.team == TEAM_NULL ? n : f, (float)p.x, (float)p.y);
 }
 
 Poison::Poison() {
@@ -353,6 +375,7 @@ void Poison::draw() const {
 	if (!p.valid)
 		return;
 
+	Draw::qonmap(Rspr::poison, -1.0, p.x, p.y);
 }
 
 Petal::Petal() {
@@ -401,6 +424,7 @@ void Petal::draw() const {
 	if (!p.valid)
 		return;
 
+	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y);
 }
 
 Mushroom::Mushroom() {

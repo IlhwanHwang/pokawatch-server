@@ -87,7 +87,7 @@ void Game::draw() {
 		for (int j = 0; j < MAP_HEIGHT; j++) {
 			Sprite& light = Rspr::tileLight;
 			Sprite& dark = Rspr::tileDark;
-			Draw::onmap((i + j) % 2 == 0 ? light : dark, -100.0, i, j);
+			Draw::onmap((i + j) % 2 == 0 ? light : dark, i, j);
 		}
 	}
 
@@ -96,6 +96,7 @@ void Game::draw() {
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
+
 	Draw::flush();
 }
 
@@ -104,26 +105,25 @@ void Game::release() {
 }
 
 void Game::ruleMove() {
-	int turnLeft = 0; //temporary
 	std::vector<int> movable;
 	std::vector<int> alive;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
-		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
+		int ind = (turnleft % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[ind];
 		protocol_command c = Network::getCommand(ind);
 		protocol_state s = u.getState();
-		
-		if (c == COMMAND_MOVE_RIGHT ||
-			c == COMMAND_MOVE_UP ||
-			c == COMMAND_MOVE_LEFT ||
-			c == COMMAND_MOVE_DOWN) {
-			movable.push_back(ind);
-		}
 
-		if (s != STATE_NULL || s != STATE_DEAD) {
+		if (s != STATE_NULL && s != STATE_DEAD) {
 			alive.push_back(ind);
+
+			if (c == COMMAND_MOVE_RIGHT ||
+				c == COMMAND_MOVE_UP ||
+				c == COMMAND_MOVE_LEFT ||
+				c == COMMAND_MOVE_DOWN) {
+				movable.push_back(ind);
+			}
 		}
 	}
 
@@ -149,7 +149,7 @@ void Game::ruleMove() {
 
 			if (moved) {
 				for (int j = 0; j < alive.size(); j++) {
-					if (j == ind)
+					if (alive[j] == ind)
 						continue;
 
 					Unit& other = unitArray[alive[j]];
@@ -158,10 +158,24 @@ void Game::ruleMove() {
 						break;
 					}
 				}
+
+				if (!duplicated) {
+					for (int j = 0; j < UNIT_NUM_MAX; j++) {
+						if (j == ind)
+							continue;
+
+						Unit& other = unitArray[j];
+						if (other.getOrgX() == u.getX() && other.getOrgY() == u.getY()) {
+							duplicated = true;
+							break;
+						}
+					}
+				}
 			}
 
 			if (duplicated) {
 				// if duplicated, then go back
+				u.moveResetMovestun();
 				switch (c) {
 				case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
 				case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
