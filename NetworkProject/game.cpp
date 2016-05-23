@@ -1,4 +1,5 @@
 #include <cmath>
+#include <vector>
 #include "game.h"
 #include "protocol.h"
 #include "network.h"
@@ -70,92 +71,68 @@ void Game::release() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
 }
 
-void Game::turn() {
-	int turnLeft = 0;
+void Game::ruleMove() {
+	int turnLeft = 0; //temporary
+	std::vector<int> movable;
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		Unit& u = unitArray[i];
-		u.turn();
-	}
-
-	// Move command
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
-		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
-
-		//c = (protocol_command)(rand() % (COMMAND_FLAG + 1));
-		switch (rand() % 4) {
-		case 0:
-			c = COMMAND_MOVE_RIGHT;
-			break;
-		case 1:
-			c = COMMAND_MOVE_UP;
-			break;
-		case 2:
-			c = COMMAND_MOVE_LEFT;
-			break;
-		case 3:
-			c = COMMAND_MOVE_DOWN;
-			break;
-		}
 
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||
 			c == COMMAND_MOVE_LEFT ||
 			c == COMMAND_MOVE_DOWN) {
-			
-			switch (c) {
-			case COMMAND_MOVE_RIGHT:
-				u.move(DIRECTION_RIGHT);
-				break;
-			case COMMAND_MOVE_UP:
-				u.move(DIRECTION_UP);
-				break;
-			case COMMAND_MOVE_LEFT:
-				u.move(DIRECTION_LEFT);
-				break;
-			case COMMAND_MOVE_DOWN:
-				u.move(DIRECTION_DOWN);
-				break;
-			}
-
-			bool duplicated = false;
-
-			for (int j = 0; j < UNIT_NUM_MAX; j++) {
-				if (j == ind)
-					continue;
-
-				Unit& other = unitArray[j];
-				if (other.getX() == u.getX() && other.getY() == u.getY()) {
-					duplicated = true;
-					break;
-				}
-			}
-
-			// if duplicated, then go back
-			if (duplicated) {
-				switch (c) {
-				case COMMAND_MOVE_RIGHT:
-					u.move(DIRECTION_LEFT);
-					break;
-				case COMMAND_MOVE_UP:
-					u.move(DIRECTION_DOWN);
-					break;
-				case COMMAND_MOVE_LEFT:
-					u.move(DIRECTION_RIGHT);
-					break;
-				case COMMAND_MOVE_DOWN:
-					u.move(DIRECTION_UP);
-					break;
-				}
-
-				u.moveOffDiscard();
-			}
+			movable.push_back(ind);
 		}
 	}
-	// End of move command
+
+	for (int i = 0; i < movable.size(); i++) {
+		int ind = movable[i];
+		Unit& u = unitArray[ind];
+		protocol_command c = Network::getCommand(i);
+
+		switch (c) {
+		case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
+		case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
+		case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
+		case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
+		}
+
+		bool duplicated = false;
+
+		for (int j = 0; j < UNIT_NUM_MAX; j++) {
+			if (j == ind)
+				continue;
+
+			Unit& other = unitArray[j];
+			if (other.getX() == u.getX() && other.getY() == u.getY()) {
+				duplicated = true;
+				break;
+			}
+		}
+
+		// if duplicated, then go back
+		if (duplicated) {
+			switch (c) {
+			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
+			case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
+			case COMMAND_MOVE_LEFT: u.move(DIRECTION_RIGHT); break;
+			case COMMAND_MOVE_DOWN: u.move(DIRECTION_UP); break;
+			}
+			u.moveOffDiscard();
+		}
+	}
+}
+
+void Game::turn() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		u.turn();
+	}
+
+	ruleMove();
 
 	//attack command
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
