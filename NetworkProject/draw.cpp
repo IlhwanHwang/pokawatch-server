@@ -31,10 +31,11 @@ DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float
 }
 
 void DrawRequest::draw() {
+	//glRectf(x - ofx, y - ofy, x - ofx + w, y - ofy + h);
 	Shader::push();
 		Shader::translate(vec3(x, y, 0.0));
-		Shader::rotateZ(a);
-		Shader::scale(vec3(sx, sy, 1.0));
+		//Shader::rotateZ(a);
+		//Shader::scale(vec3(sx, sy, 1.0));
 		Shader::translate(vec3(-ofx, -ofy, 0.0));
 		Shader::scale(vec3(w, h, 1.0));
 		Shader::apply();

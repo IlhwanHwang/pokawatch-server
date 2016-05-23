@@ -77,7 +77,7 @@ void Game::draw() {
 			Draw::onmap((i + j) % 2 == 0 ? light : dark, -100.0, i, j);
 		}
 	}
-
+	
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
 	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
@@ -121,25 +121,28 @@ void Game::ruleMove() {
 		for (int i = 0; i < movable.size(); i++) {
 			int ind = movable[i];
 			Unit& u = unitArray[ind];
-			protocol_command c = Network::getCommand(i);
+			protocol_command c = Network::getCommand(ind);
+			bool moved = false;
 
 			switch (c) {
-			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
-			case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
-			case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
-			case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
+			case COMMAND_MOVE_RIGHT: moved = u.move(DIRECTION_RIGHT); break;
+			case COMMAND_MOVE_UP: moved = u.move(DIRECTION_UP); break;
+			case COMMAND_MOVE_LEFT: moved = u.move(DIRECTION_LEFT); break;
+			case COMMAND_MOVE_DOWN: moved = u.move(DIRECTION_DOWN); break;
 			}
 
 			bool duplicated = false;
 
-			for (int j = 0; j < alive.size(); j++) {
-				if (j == ind)
-					continue;
+			if (moved) {
+				for (int j = 0; j < alive.size(); j++) {
+					if (j == ind)
+						continue;
 
-				Unit& other = unitArray[alive[j]];
-				if (other.getX() == u.getX() && other.getY() == u.getY()) {
-					duplicated = true;
-					break;
+					Unit& other = unitArray[alive[j]];
+					if (other.getX() == u.getX() && other.getY() == u.getY()) {
+						duplicated = true;
+						break;
+					}
 				}
 			}
 

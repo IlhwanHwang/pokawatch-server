@@ -39,16 +39,14 @@ void main(int argc, char **argv)
 
 	glewExperimental = GL_TRUE;
 	glewInit();
-	Shader::init();
-	//60fps, 0.5 second per turn
-	Key::init();
-	Network::init();
-	Game::init();
 
-	Resource::init();
 	Key::init();
-	Shader::init();
+	Game::init();
 	Draw::init();
+	Shader::init();
+	Network::init();
+	Resource::init();
+
 	Timer::init(FRAME_INTERVAL, FRAME_PER_TURN);
 
 	glutMainLoop();

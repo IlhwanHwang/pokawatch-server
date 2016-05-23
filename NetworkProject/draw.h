@@ -45,6 +45,7 @@ public:
 	static void reshape(int, int);
 	static void flush();
 	static void draw(Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {
+		//DrawRequest(spr, ind, depth, x, y, sx, sy, a, c, alpha).draw();
 		req.push(DrawRequest(spr, ind, depth, x, y, sx, sy, a, c, alpha));
 	}
 	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {

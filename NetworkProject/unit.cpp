@@ -44,18 +44,18 @@ void Unit::spawn(protocol_dep dep) {
 	p.dep = dep;
 }
 
-void Unit::move(protocol_direction direction) {
+bool Unit::move(protocol_direction direction) {
 	if (p.state == STATE_NULL)
-		return;
+		return false;
 
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
 		std::cout << moveStun << " turns left to move" << std::endl;
-		return;
+		return false;
 	}
 	if (p.state == STATE_STUN) {
 		error("Tried to move when stunned");
-		return;
+		return false;
 	}
 
 	int dx = 0;
@@ -78,6 +78,7 @@ void Unit::move(protocol_direction direction) {
 		p.y -= dy;
 		moveOffDirection = DIRECTION_NULL;
 		error("Tried to move to the outside of the map");
+		return false;
 	}
 	else {
 		moveOffDirection = direction;
@@ -85,6 +86,8 @@ void Unit::move(protocol_direction direction) {
 			moveStun = 2;
 		}
 	}
+
+	return true;
 }
 
 void Unit::attack(protocol_direction direction) {
