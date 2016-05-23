@@ -331,6 +331,12 @@ void Network::update()
 			if (Key::keyCheckPressed('a') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_LEFT);
 			if (Key::keyCheckPressed('s') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_DOWN);
 
+			if (Key::keyCheckPressed('1')) Network::setCommand(COMMAND_SPAWN_CSE);
+			if (Key::keyCheckPressed('2')) Network::setCommand(COMMAND_SPAWN_PHYS);
+			if (Key::keyCheckPressed('3')) Network::setCommand(COMMAND_SPAWN_LIFE);
+			if (Key::keyCheckPressed('4')) Network::setCommand(COMMAND_SPAWN_ME);
+			if (Key::keyCheckPressed('5')) Network::setCommand(COMMAND_SPAWN_CHEM);
+
 			if (Key::keyCheckPressed('l')) Network::setCommand(COMMAND_FLAG);
 		}
 	}

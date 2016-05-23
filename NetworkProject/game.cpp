@@ -90,23 +90,7 @@ void Game::turn() {
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
-
-		//c = (protocol_command)(rand() % (COMMAND_FLAG + 1));
-		switch (rand() % 4) {
-		case 0:
-			c = COMMAND_MOVE_RIGHT;
-			break;
-		case 1:
-			c = COMMAND_MOVE_UP;
-			break;
-		case 2:
-			c = COMMAND_MOVE_LEFT;
-			break;
-		case 3:
-			c = COMMAND_MOVE_DOWN;
-			break;
-		}
-
+		
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||
 			c == COMMAND_MOVE_LEFT ||
@@ -184,6 +168,7 @@ void Game::turn() {
 				{
 				case COMMAND_ATTACK_RIGHT:
 					u.attack(DIRECTION_RIGHT);
+					printf("A\nT\nT\nA\nC\nK\n");
 					break;
 				case COMMAND_ATTACK_UP:
 					u.attack(DIRECTION_UP);
