@@ -65,6 +65,7 @@ public:
 	void damage(int h = 1); // exert given damage on unit (1 on default)
 	void heal(int h = 1); // heal unit with given value (1 on default)
 	void stun(int s = 3); // stun unit (3 turns on default)
+	void kill(); // kill
 
 	void release() { p.state = STATE_IDLE; init(); } // For the first time
 
@@ -74,6 +75,8 @@ public:
 	void turn();
 	void update();
 	void draw() const;
+
+	bool isAlive() { return p.state != STATE_DEAD && p.state != STATE_NULL; }
 
 	const protocol_unit* getProtocol() const { return &p; }
 

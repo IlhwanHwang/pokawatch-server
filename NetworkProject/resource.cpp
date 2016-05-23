@@ -25,6 +25,8 @@ Sprite Rspr::faceDEAD;
 Sprite Rspr::petal;
 Sprite Rspr::poison;
 
+Sprite Rspr::hero;
+
 Sprite Rspr::tileLight;
 Sprite Rspr::tileDark;
 Sprite Rspr::flagNull;
@@ -50,6 +52,8 @@ void Resource::init() {
 
 	Rspr::petal.load("petal.png").setOffset(20.0, 40.0);
 	Rspr::poison.load("poison.png");
+
+	Rspr::hero.load("hero.png").setOffset(30.0, 100.0);
 
 	Rspr::tileLight.load("tile_light.png");
 	Rspr::tileDark.load("tile_dark.png");

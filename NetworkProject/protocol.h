@@ -5,10 +5,11 @@
 
 #pragma once
 
+// do not touch. TEAM_POSTECH = 1, TEAM_KAIST = 2. for array index.
 typedef enum {
 	TEAM_NULL,
-	TEAM_POSTECH,
-	TEAM_KAIST
+	TEAM_POSTECH = 1,
+	TEAM_KAIST = 2
 } protocol_team;
 
 typedef enum {
@@ -177,7 +178,11 @@ typedef struct {
 #define INVALID_PETAL_INDEX -1
 
 #define BLACKHOLE_DAMAGE 10
+#define ACCIDENT_DAMAGE 10
+
+
 #define DEATH_PENALTY 10
 #define FLAG_SCORE 50
 
-#define HERO_DELAY 5
+#define HERO_DELAY 2
+

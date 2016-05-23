@@ -29,6 +29,8 @@ public:
 	static Sprite petal;
 	static Sprite poison;
 
+	static Sprite hero;
+
 	static Sprite tileLight;
 	static Sprite tileDark;
 

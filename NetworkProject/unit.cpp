@@ -171,12 +171,7 @@ void Unit::damage(int h) {
 	p.health -= h;
 
 	if (p.health <= 0) {
-		p.state = STATE_DEAD;
-		p.respawn = RESPAWN_COOLTIME;
-		death++;
-		if (p.team == TEAM_POSTECH) Game::setDeath(TEAM_POSTECH - 1, Game::getDeath(TEAM_POSTECH-1) + 1);
-		if (p.team == TEAM_KAIST) Game::setDeath(TEAM_KAIST - 1, Game::getDeath(TEAM_KAIST - 1) + 1);
-		p.dep = DEP_NULL;
+		kill();
 	}
 }
 
@@ -204,6 +199,16 @@ void Unit::stun(int s) {
 	if (s > 0) {
 		p.state = STATE_STUN;
 	}
+}
+
+void Unit::kill() {
+	p.state = STATE_DEAD;
+	p.respawn = RESPAWN_COOLTIME;
+	p.hero = false;
+	death++;
+	if (p.team == TEAM_POSTECH) Game::setDeath(TEAM_POSTECH - 1, Game::getDeath(TEAM_POSTECH - 1) + 1);
+	if (p.team == TEAM_KAIST) Game::setDeath(TEAM_KAIST - 1, Game::getDeath(TEAM_KAIST - 1) + 1);
+	p.dep = DEP_NULL;
 }
 
 void Unit::turn() {
@@ -320,6 +325,9 @@ void Unit::draw() const {
 	}
 
 	Draw::qonmap(*body, 0.0, drawx, drawy);
+	if (p.hero) {
+		Draw::qonmap(Rspr::hero, 0.1, drawx, drawy);
+	}
 
 	float ddx = 20 / GUI_CELL_WIDTH;
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;

@@ -201,6 +201,10 @@ void Game::ruleAttack()
 	{
 
 		Unit& u = unitArray[i];
+
+		if (!u.isAlive())
+			continue;
+
 		protocol_command c = Network::getCommand(i);
 
 
@@ -217,7 +221,6 @@ void Game::ruleAttack()
 				{
 				case COMMAND_ATTACK_RIGHT:
 					u.attack(DIRECTION_RIGHT);
-					printf("A\nT\nT\nA\nC\nK\n");
 					break;
 				case COMMAND_ATTACK_UP:
 					u.attack(DIRECTION_UP);
@@ -316,28 +319,6 @@ void Game::ruleAttack()
 					}
 					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
 					break;
-				}
-				break;
-			case DEP_ME:
-				switch (c)
-				{
-				case COMMAND_ATTACK_RIGHT:
-					u.attack(DIRECTION_RIGHT);
-					break;
-				case COMMAND_ATTACK_UP:
-					u.attack(DIRECTION_UP);
-					break;
-				case COMMAND_ATTACK_LEFT:
-					u.attack(DIRECTION_LEFT);
-					break;
-				case COMMAND_ATTACK_DOWN:
-					u.attack(DIRECTION_DOWN);
-					break;
-				}
-				for (int a = 0; a < UNIT_NUM_MAX; a++)
-				{
-					if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1) && (unitArray[a].getY() - u.getY())*(unitArray[a].getX() - u.getX()) == 0)
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(2);
 				}
 				break;
 			case DEP_CHEM:
@@ -593,21 +574,89 @@ void Game::ruleSkill()
 			case DEP_ME:
 				switch (c)
 				{
+					int minmax;
+					int minmaxIndex;
+
 				case COMMAND_SKILL_RIGHT:
 					u.skill(DIRECTION_RIGHT);
-					u.setPosition(MAP_WIDTH, u.getY());
+					minmax = MAP_WIDTH;
+					minmaxIndex = -1;
+					for (int w = 0; w < UNIT_NUM_MAX; w++)
+					{
+						if(unitArray[w].getY() == u.getY() && unitArray[w].getX() > u.getY())
+							if (minmax > unitArray[w].getX())
+							{
+								minmax = unitArray[w].getX();
+								minmaxIndex = w;
+							}
+					}
+					if (minmaxIndex != -1)
+					{
+						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
+						u.setPosition(unitArray[minmaxIndex].getX(), u.getY());
+					}
+					else u.setPosition(MAP_WIDTH - 1, u.getY());
 					break;
 				case COMMAND_SKILL_UP:
 					u.skill(DIRECTION_UP);
-					u.setPosition(u.getX(), MAP_HEIGHT);
+					minmax = MAP_HEIGHT;
+					minmaxIndex = -1;
+					for (int w = 0; w < UNIT_NUM_MAX; w++)
+					{
+						if (unitArray[w].getX() == u.getX() && unitArray[w].getY() > u.getY())
+							if (minmax > unitArray[w].getY())
+							{
+								minmax = unitArray[w].getY();
+								minmaxIndex = w;
+							}
+					}
+					if (minmaxIndex != -1)
+					{
+						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
+						u.setPosition(u.getX(), unitArray[minmaxIndex].getY());
+					}
+					else u.setPosition(u.getX(), MAP_HEIGHT-1);
+
 					break;
 				case COMMAND_SKILL_LEFT:
 					u.skill(DIRECTION_LEFT);
-					u.setPosition(0, u.getY());
+					minmax = 0;
+					minmaxIndex = -1;
+					for (int w = 0; w < UNIT_NUM_MAX; w++)
+					{
+						if (unitArray[w].getY() == u.getY() && unitArray[w].getX() < u.getY())
+							if (minmax < unitArray[w].getX())
+							{
+								minmax = unitArray[w].getX();
+								minmaxIndex = w;
+							}
+					}
+					if (minmaxIndex != -1)
+					{
+						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
+						u.setPosition(unitArray[minmaxIndex].getX(), u.getY());
+					}
+					else u.setPosition(0, u.getY());
 					break;
 				case COMMAND_SKILL_DOWN:
 					u.skill(DIRECTION_DOWN);
-					u.setPosition(u.getX(), 0);
+					minmax = 0;
+					minmaxIndex = -1;
+					for (int w = 0; w < UNIT_NUM_MAX; w++)
+					{
+						if (unitArray[w].getX() == u.getX() && unitArray[w].getY() < u.getY())
+							if (minmax < unitArray[w].getY())
+							{
+								minmax = unitArray[w].getY();
+								minmaxIndex = w;
+							}
+					}
+					if (minmaxIndex != -1)
+					{
+						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
+						u.setPosition(u.getX(), unitArray[minmaxIndex].getY());
+					}
+					else u.setPosition(u.getX(), 0);
 					break;
 				}
 				break;
@@ -633,7 +682,7 @@ void Game::ruleSkill()
 				}
 				break;
 			}//end of case
-			u.setHero(FALSE);
+			u.setHero(false);
 		}
 
 	} // end of skill
@@ -661,28 +710,23 @@ void Game::ruleSpawn()
 			switch (c)
 			{
 			case COMMAND_SPAWN_CSE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CSE);
-				else u.spawn(DEP_CSE);
+				u.spawn(DEP_CSE);
 				break;
 			case COMMAND_SPAWN_PHYS:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_PHYS);
-				else u.spawn(DEP_PHYS);
+				u.spawn(DEP_PHYS);
 				break;
 			case COMMAND_SPAWN_LIFE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_LIFE);
-				else u.spawn(DEP_LIFE);
+				u.spawn(DEP_LIFE);
 				break;
 			case COMMAND_SPAWN_ME:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_ME);
-				else u.spawn(DEP_ME);
+				u.spawn(DEP_ME);
 				break;
 			case COMMAND_SPAWN_CHEM:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CHEM);
-				else u.spawn(DEP_CHEM);
+				u.spawn(DEP_CHEM);
 				break;
 			}
-			if (u.getTeam() == TEAM_POSTECH && (spawn[TEAM_POSTECH - 1] % 5 == 0) && spawn[TEAM_POSTECH-1] != 0) u.setHero(TRUE);
-			if (u.getTeam() == TEAM_KAIST && (spawn[TEAM_KAIST - 1] % 5 == 0) && spawn[TEAM_KAIST - 1] != 0) u.setHero(TRUE);
+			if (u.getTeam() == TEAM_POSTECH && (spawn[TEAM_POSTECH - 1] % HERO_DELAY == 0) && spawn[TEAM_POSTECH-1] != 0) u.setHero(true);
+			if (u.getTeam() == TEAM_KAIST && (spawn[TEAM_KAIST - 1] % HERO_DELAY == 0) && spawn[TEAM_KAIST - 1] != 0) u.setHero(true);
 		}
 
 	} // end of spawn
@@ -729,28 +773,51 @@ void Game::turn() {
 	
 	for (int a = 0; a < UNIT_NUM_MAX; a++)
 	{
+		Unit& u = unitArray[a];
+		if (!u.isAlive())
+			continue;
+
 		for (int b = 0; b < PETAL_NUM_MAX; b++) // petal confliction check
 		{
-			if (petalArray[b].getProtocol()->valid && unitArray[a].getY() == petalArray[b].getY() && unitArray[a].getX() == petalArray[b].getX())
+			if (petalArray[b].getProtocol()->valid && u.getY() == petalArray[b].getY() && u.getX() == petalArray[b].getX())
 			{
-				if (unitArray[a].getTeam() != petalArray[b].getTeam()) unitArray[a].damage(1);
+				if (u.getTeam() != petalArray[b].getTeam()) u.damage(1);
+				else u.heal(1);
 			}
 		}
 		for (int b = 0; b < POISON_NUM_MAX; b++) // poison confliction check
 		{
-			if (poisonArray[b].getProtocol()->valid && unitArray[a].getY() == poisonArray[b].getY() && unitArray[a].getX() == poisonArray[b].getX())
+			if (poisonArray[b].getProtocol()->valid && u.getY() == poisonArray[b].getY() && u.getX() == poisonArray[b].getX())
 			{
-				if (unitArray[a].getTeam() != poisonArray[b].getTeam()) unitArray[a].damage(1);
+				if (u.getTeam() != poisonArray[b].getTeam()) u.damage(1);
 			}
 		}
 		for (int b = 0; b < MUSHROOM_NUM_MAX; b++) // mushroom confliction check
 		{
-			if (mushroomArray[b].getProtocol()->valid && unitArray[a].getY() == mushroomArray[b].getY() && unitArray[a].getX() == mushroomArray[b].getX())
+			if (mushroomArray[b].getProtocol()->valid && u.getY() == mushroomArray[b].getY() && u.getX() == mushroomArray[b].getX())
 			{
-				if (unitArray[a].getTeam() != mushroomArray[b].getTeam()) unitArray[a].damage(1);
+				if (u.getTeam() != mushroomArray[b].getTeam()) u.damage(1);
 			}
 		}
 	}
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	{
+		Unit& u = unitArray[i];
+		if (u.getDep() == DEP_ME && u.isAlive())
+		{
+			for (int a = 0; a < UNIT_NUM_MAX; a++)
+			{
+				Unit& other = unitArray[a];
+				if (u.getTeam() != other.getTeam())
+					if (abs(u.getX() - other.getX()) + abs(u.getY() - other.getY()) <= 1)
+						other.damage(2);
+			}
+		}
+	}
+
+
+
 	score[TEAM_POSTECH-1] = 0;
 	score[TEAM_KAIST-1] = 0;
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
