@@ -75,18 +75,20 @@ public:
 	void update();
 	void draw() const;
 
-	protocol_unit* getProtocol() { return &p; }
+	const protocol_unit* getProtocol() const { return &p; }
 
-	protocol_team getTeam() { return p.team; }
-	protocol_dep getDep() { return p.dep; }
-	int getX() { return p.x; }
-	int getY() { return p.y; }
-	protocol_state getState() { return p.state; }
-	int getHealth() { return p.health; }
-	bool getHero() { return p.hero; }
-	int getCooltime() { return p.cooltime; }
-	int getRespawn() { return p.respawn; }
-	int getDeath() { return death; }
+	protocol_team getTeam() const { return p.team; }
+	protocol_dep getDep() const { return p.dep; }
+	int getX() const { return p.x; }
+	int getY() const { return p.y; }
+	protocol_state getState() const { return p.state; }
+	int getHealth() const { return p.health; }
+	bool getHero() const { return p.hero; }
+	int getCooltime() const { return p.cooltime; }
+	int getRespawn() const { return p.respawn; }
+	int getDeath() const { return death; }
+	int getOrgX() const { return orgx; }
+	int getOrgY() const { return orgy; }
 
 	// bypassing all constraints and animations.
 	// just use it for very exceptional cases.
@@ -112,11 +114,11 @@ public:
 	void update();
 	void draw() const;
 
-	protocol_flag* getProtocol() { return &p; }
+	const protocol_flag* getProtocol() const { return &p; }
 
-	protocol_team getTeam() { return p.team; }
-	int getX() { return p.x; }
-	int getY() { return p.y; }
+	protocol_team getTeam() const { return p.team; }
+	int getX() const { return p.x; }
+	int getY() const { return p.y; }
 };
 
 class Poison : public Object {
@@ -131,12 +133,12 @@ public:
 	void update();
 	void draw() const;
 
-	protocol_poison* getProtocol() { return &p; }
+	const protocol_poison* getProtocol() const { return &p; }
 
-	protocol_team getTeam() { return p.team; }
-	int getX() { return p.x; }
-	int getY() { return p.y; }
-	int getSpan() { return p.span; }
+	protocol_team getTeam() const { return p.team; }
+	int getX() const { return p.x; }
+	int getY() const { return p.y; }
+	int getSpan() const { return p.span; }
 };
 
 class Petal : public Object {
@@ -151,12 +153,12 @@ public:
 	void update();
 	void draw() const;
 
-	protocol_petal* getProtocol() { return &p; }
+	const protocol_petal* getProtocol() const { return &p; }
 
-	protocol_team getTeam() { return p.team; }
-	int getX() { return p.x; }
-	int getY() { return p.y; }
-	int getDirection() { return p.direction; }
+	protocol_team getTeam() const { return p.team; }
+	int getX() const { return p.x; }
+	int getY() const { return p.y; }
+	int getDirection() const { return p.direction; }
 };
 
 class Mushroom : public Object {
@@ -171,9 +173,9 @@ public:
 	void update();
 	void draw() const;
 
-	protocol_team getTeam() { return p.team; }
-	int getX() { return p.x; }
-	int getY() { return p.y; }
+	protocol_team getTeam() const { return p.team; }
+	int getX() const { return p.x; }
+	int getY() const { return p.y; }
 
-	protocol_mushroom* getProtocol() { return &p; }
+	const protocol_mushroom* getProtocol() const { return &p; }
 };
