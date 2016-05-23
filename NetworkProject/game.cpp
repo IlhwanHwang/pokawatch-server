@@ -96,6 +96,7 @@ void Game::draw() {
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
+	Draw::flush();
 }
 
 void Game::release() {
@@ -110,8 +111,8 @@ void Game::ruleMove() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
-		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		Unit& u = unitArray[ind];
+		protocol_command c = Network::getCommand(ind);
 		protocol_state s = u.getState();
 		
 		if (c == COMMAND_MOVE_RIGHT ||
@@ -135,24 +136,27 @@ void Game::ruleMove() {
 			int ind = movable[i];
 			Unit& u = unitArray[ind];
 			protocol_command c = Network::getCommand(ind);
+			bool moved = false;
 
 			switch (c) {
-			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
-			case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
-			case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
-			case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
+			case COMMAND_MOVE_RIGHT: moved = u.move(DIRECTION_RIGHT); break;
+			case COMMAND_MOVE_UP: moved = u.move(DIRECTION_UP); break;
+			case COMMAND_MOVE_LEFT: moved = u.move(DIRECTION_LEFT); break;
+			case COMMAND_MOVE_DOWN: moved = u.move(DIRECTION_DOWN); break;
 			}
 
 			bool duplicated = false;
 
-			for (int j = 0; j < alive.size(); j++) {
-				if (j == ind)
-					continue;
+			if (moved) {
+				for (int j = 0; j < alive.size(); j++) {
+					if (j == ind)
+						continue;
 
-				Unit& other = unitArray[alive[j]];
-				if (other.getX() == u.getX() && other.getY() == u.getY()) {
-					duplicated = true;
-					break;
+					Unit& other = unitArray[alive[j]];
+					if (other.getX() == u.getX() && other.getY() == u.getY()) {
+						duplicated = true;
+						break;
+					}
 				}
 			}
 

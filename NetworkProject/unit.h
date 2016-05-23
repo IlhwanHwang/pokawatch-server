@@ -59,7 +59,7 @@ public:
 	Unit(int x, int y, protocol_team team, const char* name);
 
 	void spawn(protocol_dep dep); // spawn as specified dep
-	void move(protocol_direction direction); // move 1 cell toward the direction
+	bool move(protocol_direction direction); // move 1 cell toward the direction
 	void attack(protocol_direction direction); // attack toward the direction
 	void skill(protocol_direction direction); // use hero skill toward the direction
 	void damage(int h = 1); // exert given damage on unit (1 on default)

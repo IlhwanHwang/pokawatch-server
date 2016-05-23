@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <WinSock2.h>
 #include <string>
+#include <ctime>
 
 #include "timer.h"
 #include "client.h"
@@ -47,6 +48,9 @@ void Timer::turn() {
 void Timer::update(int count) {
 	glutTimerFunc(frameInterval, update, count + 1);
 
+	clock_t clockSaved = clock();
+	clock_t clockSaved2 = clock();
+
 	if (count % framePerTurn == 0) {
 		turn();
 	}
@@ -71,9 +75,7 @@ void Timer::update(int count) {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	Shader::projection(Matrix::Ortho2D(0.0, WINDOW_WIDTH, 0.0, WINDOW_HEIGHT));
 	Game::draw();
-	Draw::flush();
 
 	glutSwapBuffers();
 

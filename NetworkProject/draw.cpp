@@ -21,8 +21,8 @@ void Draw::init() {
 	glutReshapeFunc(reshape);
 }
 
-DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) :
-	depth(depth), x(x), y(y), sx(sx), sy(sy), a(a), c(c), alpha(alpha) {
+DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) :
+	depth(depth), x(x), y(y), c(c), alpha(alpha) {
 	buf = spr.getBuf(ind);
 	w = spr.getW();
 	h = spr.getH();
@@ -30,19 +30,8 @@ DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float
 	ofy = spr.getOfy();
 }
 
-void DrawRequest::draw() {
-	Shader::push();
-		Shader::translate(vec3(x, y, 0.0));
-		Shader::rotateZ(a);
-		Shader::scale(vec3(sx, sy, 1.0));
-		Shader::translate(vec3(-ofx, -ofy, 0.0));
-		Shader::scale(vec3(w, h, 1.0));
-		Shader::apply();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, buf);
-		Shader::setBlend(vec4(c.r, c.g, c.b, alpha));
-		Shader::draw4thPlane();
-	Shader::pop();
+void DrawRequest::draw() const {
+	Shader::draw(buf, 0, x - ofx, y - ofy, w, h, c.r, c.g, c.b, alpha);
 }
 
 void Draw::reshape(int w, int h) {
