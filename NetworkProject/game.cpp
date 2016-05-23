@@ -1,13 +1,26 @@
 #include <cmath>
+#include <vector>
 #include "game.h"
 #include "protocol.h"
 #include "network.h"
 #include "draw.h"
 #include "resource.h"
 
-Unit Game::unitArray[UNIT_NUM_MAX] = { Unit(TEAM_POSTECH) , Unit(TEAM_KAIST)};
-//, Unit(TEAM_POSTECH), Unit(TEAM_POSTECH), Unit(TEAM_KAIST), Unit(TEAM_KAIST), Unit(TEAM_KAIST) };
-Flag Game::flagArray[FLAG_NUM_MAX] = { Flag(FLAG1_X, FLAG1_Y), Flag(FLAG2_X, FLAG2_Y) , Flag(FLAG3_X, FLAG3_Y) , Flag(FLAG4_X, FLAG4_Y) , Flag(FLAG5_X, FLAG5_Y) };
+Unit Game::unitArray[UNIT_NUM_MAX] = { 
+	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
+	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
+	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
+};
+Flag Game::flagArray[FLAG_NUM_MAX] = { 
+	Flag(FLAG1_X, FLAG1_Y), 
+	Flag(FLAG2_X, FLAG2_Y) , 
+	Flag(FLAG3_X, FLAG3_Y) , 
+	Flag(FLAG4_X, FLAG4_Y) , 
+	Flag(FLAG5_X, FLAG5_Y) 
+};
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
 Mushroom Game::mushroomArray[MUSHROOM_NUM_MAX];
@@ -76,15 +89,11 @@ void Game::release() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
 }
 
-void Game::turn() {
-	int turnLeft = 0;
+void Game::ruleMove() {
+	int turnLeft = 0; //temporary
+	std::vector<int> movable;
+	std::vector<int> alive;
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		Unit& u = unitArray[i];
-		u.turn();
-	}
-
-	// Move command
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
@@ -95,57 +104,71 @@ void Game::turn() {
 			c == COMMAND_MOVE_UP ||
 			c == COMMAND_MOVE_LEFT ||
 			c == COMMAND_MOVE_DOWN) {
-			
+			movable.push_back(ind);
+		}
+
+		if (s != STATE_NULL || s != STATE_DEAD) {
+			alive.push_back(ind);
+		}
+	}
+
+	bool changed = true; // is there any change in the map
+
+	while (changed) {
+		changed = false; // assuming no change
+
+		for (int i = 0; i < movable.size(); i++) {
+			int ind = movable[i];
+			Unit& u = unitArray[ind];
+			protocol_command c = Network::getCommand(i);
+
 			switch (c) {
-			case COMMAND_MOVE_RIGHT:
-				u.move(DIRECTION_RIGHT);
-				break;
-			case COMMAND_MOVE_UP:
-				u.move(DIRECTION_UP);
-				break;
-			case COMMAND_MOVE_LEFT:
-				u.move(DIRECTION_LEFT);
-				break;
-			case COMMAND_MOVE_DOWN:
-				u.move(DIRECTION_DOWN);
-				break;
+			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
+			case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
+			case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
+			case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
 			}
 
 			bool duplicated = false;
 
-			for (int j = 0; j < UNIT_NUM_MAX; j++) {
+			for (int j = 0; j < alive.size(); j++) {
 				if (j == ind)
 					continue;
 
-				Unit& other = unitArray[j];
+				Unit& other = unitArray[alive[j]];
 				if (other.getX() == u.getX() && other.getY() == u.getY()) {
 					duplicated = true;
 					break;
 				}
 			}
 
-			// if duplicated, then go back
 			if (duplicated) {
+				// if duplicated, then go back
 				switch (c) {
-				case COMMAND_MOVE_RIGHT:
-					u.move(DIRECTION_LEFT);
-					break;
-				case COMMAND_MOVE_UP:
-					u.move(DIRECTION_DOWN);
-					break;
-				case COMMAND_MOVE_LEFT:
-					u.move(DIRECTION_RIGHT);
-					break;
-				case COMMAND_MOVE_DOWN:
-					u.move(DIRECTION_UP);
-					break;
+				case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
+				case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
+				case COMMAND_MOVE_LEFT: u.move(DIRECTION_RIGHT); break;
+				case COMMAND_MOVE_DOWN: u.move(DIRECTION_UP); break;
 				}
-
 				u.moveOffDiscard();
+			}
+			else {
+				// if succeeded to move, then erase itself from list
+				movable.erase(movable.begin() + i);
+				i--;
+				changed = true; // keep looping
 			}
 		}
 	}
-	// End of move command
+}
+
+void Game::turn() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		u.turn();
+	}
+
+	ruleMove();
 
 	//attack command
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
@@ -603,24 +626,24 @@ void Game::turn() {
 			switch (c)
 			{
 			case COMMAND_SPAWN_CSE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_CSE);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_CSE);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CSE);
+				else u.spawn(DEP_CSE);
 				break;
 			case COMMAND_SPAWN_PHYS:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_PHYS);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_PHYS);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_PHYS);
+				else u.spawn(DEP_PHYS);
 				break;
 			case COMMAND_SPAWN_LIFE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_LIFE);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_LIFE);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_LIFE);
+				else u.spawn(DEP_LIFE);
 				break;
 			case COMMAND_SPAWN_ME:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_ME);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_ME);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_ME);
+				else u.spawn(DEP_ME);
 				break;
 			case COMMAND_SPAWN_CHEM:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_CHEM);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_CHEM);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CHEM);
+				else u.spawn(DEP_CHEM);
 				break;
 			}
 		}
@@ -675,6 +698,7 @@ void Game::turn() {
 
 	makeProtocol();
 }
+
 int Game::getValidPoisonIndex()
 {
 	int b;

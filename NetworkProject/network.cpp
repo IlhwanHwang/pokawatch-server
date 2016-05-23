@@ -246,12 +246,12 @@ void Network::update()
 		{
 			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
 			{
-				Game::getUnit(i).spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
+				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 				printf("%d! ", atoi(messageFromClient[i]));
 			}
 			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))
 			{
-				Game::getUnit(i).spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, (protocol_dep)(atoi(messageFromClient[i])));
+				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 				printf("%d! ", atoi(messageFromClient[i]));
 			}
 		}

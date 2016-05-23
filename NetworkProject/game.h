@@ -14,6 +14,8 @@ private:
 	static int turnleft;
 	static protocol_data protocolToSend;
 	static protocol_data *protocolPointer;
+
+	static void ruleMove();
 public:
 	static void init();
 	static void makeProtocol();

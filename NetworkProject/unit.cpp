@@ -22,20 +22,25 @@ void Unit::init() {
 	p.health = healthMax;
 	p.stun = 0;
 	p.cooltime = 0;
+	p.x = orgx;
+	p.y = orgy;
 }
 
-Unit::Unit(protocol_team team) : Unit(team, "Unnamed unit") {}
+Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
 
-Unit::Unit(protocol_team team, const char* name) {
+Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.team = team;
 	p.state = STATE_NULL;
 	p.respawn = 1;
+	orgx = x;
+	orgy = y;
+	p.x = orgx;
+	p.y = orgy;
+	death = 0;
 	this->name = name;
 }
 
-void Unit::spawn(int x, int y, protocol_dep dep) {
-	p.x = x;
-	p.y = y;
+void Unit::spawn(protocol_dep dep) {
 	p.dep = dep;
 }
 
