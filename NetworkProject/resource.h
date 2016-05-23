@@ -15,6 +15,7 @@ public:
 	static Sprite unitME;
 	static Sprite unitLIFE;
 	static Sprite unitPHYS;
+	static Sprite unitHeart;
 	static Sprite tileLight;
 	static Sprite tileDark;
 	static Sprite flagNull;

@@ -57,6 +57,7 @@ void Timer::update(int count) {
 		Game::getUnit(3).spawn(14, 6, DEP_LIFE);
 		Game::getUnit(4).spawn(14, 7, DEP_PHYS);
 		Game::getUnit(5).spawn(14, 8, DEP_CSE);
+		Game::release();
 		Network::setGameStart(0, GAME_START_CHAR);
 	}
 
