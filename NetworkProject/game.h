@@ -20,6 +20,7 @@ public:
 	static void update();
 	static void draw();
 	static void turn();
+	static void release();
 	static protocol_data getProtocol() { return protocolToSend; }
 	static protocol_data* getProtocolPointer() { return protocolPointer; }
 	static Unit &getUnit(int index) { return unitArray[index]; }

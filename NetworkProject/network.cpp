@@ -256,6 +256,7 @@ void Network::update()
 			}
 		}
 	
+		Game::release();
 		Network::sendToClient(gameStartMessage);		// start to clients
 		Network::setGameStart(0, GAME_START_CHAR);		// game started
 	}

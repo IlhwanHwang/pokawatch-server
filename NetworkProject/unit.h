@@ -63,6 +63,8 @@ public:
 	void heal(int h = 1); // heal unit with given value (1 on default)
 	void stun(int s = 3); // stun unit (3 turns on default)
 
+	void release() { p.state = STATE_IDLE; init(); } // For the first time
+
 	void moveOffDiscard() { moveOffDirection = DIRECTION_NULL; };
 
 	void turn();
