@@ -17,6 +17,8 @@
 
 struct Color {
 	static Color white;
+	static Color black;
+	static Color merge(Color& c1, Color& c2, float x);
 	float r, g, b;
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
 };

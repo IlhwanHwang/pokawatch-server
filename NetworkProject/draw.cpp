@@ -7,6 +7,14 @@
 #include "shader.h"
 
 Color Color::white(1.0, 1.0, 1.0);
+Color Color::black(0.0, 0.0, 0.0);
+
+Color Color::merge(Color& c1, Color& c2, float x) {
+	return Color(
+		c1.r * (1.0 - x) + c2.r * x,
+		c1.g * (1.0 - x) + c2.g * x,
+		c1.b * (1.0 - x) + c2.b * x);
+}
 
 int Draw::w = WINDOW_WIDTH;
 int Draw::h = WINDOW_HEIGHT;

@@ -654,7 +654,7 @@ void Game::ruleSpawn()
 			c == COMMAND_SPAWN_PHYS ||
 			c == COMMAND_SPAWN_LIFE ||
 			c == COMMAND_SPAWN_ME ||
-			c == COMMAND_SPAWN_CHEM)&&u.getRespawn()>0)
+			c == COMMAND_SPAWN_CHEM) && u.getState() == STATE_DEAD)
 		{
 			int b;
 			spawn[u.getTeam() - 1]++;

@@ -26,6 +26,7 @@ void Unit::init() {
 	p.cooltime = 0;
 	p.x = orgx;
 	p.y = orgy;
+	p.state = STATE_IDLE;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -299,7 +300,9 @@ void Unit::draw() const {
 	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + WINDOW_WIDTH / 2.0;
 	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + WINDOW_HEIGHT / 2.0;
 
-	Draw::draw(*face, x, y);
+	float k = (float)p.respawn / RESPAWN_COOLTIME;
+
+	Draw::draw(*face, 0, x, y, Color::merge(Color::white, Color::black, k), 1.0);
 
 	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
