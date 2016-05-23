@@ -14,6 +14,9 @@ private:
 	static int turnleft;
 	static protocol_data protocolToSend;
 	static protocol_data *protocolPointer;
+	static int heroLeft[2];
+	static int death[2];								// record how many death occured in each team
+	static int spawn[2];								// record how many spawn occured in each team
 
 	static void ruleMove();
 	static void ruleAttack();
@@ -35,4 +38,6 @@ public:
 	static int getValidPoisonIndex();
 	static int getValidPetalIndex();
 	static int getValidMushroomIndex();
+	static int getDeath(int ind) { return death[ind]; }
+	static void setDeath(int ind, int x) { death[ind] = x; }
 };

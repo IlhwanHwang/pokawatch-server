@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "draw.h"
 #include "spline.h"
+#include "game.h"
 
 void Unit::init() {
 	switch (p.dep) {
@@ -164,6 +165,8 @@ void Unit::damage(int h) {
 		p.state = STATE_DEAD;
 		p.respawn = RESPAWN_COOLTIME;
 		death++;
+		if (p.team == TEAM_POSTECH) Game::setDeath(TEAM_POSTECH - 1, Game::getDeath(TEAM_POSTECH-1) + 1);
+		if (p.team == TEAM_KAIST) Game::setDeath(TEAM_KAIST - 1, Game::getDeath(TEAM_KAIST - 1) + 1);
 	}
 }
 

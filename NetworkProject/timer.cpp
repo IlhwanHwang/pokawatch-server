@@ -29,6 +29,7 @@ using namespace std;
 int Timer::frameInterval;
 int Timer::framePerTurn;
 
+
 void Timer::init(int interval, int perturn) {
 	frameInterval = interval;
 	framePerTurn = perturn;
@@ -40,7 +41,7 @@ void Timer::turn() {
 	//std::cout << "Turn!" << std::endl;
 	// add any per turn action
 	Network::turn();
-	Game::turn();
+	if(Network::getGameStart()[0]==GAME_START_CHAR) Game::turn();
 }
 
 void Timer::update(int count) {
