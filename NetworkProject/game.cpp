@@ -8,10 +8,10 @@
 
 Unit Game::unitArray[UNIT_NUM_MAX] = { 
 	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
-	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
-	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
-	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
-	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
+//	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
+//	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
+//	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
+//	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
 };
 Flag Game::flagArray[FLAG_NUM_MAX] = { 
@@ -99,6 +99,7 @@ void Game::ruleMove() {
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
+		protocol_state s = u.getState();
 		
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||
