@@ -177,3 +177,5 @@ typedef struct {
 #define INVALID_PETAL_INDEX -1
 
 #define BLACKHOLE_DAMAGE 10
+#define DEATH_PENALTY 10
+#define FLAG_SCORE 50

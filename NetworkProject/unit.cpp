@@ -163,6 +163,7 @@ void Unit::damage(int h) {
 	if (p.health <= 0) {
 		p.state = STATE_DEAD;
 		p.respawn = RESPAWN_COOLTIME;
+		death++;
 	}
 }
 

@@ -16,6 +16,12 @@ private:
 	static protocol_data *protocolPointer;
 
 	static void ruleMove();
+	static void ruleAttack();
+	static void ruleSkill();
+	static void ruleSpawn();
+	static void ruleFlag();
+
+
 public:
 	static void init();
 	static void makeProtocol();
