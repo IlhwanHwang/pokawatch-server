@@ -51,12 +51,12 @@ void Timer::update(int count) {
 	}
 
 	if (Key::keyCheckPressed('1') && Network::getMode() == MODE_NOTHING) {
-		Game::getUnit(0).spawn(0, 6, DEP_CHEM);
-		Game::getUnit(1).spawn(0, 7, DEP_CSE);
-		Game::getUnit(2).spawn(0, 8, DEP_ME);
-		Game::getUnit(3).spawn(14, 6, DEP_LIFE);
-		Game::getUnit(4).spawn(14, 7, DEP_PHYS);
-		Game::getUnit(5).spawn(14, 8, DEP_CSE);
+		Game::getUnit(0).spawn(DEP_CHEM);
+		Game::getUnit(1).spawn(DEP_CSE);
+		Game::getUnit(2).spawn(DEP_ME);
+		Game::getUnit(3).spawn(DEP_LIFE);
+		Game::getUnit(4).spawn(DEP_PHYS);
+		Game::getUnit(5).spawn(DEP_CSE);
 		Game::release();
 		Network::setGameStart(0, GAME_START_CHAR);
 	}

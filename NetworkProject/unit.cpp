@@ -26,7 +26,7 @@ void Unit::init() {
 	p.y = orgy;
 }
 
-Unit::Unit(int x, int y, protocol_team team) : Unit(team, "Unnamed unit") {}
+Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
 
 Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.team = team;

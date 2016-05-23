@@ -87,11 +87,14 @@ void Game::release() {
 void Game::ruleMove() {
 	int turnLeft = 0; //temporary
 	std::vector<int> movable;
+	std::vector<int> alive;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
-		protocol_command c = Network::getCommand(i);
+		Unit& u = unitArray[ind];
+		protocol_command c = Network::getCommand(ind);
+		protocol_state s = u.getState();
 
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||
@@ -99,42 +102,58 @@ void Game::ruleMove() {
 			c == COMMAND_MOVE_DOWN) {
 			movable.push_back(ind);
 		}
+
+		if (s != STATE_NULL || s != STATE_DEAD) {
+			alive.push_back(ind);
+		}
 	}
 
-	for (int i = 0; i < movable.size(); i++) {
-		int ind = movable[i];
-		Unit& u = unitArray[ind];
-		protocol_command c = Network::getCommand(i);
+	bool changed = true; // is there any change in the map
 
-		switch (c) {
-		case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
-		case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
-		case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
-		case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
-		}
+	while (changed) {
+		changed = false; // assuming no change
 
-		bool duplicated = false;
+		for (int i = 0; i < movable.size(); i++) {
+			int ind = movable[i];
+			Unit& u = unitArray[ind];
+			protocol_command c = Network::getCommand(i);
 
-		for (int j = 0; j < UNIT_NUM_MAX; j++) {
-			if (j == ind)
-				continue;
-
-			Unit& other = unitArray[j];
-			if (other.getX() == u.getX() && other.getY() == u.getY()) {
-				duplicated = true;
-				break;
-			}
-		}
-
-		// if duplicated, then go back
-		if (duplicated) {
 			switch (c) {
-			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
-			case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
-			case COMMAND_MOVE_LEFT: u.move(DIRECTION_RIGHT); break;
-			case COMMAND_MOVE_DOWN: u.move(DIRECTION_UP); break;
+			case COMMAND_MOVE_RIGHT: u.move(DIRECTION_RIGHT); break;
+			case COMMAND_MOVE_UP: u.move(DIRECTION_UP); break;
+			case COMMAND_MOVE_LEFT: u.move(DIRECTION_LEFT); break;
+			case COMMAND_MOVE_DOWN: u.move(DIRECTION_DOWN); break;
 			}
-			u.moveOffDiscard();
+
+			bool duplicated = false;
+
+			for (int j = 0; j < alive.size(); j++) {
+				if (j == ind)
+					continue;
+
+				Unit& other = unitArray[alive[j]];
+				if (other.getX() == u.getX() && other.getY() == u.getY()) {
+					duplicated = true;
+					break;
+				}
+			}
+
+			if (duplicated) {
+				// if duplicated, then go back
+				switch (c) {
+				case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
+				case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
+				case COMMAND_MOVE_LEFT: u.move(DIRECTION_RIGHT); break;
+				case COMMAND_MOVE_DOWN: u.move(DIRECTION_UP); break;
+				}
+				u.moveOffDiscard();
+			}
+			else {
+				// if succeeded to move, then erase itself from list
+				movable.erase(movable.begin() + i);
+				i--;
+				changed = true; // keep looping
+			}
 		}
 	}
 }
@@ -619,24 +638,24 @@ void Game::turn() {
 			switch (c)
 			{
 			case COMMAND_SPAWN_CSE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_CSE);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_CSE);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CSE);
+				else u.spawn(DEP_CSE);
 				break;
 			case COMMAND_SPAWN_PHYS:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_PHYS);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_PHYS);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_PHYS);
+				else u.spawn(DEP_PHYS);
 				break;
 			case COMMAND_SPAWN_LIFE:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_LIFE);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_LIFE);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_LIFE);
+				else u.spawn(DEP_LIFE);
 				break;
 			case COMMAND_SPAWN_ME:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_ME);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_ME);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_ME);
+				else u.spawn(DEP_ME);
 				break;
 			case COMMAND_SPAWN_CHEM:
-				if (u.getTeam() == TEAM_POSTECH) u.spawn(TEAM_POSTECH_SPAWN_X, TEAM_POSTECH_SPAWN_Y, DEP_CHEM);
-				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_CHEM);
+				if (u.getTeam() == TEAM_POSTECH) u.spawn(DEP_CHEM);
+				else u.spawn(DEP_CHEM);
 				break;
 			}
 
@@ -687,6 +706,7 @@ void Game::turn() {
 
 	
 }
+
 int Game::getValidPoisonIndex()
 {
 	int b;
