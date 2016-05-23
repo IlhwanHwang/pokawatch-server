@@ -43,7 +43,7 @@ void Game::makeProtocol()
 	printf("UNIT_INFO\n");
 	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d hero : %d cooltime : %d respawn : %d stun : %d\n" ,unitArray[i].getProtocol()->team, unitArray[i].getProtocol()->dep, unitArray[i].getProtocol()->x, unitArray[i].getProtocol()->y, unitArray[i].getProtocol()->state, unitArray[i].getProtocol()->health, unitArray[i].getProtocol()->hero, unitArray[i].getProtocol()->cooltime, unitArray[i].getProtocol()->respawn, unitArray[i].getProtocol()->stun);
 	printf("FLAG_INFO\n");
-	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n");
+	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", flagArray[i].getTeam(), flagArray[i].getX(), flagArray[i].getY());
 	
 	protocolPointer = &protocolToSend;
 }

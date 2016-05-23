@@ -160,6 +160,15 @@ void Network::getProtocolDataFromServer()
 	{
 		printf("%d ", ((int*)messageToClient)[i]);
 	}
+
+	protocol_data *newData = (protocol_data*)messageToClient;
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d hero : %d cooltime : %d respawn : %d stun : %d\n", newData->unit[i].team, newData->unit[i].dep, newData->unit[i].x, newData->unit[i].y, newData->unit[i].state, newData->unit[i].health, newData->unit[i].hero, newData->unit[i].cooltime, newData->unit[i].respawn, newData->unit[i].stun);
+
+	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", newData->flag[i].team, newData->flag[i].x, newData->flag[i].y);
+
+
+	
 	printf("\n");
 }
 
