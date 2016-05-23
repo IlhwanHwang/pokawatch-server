@@ -714,10 +714,12 @@ void Game::ruleFlag()
 void Game::turn() {
 	turnleft--;
 	if (turnleft <= 0) return;
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		Unit& u = unitArray[i];
-		u.turn();
-	}
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].turn();
+	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].turn();
+	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].turn();
+	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].turn();
+	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].turn();
 
 	ruleMove();
 	ruleAttack();
