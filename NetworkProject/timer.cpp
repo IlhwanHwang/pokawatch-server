@@ -47,16 +47,13 @@ void Timer::turn() {
 void Timer::update(int count) {
 	glutTimerFunc(frameInterval, update, count + 1);
 
-	clock_t clockSaved = clock();
-	clock_t clockSaved2 = clock();
-
 	if (count % framePerTurn == 0) {
 		turn();
 	}
 
 	if (Key::keyCheckPressed('1') && Network::getMode() == MODE_NOTHING) {
 		Game::getUnit(0).spawn(DEP_CHEM);
-		Game::getUnit(1).spawn(DEP_CSE);
+		Game::getUnit(1).spawn(DEP_ME);
 		Game::getUnit(2).spawn(DEP_ME);
 		Game::getUnit(3).spawn(DEP_LIFE);
 		Game::getUnit(4).spawn(DEP_PHYS);

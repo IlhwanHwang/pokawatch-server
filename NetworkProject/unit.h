@@ -68,6 +68,7 @@ public:
 
 	void release() { p.state = STATE_IDLE; init(); } // For the first time
 
+	void moveResetMovestun() { moveStun = 0; }
 	void moveOffDiscard() { moveOffDirection = DIRECTION_NULL; };
 
 	void turn();

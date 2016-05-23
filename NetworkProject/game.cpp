@@ -149,6 +149,7 @@ void Game::ruleMove() {
 
 			if (duplicated) {
 				// if duplicated, then go back
+				u.moveResetMovestun();
 				switch (c) {
 				case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
 				case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;

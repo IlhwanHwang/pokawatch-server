@@ -50,7 +50,6 @@ bool Unit::move(protocol_direction direction) {
 
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
-		std::cout << moveStun << " turns left to move" << std::endl;
 		return false;
 	}
 	if (p.state == STATE_STUN) {
