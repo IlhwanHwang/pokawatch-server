@@ -49,7 +49,7 @@ void Resource::init() {
 	Rspr::faceDEAD.load("face_dead.png");
 
 	Rspr::petal.load("petal.png").setOffset(20.0, 40.0);
-	Rspr::petal.load("poison.png");
+	Rspr::poison.load("poison.png");
 
 	Rspr::tileLight.load("tile_light.png");
 	Rspr::tileDark.load("tile_dark.png");
