@@ -79,12 +79,33 @@ void Game::release() {
 void Game::turn() {
 	int turnLeft = 0;
 
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		u.turn();
+	}
+
 	// Move command
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnLeft % 2 == 0) ? i : ind = (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
+
+		//c = (protocol_command)(rand() % (COMMAND_FLAG + 1));
+		switch (rand() % 4) {
+		case 0:
+			c = COMMAND_MOVE_RIGHT;
+			break;
+		case 1:
+			c = COMMAND_MOVE_UP;
+			break;
+		case 2:
+			c = COMMAND_MOVE_LEFT;
+			break;
+		case 3:
+			c = COMMAND_MOVE_DOWN;
+			break;
+		}
 
 		if (c == COMMAND_MOVE_RIGHT ||
 			c == COMMAND_MOVE_UP ||
@@ -702,4 +723,3 @@ int Game::getValidPetalIndex()
 	if (b < PETAL_NUM_MAX) return b;
 	else return INVALID_PETAL_INDEX;
 }
-

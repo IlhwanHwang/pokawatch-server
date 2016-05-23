@@ -37,7 +37,6 @@ void Unit::spawn(int x, int y, protocol_dep dep) {
 	p.x = x;
 	p.y = y;
 	p.dep = dep;
-	p.state = STATE_IDLE;
 }
 
 void Unit::move(protocol_direction direction) {
@@ -46,6 +45,7 @@ void Unit::move(protocol_direction direction) {
 
 	if (moveStun > 0) {
 		error("Cannot move in consecutive turns");
+		std::cout << moveStun << " turns left to move" << std::endl;
 		return;
 	}
 	if (p.state == STATE_STUN) {
@@ -66,17 +66,18 @@ void Unit::move(protocol_direction direction) {
 
 	p.x += dx;
 	p.y += dy;
+	moveOffPhase = 1.0;
 
 	if (p.x < 0 || p.x >= MAP_WIDTH || p.y < 0 || p.y >= MAP_HEIGHT) {
 		p.x -= dx;
 		p.y -= dy;
+		moveOffDirection = DIRECTION_NULL;
 		error("Tried to move to the outside of the map");
 	}
 	else {
 		moveOffDirection = direction;
-		moveOffPhase = 1.0;
 		if (p.dep == DEP_ME) {
-			moveStun = 1;
+			moveStun = 2;
 		}
 	}
 }
@@ -261,7 +262,34 @@ void Unit::draw() const {
 	if (p.state == STATE_DEAD)
 		return;
 
-	Draw::onmap(Rspr::temp, 0.0, (float)p.x + moveOffX, (float)p.y + moveOffY);
+	float drawx = (float)p.x + moveOffX;
+	float drawy = (float)p.y + moveOffY;
+
+	switch (p.dep) {
+	case DEP_CSE:
+		Draw::onmap(Rspr::unitCSE, 0.0, drawx, drawy);
+		break;
+	case DEP_CHEM:
+		Draw::onmap(Rspr::unitCHEM, 0.0, drawx, drawy);
+		break;
+	case DEP_ME:
+		Draw::onmap(Rspr::unitME, 0, 0.0, drawx, drawy, 1.0, 1.0, 0.0, moveStun > 1 ? Color(1.0, 0.5, 0.5) : Color(1.0, 1.0, 1.0), 1.0);
+		break;
+	case DEP_LIFE:
+		Draw::onmap(Rspr::unitLIFE, 0.0, drawx, drawy);
+		break;
+	case DEP_PHYS:
+		Draw::onmap(Rspr::unitPHYS, 0.0, drawx, drawy);
+		break;
+	}
+
+	float ddx = 20 / GUI_CELL_WIDTH;
+	float dx = -(float)(p.health - 1) / 2.0 * ddx;
+
+	for (int i = 0; i < p.health; i++) {
+		Draw::onmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 2.0);
+		dx += ddx;
+	}
 }
 
 void Flag::turn() {
@@ -275,7 +303,7 @@ void Flag::update() {
 void Flag::draw() const {
 	Sprite& n = Rspr::flagNull;
 	Sprite& f = Rspr::flagFlag;
-	Draw::onmap(p.team == TEAM_NULL ? n : f, 0.0, (float)p.x, (float)p.y);
+	Draw::onmap(p.team == TEAM_NULL ? n : f, -1.0, (float)p.x, (float)p.y);
 }
 
 Poison::Poison() {

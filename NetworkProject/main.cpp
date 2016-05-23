@@ -49,7 +49,7 @@ void main(int argc, char **argv)
 	Key::init();
 	Shader::init();
 	Draw::init();
-	Timer::init(16, 60);
+	Timer::init(FRAME_INTERVAL, FRAME_PER_TURN);
 
 	glutMainLoop();
 }
