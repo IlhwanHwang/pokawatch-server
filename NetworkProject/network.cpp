@@ -79,7 +79,6 @@ void Network::acceptClient()
 
 void Network::sendToClient(char *messageToClient)
 {
-	
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
@@ -129,6 +128,7 @@ void Network::makeClientSocket()
 	{
 		ErrorHandling("hSocketet(), error");
 	}
+	printf("소켓 만들어 졌다.\n");
 
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
@@ -160,6 +160,15 @@ void Network::getProtocolDataFromServer()
 	{
 		printf("%d ", ((int*)messageToClient)[i]);
 	}
+
+	protocol_data *newData = (protocol_data*)messageToClient;
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d hero : %d cooltime : %d respawn : %d stun : %d\n", newData->unit[i].team, newData->unit[i].dep, newData->unit[i].x, newData->unit[i].y, newData->unit[i].state, newData->unit[i].health, newData->unit[i].hero, newData->unit[i].cooltime, newData->unit[i].respawn, newData->unit[i].stun);
+
+	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", newData->flag[i].team, newData->flag[i].x, newData->flag[i].y);
+
+
+	
 	printf("\n");
 }
 
@@ -321,6 +330,12 @@ void Network::update()
 			if (Key::keyCheckPressed('w') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_UP);
 			if (Key::keyCheckPressed('a') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_LEFT);
 			if (Key::keyCheckPressed('s') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_DOWN);
+
+			if (Key::keyCheckPressed('1')) Network::setCommand(COMMAND_SPAWN_CSE);
+			if (Key::keyCheckPressed('2')) Network::setCommand(COMMAND_SPAWN_PHYS);
+			if (Key::keyCheckPressed('3')) Network::setCommand(COMMAND_SPAWN_LIFE);
+			if (Key::keyCheckPressed('4')) Network::setCommand(COMMAND_SPAWN_ME);
+			if (Key::keyCheckPressed('5')) Network::setCommand(COMMAND_SPAWN_CHEM);
 
 			if (Key::keyCheckPressed('l')) Network::setCommand(COMMAND_FLAG);
 		}

@@ -80,7 +80,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
-#define UNIT_NUM_MAX 6
+#define UNIT_NUM_MAX 2
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -139,7 +139,8 @@ typedef struct {
 
 #define PORT_STRING "2222"
 //#define SERV_IP_STRING "141.223.208.207"
-#define SERV_IP_STRING "119.202.87.115"
+#define SERV_IP_STRING "141.223.211.178"
+//#define SERV_IP_STRING "119.202.87.115"
 //#define SERV_IP_STRING "141.223.85.241"
 
 #define MODE_NOTHING 7
@@ -172,4 +173,7 @@ typedef struct {
 #define TURN_MAX 300
 
 #define INVALID_POISON_INDEX -1
+#define INVALID_MUSHROOM_INDEX -1
+#define INVALID_PETAL_INDEX -1
+
 #define BLACKHOLE_DAMAGE 10

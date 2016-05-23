@@ -27,4 +27,6 @@ public:
 	static protocol_data* getProtocolPointer() { return protocolPointer; }
 	static Unit &getUnit(int index) { return unitArray[index]; }
 	static int getValidPoisonIndex();
+	static int getValidPetalIndex();
+	static int getValidMushroomIndex();
 };
