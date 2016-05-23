@@ -79,7 +79,6 @@ void Network::acceptClient()
 
 void Network::sendToClient(char *messageToClient)
 {
-	
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
@@ -129,6 +128,7 @@ void Network::makeClientSocket()
 	{
 		ErrorHandling("hSocketet(), error");
 	}
+	printf("소켓 만들어 졌다.\n");
 
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;

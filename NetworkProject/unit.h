@@ -164,5 +164,9 @@ public:
 	void update();
 	void draw() const;
 
+	protocol_team getTeam() { return p.team; }
+	int getX() { return p.x; }
+	int getY() { return p.y; }
+
 	protocol_mushroom* getProtocol() { return &p; }
 };

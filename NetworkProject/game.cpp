@@ -39,7 +39,12 @@ void Game::makeProtocol()
 	for (int i = 0; i < POISON_NUM_MAX; i++) protocolToSend.poison[i] = *(poisonArray[i].getProtocol());
 	for (int i = 0; i < PETAL_NUM_MAX; i++) protocolToSend.petal[i] = *(petalArray[i].getProtocol());
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) protocolToSend.mushroom[i] = *(mushroomArray[i].getProtocol());
-
+	
+	printf("UNIT_INFO\n");
+	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d hero : %d cooltime : %d respawn : %d stun : %d\n" ,unitArray[i].getProtocol()->team, unitArray[i].getProtocol()->dep, unitArray[i].getProtocol()->x, unitArray[i].getProtocol()->y, unitArray[i].getProtocol()->state, unitArray[i].getProtocol()->health, unitArray[i].getProtocol()->hero, unitArray[i].getProtocol()->cooltime, unitArray[i].getProtocol()->respawn, unitArray[i].getProtocol()->stun);
+	printf("FLAG_INFO\n");
+	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n");
+	
 	protocolPointer = &protocolToSend;
 }
 
@@ -168,7 +173,7 @@ void Game::turn() {
 				for (int a = 0; a < UNIT_NUM_MAX; a++)
 				{
 					if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(1);
 				}
 				break;
 			case DEP_PHYS:
@@ -436,7 +441,7 @@ void Game::turn() {
 				for (int a = 0; a < UNIT_NUM_MAX; a++)
 				{
 					if (abs((unitArray[a].getX() - u.getX()) <= 3) && (abs(unitArray[a].getY() - u.getY()) <= 3))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(1);
 				}
 				break;
 			case DEP_PHYS:
@@ -549,36 +554,19 @@ void Game::turn() {
 				{
 				case COMMAND_SKILL_RIGHT:
 					u.skill(DIRECTION_RIGHT);
-					for (int c = 1; c <= 7; c++)
-					{
-						if ((b = getValidPoisonIndex()) != INVALID_POISON_INDEX) poisonArray[b].spawn(u.getTeam(), u.getX()+c, u.getY());
-					}
-
+					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX()+1, u.getY());
 					break;
 				case COMMAND_SKILL_UP:
 					u.skill(DIRECTION_UP);
-
-					for (int c = 1; c <= 7; c++)
-					{
-						if ((b = getValidPoisonIndex()) != INVALID_POISON_INDEX) poisonArray[b].spawn(u.getTeam(), u.getX() , u.getY()+c);
-					}
-
+					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX() , u.getY()+1);
 					break;
 				case COMMAND_SKILL_LEFT:
 					u.skill(DIRECTION_LEFT);
-					for (int c = 1; c <= 7; c++)
-					{
-						if ((b = getValidPoisonIndex()) != INVALID_POISON_INDEX) poisonArray[b].spawn(u.getTeam(), u.getX() - c, u.getY());
-					}
-
+					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX() -1, u.getY());
 					break;
 				case COMMAND_SKILL_DOWN:
 					u.skill(DIRECTION_DOWN);
-					for (int c = 1; c <= 7; c++)
-					{
-						if ((b = getValidPoisonIndex()) != INVALID_POISON_INDEX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() - c);
-					}
-
+					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX() , u.getY() -1);
 					break;
 				}
 				break;
@@ -625,7 +613,6 @@ void Game::turn() {
 				else u.spawn(TEAM_KAIST_SPAWN_X, TEAM_KAIST_SPAWN_Y, DEP_CHEM);
 				break;
 			}
-
 		}
 
 	} // end of spawn
@@ -664,14 +651,19 @@ void Game::turn() {
 		{
 			if (unitArray[a].getY() == poisonArray[b].getY() && unitArray[a].getX() == poisonArray[b].getX())
 			{
-				if (unitArray[a].getTeam() != petalArray[b].getTeam()) unitArray[a].damage(1);
+				if (unitArray[a].getTeam() != poisonArray[b].getTeam()) unitArray[a].damage(1);
+			}
+		}
+		for (int b = 0; b < MUSHROOM_NUM_MAX; b++) // mushroom confliction
+		{
+			if (unitArray[a].getY() == mushroomArray[b].getY() && unitArray[a].getX() == mushroomArray[b].getX())
+			{
+				if (unitArray[a].getTeam() != mushroomArray[b].getTeam()) unitArray[a].damage(1);
 			}
 		}
 	}
 
-
-
-	
+	makeProtocol();
 }
 int Game::getValidPoisonIndex()
 {
@@ -684,3 +676,26 @@ int Game::getValidPoisonIndex()
 	if (b < POISON_NUM_MAX) return b;
 	else return INVALID_POISON_INDEX;
 }
+int Game::getValidMushroomIndex()
+{
+	int b;
+	for (b = 0; b < MUSHROOM_NUM_MAX; b++)
+	{
+		if (mushroomArray[b].getProtocol()->valid)
+			break;
+	}
+	if (b < MUSHROOM_NUM_MAX) return b;
+	else return INVALID_MUSHROOM_INDEX;
+}
+int Game::getValidPetalIndex()
+{
+	int b;
+	for (b = 0; b < PETAL_NUM_MAX; b++)
+	{
+		if (petalArray[b].getProtocol()->valid)
+			break;
+	}
+	if (b < PETAL_NUM_MAX) return b;
+	else return INVALID_PETAL_INDEX;
+}
+
