@@ -275,19 +275,19 @@ void Unit::draw() const {
 
 	switch (p.dep) {
 	case DEP_CSE:
-		Draw::onmap(Rspr::unitCSE, 0.0, drawx, drawy);
+		Draw::qonmap(Rspr::unitCSE, 0.0, drawx, drawy);
 		break;
 	case DEP_CHEM:
-		Draw::onmap(Rspr::unitCHEM, 0.0, drawx, drawy);
+		Draw::qonmap(Rspr::unitCHEM, 0.0, drawx, drawy);
 		break;
 	case DEP_ME:
-		Draw::onmap(Rspr::unitME, 0, 0.0, drawx, drawy, 1.0, 1.0, 0.0, moveStun > 1 ? Color(1.0, 0.5, 0.5) : Color(1.0, 1.0, 1.0), 1.0);
+		Draw::qonmap(Rspr::unitME, 0, 0.0, drawx, drawy, moveStun > 1 ? Color(1.0, 0.5, 0.5) : Color(1.0, 1.0, 1.0), 1.0);
 		break;
 	case DEP_LIFE:
-		Draw::onmap(Rspr::unitLIFE, 0.0, drawx, drawy);
+		Draw::qonmap(Rspr::unitLIFE, 0.0, drawx, drawy);
 		break;
 	case DEP_PHYS:
-		Draw::onmap(Rspr::unitPHYS, 0.0, drawx, drawy);
+		Draw::qonmap(Rspr::unitPHYS, 0.0, drawx, drawy);
 		break;
 	}
 
@@ -295,7 +295,7 @@ void Unit::draw() const {
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;
 
 	for (int i = 0; i < p.health; i++) {
-		Draw::onmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 2.0);
+		Draw::qonmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 2.0);
 		dx += ddx;
 	}
 }

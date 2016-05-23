@@ -48,6 +48,7 @@ void Timer::update(int count) {
 	glutTimerFunc(frameInterval, update, count + 1);
 
 	clock_t clockSaved = clock();
+	clock_t clockSaved2 = clock();
 
 	if (count % framePerTurn == 0) {
 		turn();
@@ -67,21 +68,13 @@ void Timer::update(int count) {
 	// add any per frame actions
 	// such as update() and draw() for all object
 
-	clockSaved = clock();
 	Network::update();
-	std::cout << (clock() - clockSaved) * 1000.0 / CLOCKS_PER_SEC << "ms for Network" << std::endl;
-	clockSaved = clock();
 	Game::update();
-	std::cout << (clock() - clockSaved) * 1000.0 / CLOCKS_PER_SEC << "ms for Game update" << std::endl;
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	clockSaved = clock();
-	Shader::projection(Matrix::Ortho2D(0.0, WINDOW_WIDTH, 0.0, WINDOW_HEIGHT));
 	Game::draw();
-	Draw::flush();
-	std::cout << (clock() - clockSaved) * 1000.0 / CLOCKS_PER_SEC << "ms for Draw" << std::endl;
 
 	glutSwapBuffers();
 

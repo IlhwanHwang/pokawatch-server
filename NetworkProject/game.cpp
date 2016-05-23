@@ -77,12 +77,13 @@ void Game::draw() {
 			Draw::onmap((i + j) % 2 == 0 ? light : dark, -100.0, i, j);
 		}
 	}
-	
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
 	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
+	Draw::flush();
 }
 
 void Game::release() {

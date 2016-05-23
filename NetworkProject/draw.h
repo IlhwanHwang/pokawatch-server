@@ -30,8 +30,8 @@ private:
 	float depth;
 
 public:
-	DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha);
-	void draw();
+	DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha);
+	void draw() const;
 	bool operator< (const DrawRequest& other) const { return depth > other.depth; }
 };
 
@@ -44,32 +44,41 @@ public:
 	static void init();
 	static void reshape(int, int);
 	static void flush();
-	static void draw(Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {
-		//DrawRequest(spr, ind, depth, x, y, sx, sy, a, c, alpha).draw();
-		req.push(DrawRequest(spr, ind, depth, x, y, sx, sy, a, c, alpha));
+	static void draw(Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) {
+		DrawRequest(spr, ind, depth, x, y, c, alpha).draw();
 	}
-	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {
-		draw(spr, 0, depth, x, y, sx, sy, a, c, alpha);
+	static void draw(Sprite& spr, int ind, float depth, float x, float y) {
+		draw(spr, ind, depth, x, y, Color::white, 1.0);
 	}
 	static void draw(Sprite& spr, float depth, float x, float y) {
-		draw(spr, 0, depth, x, y, 1.0, 1.0, 0.0, Color::white, 1.0);
+		draw(spr, 0, depth, x, y, Color::white, 1.0);
 	}
-	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy) {
-		draw(spr, 0, depth, x, y, sx, sy, 0.0, Color::white, 1.0);
-	}
-	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy, float a) {
-		draw(spr, 0, depth, x, y, sx, sy, a, Color::white, 1.0);
-	}
-	static void draw(Sprite& spr, float depth, float x, float y, float sx, float sy, float a, Color& c) {
-		draw(spr, 0, depth, x, y, sx, sy, a, c, 1.0);
-	}
-	static void onmap(Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, float a, Color& c, float alpha) {
-		draw(spr, ind, depth - y, Gui::unitX(x), Gui::unitY(y), sx, sy, a, c, alpha);
-	}
-	static void onmap(Sprite& spr, float depth, float x, float y) {
-		onmap(spr, 0, depth, x, y, 1.0, 1.0, 0.0, Color::white, 1.0);
+	static void onmap(Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) {
+		draw(spr, ind, depth - y, Gui::unitX(x), Gui::unitY(y), c, alpha);
 	}
 	static void onmap(Sprite& spr, int ind, float depth, float x, float y) {
-		onmap(spr, ind, depth, x, y, 1.0, 1.0, 0.0, Color::white, 1.0);
+		onmap(spr, ind, depth, x, y, Color::white, 1.0);
+	}
+	static void onmap(Sprite& spr, float depth, float x, float y) {
+		onmap(spr, 0, depth, x, y, Color::white, 1.0);
+	}
+
+	static void qdraw(Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) {
+		req.push(DrawRequest(spr, ind, depth, x, y, c, alpha));
+	}
+	static void qdraw(Sprite& spr, int ind, float depth, float x, float y) {
+		qdraw(spr, ind, depth, x, y, Color::white, 1.0);
+	}
+	static void qdraw(Sprite& spr, float depth, float x, float y) {
+		qdraw(spr, 0, depth, x, y, Color::white, 1.0);
+	}
+	static void qonmap(Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) {
+		qdraw(spr, ind, depth - y, Gui::unitX(x), Gui::unitY(y), c, alpha);
+	}
+	static void qonmap(Sprite& spr, int ind, float depth, float x, float y) {
+		qonmap(spr, ind, depth, x, y, Color::white, 1.0);
+	}
+	static void qonmap(Sprite& spr, float depth, float x, float y) {
+		qonmap(spr, 0, depth, x, y, Color::white, 1.0);
 	}
 };

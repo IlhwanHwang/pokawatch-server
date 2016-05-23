@@ -3,6 +3,8 @@
 // sprite class
 //
 
+#include <iostream>
+
 #include "shader.h"
 #include "sprite.h"
 #include "lodepng.h"
