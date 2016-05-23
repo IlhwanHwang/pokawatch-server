@@ -66,6 +66,10 @@ void Game::draw() {
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
 }
 
+void Game::release() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
+}
+
 void Game::turn() {
 	int turnLeft = 0;
 
