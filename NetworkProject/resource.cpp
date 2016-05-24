@@ -24,6 +24,7 @@ Sprite Rspr::faceDEAD;
 
 Sprite Rspr::petal;
 Sprite Rspr::poison;
+Sprite Rspr::beamH[4];
 
 Sprite Rspr::hero;
 
@@ -53,8 +54,13 @@ void Resource::init() {
 	Rspr::facePHYS.load("face_phys.png");
 	Rspr::faceDEAD.load("face_dead.png");
 
-	Rspr::petal.load("petal.png").dot().setOffset(16.0, 40.0);
+	Rspr::petal.load("petal.png").dot().setOffset(16.0, 80.0);
 	Rspr::poison.load("poison.png").dot();
+	for (int i = 0; i < 4; i++) {
+		char fn[] = "beam_h0.png";
+		fn[6] = i + '0';
+		Rspr::beamH[i].load(fn).dot();
+	}
 
 	Rspr::hero.load("hero.png").dot().setOffset(30.0, 50.0);
 

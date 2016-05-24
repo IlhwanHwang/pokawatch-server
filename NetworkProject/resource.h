@@ -28,6 +28,7 @@ public:
 
 	static Sprite petal;
 	static Sprite poison;
+	static Sprite beamH[4];
 
 	static Sprite hero;
 

@@ -43,6 +43,7 @@ Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.x = orgx;
 	p.y = orgy;
 	death = 0;
+	animationPhase = 0.0;
 
 	this->name = name;
 }
@@ -224,6 +225,8 @@ void Unit::turn() {
 	if (p.state == STATE_NULL)
 		return;
 
+	animationPhase = 0.0;
+
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
 		if (p.respawn > 0) {
@@ -263,6 +266,13 @@ void Unit::turn() {
 void Unit::update() {
 	if (p.state == STATE_NULL)
 		return;
+
+	if (animationPhase < 1.0) {
+		animationPhase += DELTA_ANIMATION;
+	}
+	else {
+		animationPhase = 1.0;
+	}
 
 	/*
 	if (Key::keyCheckPressed('/'))
@@ -353,8 +363,8 @@ void Unit::draw() const {
 	const float drawx = (float)p.x + moveOffX;
 	const float drawy = (float)p.y + moveOffY;
 
-	Draw::qonmapISB(
-		*body, 0, 0.0,
+	Draw::qonmapSB(
+		*body, 0.0,
 		drawx, drawy,
 		animationFlip ? -1.0 : 1.0, 1.0,
 		p.invincible > 0 ? Color::gray : Color::white, 1.0);
