@@ -154,6 +154,7 @@ public:
 class Petal : public Object {
 private:
 	protocol_petal p;
+	float moveOffX, moveOffY;
 
 public:
 	Petal();

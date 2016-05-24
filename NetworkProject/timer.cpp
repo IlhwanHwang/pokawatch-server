@@ -59,29 +59,27 @@ void Timer::update(int count) {
 		turn();
 	}
 
-	if (Key::keyCheckPressed('1') && Network::getMode() == MODE_NOTHING) {
-		Game::getUnit(0).spawn(DEP_CSE);
-		Game::getUnit(1).spawn(DEP_CSE);
-		//Game::getUnit(2).spawn(DEP_ME);
-		//Game::getUnit(3).spawn(DEP_LIFE);
-		//Game::getUnit(4).spawn(DEP_PHYS);
-		//Game::getUnit(5).spawn(DEP_CSE);
-		Game::release();
-		Network::setGameStart(0, GAME_START_CHAR);
-	}
-
 	Gui::update();
+	Draw::refresh();
 
 	// add any per frame actions
 	// such as update() and draw() for all object
 
 	Network::update();
-	Game::update();
 
-	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	Game::draw();
+	if (Network::getMode() == MODE_SERVER) {
+		Game::update();
+		Game::draw();
+	}
+	if (Network::getMode() == MODE_NOTHING) {
+		Draw::naivefill(Rspr::infoMain);
+	}
+	if (Network::getMode() == MODE_CLIENT) {
+		if (Network::getCharacterSelection() == 0)
+			Draw::naivefill(Rspr::infoClient1);
+		else
+			Draw::naivefill(Rspr::infoClient2);
+	}
 
 	glutSwapBuffers();
 

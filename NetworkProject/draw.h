@@ -16,7 +16,7 @@
 #include "gui.h"
 
 struct Color {
-	static Color white, black, gray;
+	static Color white, black, lightgray, gray, cyan, magenta, postech, kaist;
 	static Color merge(Color& c1, Color& c2, float x);
 	float r, g, b;
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
@@ -43,8 +43,9 @@ private:
 
 public:
 	static void init();
-	static void reshape(int, int);
 	static void flush();
+	static void refresh();
+	static void setsize(int _w, int _h);
 	static void drawSB(Sprite& spr, float x, float y, float sx, float sy, Color& c, float alpha) {
 		DrawRequest(spr, 0.0, x, y, sx, sy, c, alpha).draw();
 	}
@@ -59,6 +60,9 @@ public:
 	}
 	static void onmapSB(Sprite& spr, float x, float y, float z, float sx, float sy, Color& c, float alpha) {
 		drawSB(spr, Gui::unitX(x), Gui::unitY(y + z), sx, sy, c, alpha);
+	}
+	static void onmapB(Sprite& spr, float x, float y, float z, Color& c, float alpha) {
+		drawSB(spr, Gui::unitX(x), Gui::unitY(y + z), 1.0, 1.0, c, alpha);
 	}
 	static void onmap(Sprite& spr, float x, float y, float z) {
 		onmapSB(spr, x, y, z, 1.0, 1.0, Color::white, 1.0);
@@ -79,6 +83,8 @@ public:
 	static void qonmap(Sprite& spr, float depth, float x, float y, float z) {
 		qonmapSB(spr, depth, x, y, z, 1.0, 1.0, Color::white, 1.0);
 	}
+
+	static void naivefill(Sprite& spr);
 
 	static void number(int num, float x, float y);
 	static void bignumber(int num, float x, float y);

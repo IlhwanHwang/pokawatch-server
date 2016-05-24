@@ -7,6 +7,11 @@
 
 #include "protocol.h"
 
+#define ACTUAL_WINDOW_WIDTH 1280
+#define ACTUAL_WINDOW_HEIGHT 960
+#define INFO_WINDOW_WIDTH 360
+#define INFO_WINDOW_HEIGHT 240
+
 #define GUI_CELL_WIDTH 48.0
 #define GUI_CELL_HEIGHT 48.0
 #define GUI_MAP_X (WINDOW_WIDTH / 2.0)

@@ -43,6 +43,8 @@ void Game::init() // game initialization
 	spawn[0] = 0;
 	spawn[1] = 0;
 
+	glutDisplayFunc(draw);
+
 	makeProtocol();
 }
 
@@ -61,6 +63,9 @@ void Game::makeProtocol() // protocol data making routine
 }
 
 void Game::update() {	// update routine
+	if (turnleft <= 0)
+		return;
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].update();
 	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].update();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].update();
@@ -69,11 +74,20 @@ void Game::update() {	// update routine
 }
 
 void Game::draw() {		// draw routine
+	Draw::draw(Rspr::bg, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
+
 	for (int i = 0; i < MAP_WIDTH; i++) {
 		for (int j = 0; j < MAP_HEIGHT; j++) {
-			Sprite& light = Rspr::tileLight;
-			Sprite& dark = Rspr::tileDark;
-			Draw::onmap((i + j) % 2 == 0 ? light : dark, i, j, 0.0);
+			if (turnleft > 50) {
+				Draw::onmapB(Rspr::tileLight, i, j, 0.0, (i + j) % 2 == 0 ? Color::white : Color::lightgray, 1.0);
+			}
+			else {
+				Draw::onmapB(Rspr::tileLight, i, j, 0.0, 
+					(i + j) % 2 == 0 ?
+						(turnleft % 2 == 0 ? Color::lightgray : Color::cyan) :
+						(turnleft % 2 == 1 ? Color::lightgray : Color::magenta),
+					1.0);
+			}
 		}
 	}
 
@@ -86,13 +100,26 @@ void Game::draw() {		// draw routine
 	Draw::flush();
 
 	// Overlay informations
-	Draw::number(score[0], WINDOW_WIDTH * 0.1, WINDOW_HEIGHT * 0.91);
-	Draw::number(score[1], WINDOW_WIDTH * 0.9, WINDOW_HEIGHT * 0.91);
+	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::postech, 0.5);
+	Draw::number(score[0], WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91);
+	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.85, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::kaist, 0.5);
+	Draw::number(score[1], WINDOW_WIDTH * 0.85, WINDOW_HEIGHT * 0.91);
+	Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
 	Draw::bignumber(turnleft, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
+
+	if (turnleft <= 0) {
+		if (score[0] > score[1])
+			Draw::draw(Rspr::winPostech, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
+		else if (score[0] < score[1])
+			Draw::draw(Rspr::winKaist, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
+		else
+			Draw::draw(Rspr::winDraw, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
+	}
 }
 
 void Game::release() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
+	Draw::setsize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
 }
 
 void Game::ruleMove() // rules related to move command
@@ -706,6 +733,7 @@ void Game::ruleFlag() // rules related to flag
 
 	} // end of flag
 }
+
 void Game::turn() {
 	turnleft--;
 	if (turnleft <= 0) return;

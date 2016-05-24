@@ -10,6 +10,9 @@
 #include "game.h"
 #include "key.h"
 
+#include "draw.h"
+#include "resource.h"
+
 using namespace std;
 
 SOCKET Network::hServSock;														// Server socket variable of server/client side
@@ -218,6 +221,9 @@ void Network::update() // frame turn routine
 		char gameStartMessage[2];
 		gameStartMessage[0] = GAME_START_CHAR;
 		gameStartMessage[1] = '\0';
+
+		Draw::naivefill(Rspr::infoServer);
+		glutSwapBuffers();
 
 		Network::setMode(MODE_SERVER);														// set as server
 		printf("mode- server chosn\n");

@@ -44,6 +44,18 @@ Sprite Rspr::flagKaist;
 Sprite Rspr::number[10];
 Sprite Rspr::bignumber[10];
 
+Sprite Rspr::bg;
+Sprite Rspr::intengrad;
+
+Sprite Rspr::winPostech;
+Sprite Rspr::winKaist;
+Sprite Rspr::winDraw;
+
+Sprite Rspr::infoMain;
+Sprite Rspr::infoServer;
+Sprite Rspr::infoClient1;
+Sprite Rspr::infoClient2;
+
 #define MULTILOAD(buf, res, num, filename) \
 	for (int i = 0; i < num; i++) \
 	{ \
@@ -91,4 +103,16 @@ void Resource::init() {
 
 	MULTILOAD(buf, number, 10, "num_%d.png");
 	MULTILOAD(buf, bignumber, 10, "bignum%d.png");
+
+	Rspr::bg.load("bg.png").dot();
+	Rspr::intengrad.load("intengrad.png").dot();
+
+	Rspr::winPostech.load("win_postech.png").dot();
+	Rspr::winKaist.load("win_kaist.png").dot();
+	Rspr::winDraw.load("win_draw.png").dot();
+
+	Rspr::infoMain.load("info_main.png").setOffset(0.0, 240.0);
+	Rspr::infoServer.load("info_server.png").setOffset(0.0, 240.0);
+	Rspr::infoClient1.load("info_client1.png").setOffset(0.0, 240.0);
+	Rspr::infoClient2.load("info_client2.png").setOffset(0.0, 240.0);
 }

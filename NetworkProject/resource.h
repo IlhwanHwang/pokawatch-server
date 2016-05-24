@@ -47,6 +47,18 @@ public:
 
 	static Sprite number[10];
 	static Sprite bignumber[10];
+
+	static Sprite bg;
+	static Sprite intengrad;
+
+	static Sprite winPostech;
+	static Sprite winKaist;
+	static Sprite winDraw;
+
+	static Sprite infoMain;
+	static Sprite infoServer;
+	static Sprite infoClient1;
+	static Sprite infoClient2;
 };
 
 class Resource {

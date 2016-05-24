@@ -6,10 +6,16 @@
 #include "draw.h"
 #include "shader.h"
 #include "resource.h"
+#include "debug.h"
 
 Color Color::white(1.0, 1.0, 1.0);
 Color Color::black(0.0, 0.0, 0.0);
 Color Color::gray(0.5, 0.5, 0.5);
+Color Color::lightgray(0.75, 0.75, 0.75);
+Color Color::cyan(0.3, 1.0, 1.0);
+Color Color::magenta(1.0, 0.7, 1.0);
+Color Color::postech(1.0, 0.0, 0.2);
+Color Color::kaist(0.0, 0.5, 1.0);
 
 Color Color::merge(Color& c1, Color& c2, float x) {
 	return Color(
@@ -18,8 +24,8 @@ Color Color::merge(Color& c1, Color& c2, float x) {
 		c1.b * (1.0 - x) + c2.b * x);
 }
 
-int Draw::w = ACTUAL_WINDOW_WIDTH;
-int Draw::h = ACTUAL_WINDOW_HEIGHT;
+int Draw::w = INFO_WINDOW_WIDTH;
+int Draw::h = INFO_WINDOW_HEIGHT;
 std::priority_queue<DrawRequest> Draw::req;
 
 void Draw::init() {
@@ -31,7 +37,6 @@ void Draw::init() {
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glViewport(0, 0, w, h);
-	glutReshapeFunc(reshape);
 }
 
 DrawRequest::DrawRequest(const Sprite& spr, float depth, float x, float y, float sx, float sy, Color& c, float alpha) :
@@ -47,8 +52,18 @@ void DrawRequest::draw() const {
 	Shader::draw(buf, 0, x - ofx, y - ofy, w, h, c.r, c.g, c.b, alpha);
 }
 
-void Draw::reshape(int _w, int _h) {
-	glViewport(0, 0, _w, _h);
+void Draw::refresh() {
+	w = glutGet(GLUT_WINDOW_WIDTH);
+	h = glutGet(GLUT_WINDOW_HEIGHT);
+
+	glViewport(0, 0, w, h);
+}
+
+void Draw::setsize(int _w, int _h) { 
+	w = _w;
+	h = _h;
+	glutReshapeWindow(w, h);
+	glutPostRedisplay();
 }
 
 void Draw::flush() {
@@ -56,6 +71,12 @@ void Draw::flush() {
 		(const_cast<DrawRequest&>(req.top())).draw();
 		req.pop();
 	}
+}
+
+void Draw::naivefill(Sprite& spr) {
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	Shader::draw(spr.getBuf(0), 0, 0.0, 0.0, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0, 1.0, 1.0, 1.0);
 }
 
 void Draw::number(int num, float x, float y) {

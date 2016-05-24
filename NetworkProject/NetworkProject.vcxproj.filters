@@ -74,6 +74,9 @@
     <ClInclude Include="spline.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>헤더 파일\게임기반</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -120,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="gui.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

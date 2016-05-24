@@ -321,7 +321,7 @@ void Unit::draw() const {
 	if (p.state == STATE_DEAD)
 		Draw::number(p.respawn, x, y);
 
-	if (p.state == STATE_NULL || (p.state == STATE_DEAD && p.health == healthPrevious)) {
+	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
 	}
 
@@ -339,7 +339,7 @@ void Unit::draw() const {
 
 	Color c = Color::white;
 
-	if (p.invincible > 0 || (p.health != healthPrevious && Gui::aniPhase() >= 1.0)) {
+	if (p.invincible > 0 || p.health < healthPrevious) {
 		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
 	}
 
@@ -355,9 +355,12 @@ void Unit::draw() const {
 	drawAttackMotion();
 
 	// Health status
-	int showHealth = Gui::aniPhase() < 1.0 ? healthPrevious : p.health;
+	int showHealth = p.health;
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
+	if (p.health < healthPrevious) {
+		dx -= ddx * (healthPrevious - p.health) * 0.5 * (1.0 - Gui::aniPhase());
+	}
 	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
@@ -551,13 +554,27 @@ void Petal::update() {
 	if (!p.valid)
 		return;
 
+	float dx = 0.0, dy = 0.0;
+	switch (p.direction) {
+	case DIRECTION_RIGHT: dx = -1.0; break;
+	case DIRECTION_UP: dy = -1.0; break;
+	case DIRECTION_LEFT: dx = 1.0; break;
+	case DIRECTION_DOWN: dy = 1.0; break;
+	}
+
+	float mag = 1.0 - Spline::accandfric(Gui::aniPhase());
+	dx *= mag;
+	dy *= mag;
+
+	moveOffX = dx;
+	moveOffY = dy;
 }
 
 void Petal::draw() const {
 	if (!p.valid)
 		return;
 
-	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y, 0.5);
+	Draw::qonmap(Rspr::petal, 0.0, p.x + moveOffX, p.y + moveOffY, 0.5);
 }
 
 Mushroom::Mushroom() {

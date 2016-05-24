@@ -23,6 +23,7 @@
 #include "game.h"
 #include "draw.h"
 #include "resource.h"
+#include "gui.h"
 
 void main(int argc, char **argv)
 {
@@ -30,7 +31,7 @@ void main(int argc, char **argv)
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
+	glutInitWindowSize(INFO_WINDOW_WIDTH, INFO_WINDOW_HEIGHT);
 
 	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
@@ -40,9 +41,9 @@ void main(int argc, char **argv)
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	Draw::init();
 	Key::init();
 	Game::init();
-	Draw::init();
 	Shader::init();
 	Network::init();
 	Resource::init();
