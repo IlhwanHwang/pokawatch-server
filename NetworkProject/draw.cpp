@@ -34,9 +34,9 @@ void Draw::init() {
 	glutReshapeFunc(reshape);
 }
 
-DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, Color& c, float alpha) :
+DrawRequest::DrawRequest(const Sprite& spr, float depth, float x, float y, float sx, float sy, Color& c, float alpha) :
 	depth(depth), x(x), y(y), c(c), alpha(alpha) {
-	buf = spr.getBuf(ind);
+	buf = spr.getBuf(0);
 	w = spr.getW() * sx;
 	h = spr.getH() * sy;
 	ofx = spr.getOfx() * sx;

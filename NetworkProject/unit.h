@@ -12,6 +12,7 @@ class Object {
 protected:
 	const char* name;
 	void error(const char* e) { std::cerr << name << ": " << e << std::endl; }
+	float animationPhase;
 
 public:
 	Object() { name = "Anonmous object"; }
@@ -46,6 +47,7 @@ private:
 
 	int death;
 	bool animationFlip;
+	
 
 	float moveOffX, moveOffY, moveOffPhase;
 	protocol_direction moveOffDirection;
