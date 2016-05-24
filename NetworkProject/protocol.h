@@ -184,6 +184,7 @@ typedef struct {
 
 #define BLACKHOLE_DAMAGE 10
 #define ACCIDENT_DAMAGE 10
+#define POISON_LENGTH 4
 
 #define INVINCIBLE_SPAN 5
 
@@ -192,3 +193,4 @@ typedef struct {
 
 #define HERO_DELAY 2
 
+#define ARBITRARY_BIG_NUM 999

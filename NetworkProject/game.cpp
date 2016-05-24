@@ -295,7 +295,7 @@ void Game::ruleAttack()
 					break;
 				case COMMAND_ATTACK_UP:
 					
-					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					if (indexForValidPetal != INVALID_PETAL_INDEX)
 					{
 						u.attack(DIRECTION_UP);
 						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() + 1, DIRECTION_UP);
@@ -303,7 +303,7 @@ void Game::ruleAttack()
 					break;
 				case COMMAND_ATTACK_LEFT:
 
-					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					if (indexForValidPetal != INVALID_PETAL_INDEX)
 					{
 						u.attack(DIRECTION_LEFT);
 						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
@@ -312,7 +312,7 @@ void Game::ruleAttack()
 					break;
 				case COMMAND_ATTACK_DOWN:
 
-					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					if (indexForValidPetal != INVALID_PETAL_INDEX)
 					{
 						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
 						u.attack(DIRECTION_DOWN);
@@ -320,123 +320,57 @@ void Game::ruleAttack()
 					break;
 				}
 				break;
-			case DEP_CHEM: // 이거 도 index 바꿔놔야 제대로 작동함.... ~!!!!!! mushroom도 하셈
+			case DEP_CHEM:
 				switch (c)
 				{
 				case COMMAND_ATTACK_RIGHT:
-					u.attack(DIRECTION_RIGHT);
-
-					for (b = 0; b < POISON_NUM_MAX; b++)
+					for (int p = 0; p < POISON_LENGTH; p++)
 					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
+						indexForValidPoison = getValidPoisonIndex();
+						if (indexForValidPoison != INVALID_POISON_INDEX)
+						{
+							if(p==0) u.attack(DIRECTION_RIGHT);
+							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() + (p + 1), u.getY());
+						}
 					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() + 2, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() + 3, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() + 4, u.getY());
 
 					break;
 				case COMMAND_ATTACK_UP:
-					u.attack(DIRECTION_UP);
+					for (int p = 0; p < POISON_LENGTH; p++)
+					{
+						indexForValidPoison = getValidPoisonIndex();
+						if (indexForValidPoison != INVALID_POISON_INDEX)
+						{
+							if (p == 0) u.attack(DIRECTION_UP);
+							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() , u.getY() + (p+1));
+						}
+					}
 
-					for (b = 0; b < POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 1);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 2);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 3);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 4);
 					break;
 				case COMMAND_ATTACK_LEFT:
-					u.attack(DIRECTION_LEFT);
-
-					for (b = 0; b < POISON_NUM_MAX; b++)
+					for (int p = 0; p < POISON_LENGTH; p++)
 					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
+						indexForValidPoison = getValidPoisonIndex();
+						if (indexForValidPoison != INVALID_POISON_INDEX)
+						{
+							if (p == 0) u.attack(DIRECTION_LEFT);
+							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() - (p + 1), u.getY());
+						}
 					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() - 2, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() - 3, u.getY());
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX() - 4, u.getY());
 					break;
 				case COMMAND_ATTACK_DOWN:
-					u.attack(DIRECTION_DOWN);
-
-					for (b = 0; b < POISON_NUM_MAX; b++)
+					for (int p = 0; p < POISON_LENGTH; p++)
 					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
+						indexForValidPoison = getValidPoisonIndex();
+						if (indexForValidPoison != INVALID_POISON_INDEX)
+						{
+							if (p == 0) u.attack(DIRECTION_RIGHT);
+							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() , u.getY() - (p + 1));
+						}
 					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 2);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 3);
-					for (b = b + 1; b<POISON_NUM_MAX; b++)
-					{
-						if (poisonArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b < POISON_NUM_MAX) poisonArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 4);
 					break;
 				}
+
 				break;
 			}
 
@@ -454,6 +388,7 @@ void Game::ruleSkill()
 
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
+		int indexForValidMushroom = getValidMushroomIndex();
 
 
 		if ( ((c == COMMAND_SKILL_RIGHT ||
@@ -530,43 +465,35 @@ void Game::ruleSkill()
 				{
 				case COMMAND_SKILL_RIGHT:
 					u.skill(DIRECTION_RIGHT);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
+					for (int a = 0; a < UNIT_NUM_MAX; a++)
 					{
-						if (petalArray[b].getProtocol()->valid)
-							break;
+						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() > u.getX())
+							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
 					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
 					break;
 				case COMMAND_SKILL_UP:
 					u.skill(DIRECTION_UP);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
+					for (int a = 0; a < UNIT_NUM_MAX; a++)
 					{
-						if (petalArray[b].getProtocol()->valid)
-							break;
+						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() > u.getY())
+							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
 					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 1, DIRECTION_UP);
 					break;
 				case COMMAND_SKILL_LEFT:
 					u.skill(DIRECTION_LEFT);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
+					for (int a = 0; a < UNIT_NUM_MAX; a++)
 					{
-						if (petalArray[b].getProtocol()->valid)
-							break;
+						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() < u.getX())
+							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
 					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
 					break;
 				case COMMAND_SKILL_DOWN:
 					u.skill(DIRECTION_DOWN);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
+					for (int a = 0; a < UNIT_NUM_MAX; a++)
 					{
-						if (petalArray[b].getProtocol()->valid)
-							break;
+						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() < u.getY())
+							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
 					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
 					break;
 				}
 				break;
@@ -663,20 +590,38 @@ void Game::ruleSkill()
 				switch (c)
 				{
 				case COMMAND_SKILL_RIGHT:
-					u.skill(DIRECTION_RIGHT);
-					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY());
+
+					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
+					{
+						u.skill(DIRECTION_RIGHT);
+						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() + 1 , u.getY());
+					}
+
 					break;
-				case COMMAND_SKILL_UP:
-					u.skill(DIRECTION_UP);
-					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 1);
+				case COMMAND_ATTACK_UP:
+
+					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
+					{
+						u.skill(DIRECTION_RIGHT);
+						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() , u.getY() + 1);
+					}
 					break;
-				case COMMAND_SKILL_LEFT:
-					u.skill(DIRECTION_LEFT);
-					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY());
+				case COMMAND_ATTACK_LEFT:
+
+					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
+					{
+						u.skill(DIRECTION_RIGHT);
+						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() -1, u.getY());
+					}
+
 					break;
-				case COMMAND_SKILL_DOWN:
-					u.skill(DIRECTION_DOWN);
-					if ((b = getValidMushroomIndex()) != INVALID_POISON_INDEX) mushroomArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1);
+				case COMMAND_ATTACK_DOWN:
+
+					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
+					{
+						u.skill(DIRECTION_RIGHT);
+						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX(), u.getY() - 1);
+					}
 					break;
 				}
 				break;
