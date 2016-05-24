@@ -212,10 +212,10 @@ void Game::ruleAttack()
 		protocol_command c = Network::getCommand(i);
 
 
-		if (c == COMMAND_ATTACK_RIGHT ||
+		if ((c == COMMAND_ATTACK_RIGHT ||
 			c == COMMAND_ATTACK_UP ||
 			c == COMMAND_ATTACK_LEFT ||
-			c == COMMAND_ATTACK_DOWN)
+			c == COMMAND_ATTACK_DOWN ) && u.getCooltime() == 0)
 		{
 			int b;
 			switch (u.getDep())
@@ -285,43 +285,21 @@ void Game::ruleAttack()
 				{
 				case COMMAND_ATTACK_RIGHT:
 					u.attack(DIRECTION_RIGHT);
+					if(b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
 
-					for (b = 0; b < PETAL_NUM_MAX; b++)
-					{
-						if (petalArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
 					break;
 				case COMMAND_ATTACK_UP:
 					u.attack(DIRECTION_UP);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
-					{
-						if (petalArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() + 1, DIRECTION_UP);
+					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() , u.getY() + 1, DIRECTION_UP);
 					break;
 				case COMMAND_ATTACK_LEFT:
 					u.attack(DIRECTION_LEFT);
+					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
 
-					for (b = 0; b < PETAL_NUM_MAX; b++)
-					{
-						if (petalArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
 					break;
 				case COMMAND_ATTACK_DOWN:
 					u.attack(DIRECTION_DOWN);
-
-					for (b = 0; b < PETAL_NUM_MAX; b++)
-					{
-						if (petalArray[b].getProtocol()->valid==0)
-							break;
-					}
-					if (b<PETAL_NUM_MAX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
+					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1 , DIRECTION_DOWN);
 					break;
 				}
 				break;
@@ -461,10 +439,10 @@ void Game::ruleSkill()
 		protocol_command c = Network::getCommand(i);
 
 
-		if ((c == COMMAND_SKILL_RIGHT ||
+		if ( ((c == COMMAND_SKILL_RIGHT ||
 			c == COMMAND_SKILL_UP ||
 			c == COMMAND_SKILL_LEFT ||
-			c == COMMAND_SKILL_DOWN) && u.getHero() == TRUE)
+			c == COMMAND_SKILL_DOWN) ) && u.getHero() == TRUE && u.getCooltime() == 0)
 		{
 			int b;
 			switch (u.getDep())
@@ -788,7 +766,7 @@ void Game::turn() {
 				if (u.getTeam() != petalArray[b].getTeam())
 				{
 					u.damage(1);
-
+					petalArray[b].invalidate();
 				}
 				else u.heal(1);
 			}
@@ -804,7 +782,11 @@ void Game::turn() {
 		{
 			if (mushroomArray[b].getProtocol()->valid && u.getY() == mushroomArray[b].getY() && u.getX() == mushroomArray[b].getX())
 			{
-				if (u.getTeam() != mushroomArray[b].getTeam()) u.damage(1);
+				if (u.getTeam() != mushroomArray[b].getTeam())
+				{
+					u.damage(1);
+					mushroomArray[b].invalidate();
+				}
 			}
 		}
 	}
@@ -838,7 +820,13 @@ void Game::turn() {
 		if (flagArray[i].getTeam() == TEAM_POSTECH) score[TEAM_POSTECH - 1] = score[TEAM_POSTECH - 1] + FLAG_SCORE;
 		if (flagArray[i].getTeam() == TEAM_KAIST) score[TEAM_KAIST - 1] = score[TEAM_KAIST - 1] + FLAG_SCORE;
 	}
-	if(Network::getMode() == MODE_SERVER) makeProtocol();
+//	if(Network::getMode() == MODE_SERVER) makeProtocol();
+
+	printf("petal \n");
+	for (int i = 0; i < PETAL_NUM_MAX; i++)
+	{
+		printf("%d", petalArray[i].getProtocol()->valid);
+	}
 }
 
 int Game::getValidPoisonIndex()
@@ -846,7 +834,7 @@ int Game::getValidPoisonIndex()
 	int b;
 	for ( b = 0; b < POISON_NUM_MAX; b++)
 	{
-		if (poisonArray[b].getProtocol()->valid)
+		if (poisonArray[b].getProtocol()->valid == false)
 			break;
 	}
 	if (b < POISON_NUM_MAX) return b;
@@ -857,7 +845,7 @@ int Game::getValidMushroomIndex()
 	int b;
 	for (b = 0; b < MUSHROOM_NUM_MAX; b++)
 	{
-		if (mushroomArray[b].getProtocol()->valid)
+		if (mushroomArray[b].getProtocol()->valid == false)
 			break;
 	}
 	if (b < MUSHROOM_NUM_MAX) return b;
@@ -868,7 +856,7 @@ int Game::getValidPetalIndex()
 	int b;
 	for (b = 0; b < PETAL_NUM_MAX; b++)
 	{
-		if (petalArray[b].getProtocol()->valid)
+		if (petalArray[b].getProtocol()->valid == false)
 			break;
 	}
 	if (b < PETAL_NUM_MAX) return b;
