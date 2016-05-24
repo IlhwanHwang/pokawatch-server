@@ -583,7 +583,7 @@ void Game::ruleSkill()
 					minmaxIndex = -1;
 					for (int w = 0; w < UNIT_NUM_MAX; w++)
 					{
-						if(unitArray[w].getY() == u.getY() && unitArray[w].getX() > u.getY())
+						if(unitArray[w].getY() == u.getY() && unitArray[w].getX() > u.getX())
 							if (minmax > unitArray[w].getX())
 							{
 								minmax = unitArray[w].getX();
@@ -624,7 +624,7 @@ void Game::ruleSkill()
 					minmaxIndex = -1;
 					for (int w = 0; w < UNIT_NUM_MAX; w++)
 					{
-						if (unitArray[w].getY() == u.getY() && unitArray[w].getX() < u.getY())
+						if (unitArray[w].getY() == u.getY() && unitArray[w].getX() < u.getX())
 							if (minmax < unitArray[w].getX())
 							{
 								minmax = unitArray[w].getX();
@@ -781,7 +781,11 @@ void Game::turn() {
 		{
 			if (petalArray[b].getProtocol()->valid && u.getY() == petalArray[b].getY() && u.getX() == petalArray[b].getX())
 			{
-				if (u.getTeam() != petalArray[b].getTeam()) u.damage(1);
+				if (u.getTeam() != petalArray[b].getTeam())
+				{
+					u.damage(1);
+
+				}
 				else u.heal(1);
 			}
 		}
@@ -830,7 +834,7 @@ void Game::turn() {
 		if (flagArray[i].getTeam() == TEAM_POSTECH) score[TEAM_POSTECH - 1] = score[TEAM_POSTECH - 1] + FLAG_SCORE;
 		if (flagArray[i].getTeam() == TEAM_KAIST) score[TEAM_KAIST - 1] = score[TEAM_KAIST - 1] + FLAG_SCORE;
 	}
-	makeProtocol();
+	if(Network::getMode() == MODE_SERVER) makeProtocol();
 }
 
 int Game::getValidPoisonIndex()
