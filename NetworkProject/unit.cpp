@@ -26,6 +26,7 @@ void Unit::init() {
 	p.cooltime = 0;
 	p.x = orgx;
 	p.y = orgy;
+	p.invincible = INVINCIBLE_SPAN;
 	p.state = STATE_IDLE;
 }
 
@@ -34,7 +35,7 @@ Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") 
 Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.team = team;
 	p.state = STATE_NULL;
-	p.respawn = 1;
+	p.respawn = 0;
 	orgx = x;
 	orgy = y;
 	p.x = orgx;
@@ -168,6 +169,11 @@ void Unit::damage(int h) {
 		return;
 	}
 
+	if (p.invincible > 0) {
+		error("Cannot damage invincible unit");
+		return;
+	}
+
 	p.health -= h;
 
 	if (p.health <= 0) {
@@ -229,6 +235,10 @@ void Unit::turn() {
 	else {
 		p.state = STATE_IDLE;
 
+		if (p.invincible > 0) {
+			p.invincible--;
+		}
+
 		if (p.cooltime > 0) {
 			p.cooltime--;
 		}
@@ -250,6 +260,9 @@ void Unit::turn() {
 void Unit::update() {
 	if (p.state == STATE_NULL)
 		return;
+
+	if (Key::keyCheckPressed('/'))
+		damage();
 
 	// Animation by moving
 	if (moveOffPhase > 0.0) {
@@ -305,17 +318,15 @@ void Unit::draw() const {
 	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + WINDOW_WIDTH / 2.0;
 	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + WINDOW_HEIGHT / 2.0;
 
-	float k = (float)p.respawn / RESPAWN_COOLTIME;
-
-	Draw::draw(*face, 0, x, y, Color::merge(Color::white, Color::black, k), 1.0);
+	Draw::draw(*face, x, y);
+	if (p.state == STATE_DEAD)
+		Draw::number(p.respawn, x, y);
 
 	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
 	}
 
-	float drawx = (float)p.x + moveOffX;
-	float drawy = (float)p.y + moveOffY;
-
+	// Unit body
 	switch (p.dep) {
 	case DEP_CSE: body = &Rspr::unitCSE; break;
 	case DEP_CHEM: body = &Rspr::unitCHEM; break;
@@ -324,11 +335,15 @@ void Unit::draw() const {
 	case DEP_PHYS: body = &Rspr::unitPHYS; break;
 	}
 
-	Draw::qonmap(*body, 0.0, drawx, drawy);
+	const float drawx = (float)p.x + moveOffX;
+	const float drawy = (float)p.y + moveOffY;
+
+	Draw::qonmap(*body, 0, 0.0, drawx, drawy, p.invincible > 0 ? Color::gray : Color::white, 1.0);
 	if (p.hero) {
-		Draw::qonmap(Rspr::hero, 0.1, drawx, drawy);
+		Draw::qonmap(Rspr::hero, -0.1, drawx, drawy);
 	}
 
+	// Health status
 	float ddx = 20 / GUI_CELL_WIDTH;
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;
 	for (int i = 0; i < p.health; i++) {

@@ -98,6 +98,10 @@ void Game::draw() {
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
 
 	Draw::flush();
+
+	// Overlay informations
+	Draw::number(score[0], WINDOW_WIDTH * 0.1, WINDOW_HEIGHT * 0.9);
+	Draw::number(score[1], WINDOW_WIDTH * 0.9, WINDOW_HEIGHT * 0.9);
 }
 
 void Game::release() {

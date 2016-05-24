@@ -32,6 +32,8 @@ Sprite Rspr::tileDark;
 Sprite Rspr::flagNull;
 Sprite Rspr::flagFlag;
 
+Sprite Rspr::number[10];
+
 void Resource::init() {
 	Rspr::temp.load("cse_temp.png").setOffset(20.0, 80.0);
 	Rspr::error.load("error.png");
@@ -59,4 +61,10 @@ void Resource::init() {
 	Rspr::tileDark.load("tile_dark.png");
 	Rspr::flagNull.load("flag_null.png");
 	Rspr::flagFlag.load("flag_flag.png");
+
+	for (int i = 0; i < 10; i++) {
+		char fn[] = "num_0.png";
+		fn[4] = i + '0';
+		Rspr::number[i].load(fn);
+	}
 }

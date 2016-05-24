@@ -136,6 +136,8 @@ public:
 	void update();
 	void draw() const;
 
+	void invalidate() { p.valid = false; }
+
 	const protocol_poison* getProtocol() const { return &p; }
 
 	protocol_team getTeam() const { return p.team; }
@@ -156,6 +158,8 @@ public:
 	void update();
 	void draw() const;
 
+	void invalidate() { p.valid = false; }
+
 	const protocol_petal* getProtocol() const { return &p; }
 
 	protocol_team getTeam() const { return p.team; }
@@ -175,6 +179,8 @@ public:
 	void turn();
 	void update();
 	void draw() const;
+
+	void invalidate() { p.valid = false; }
 
 	protocol_team getTeam() const { return p.team; }
 	int getX() const { return p.x; }
