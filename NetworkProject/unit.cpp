@@ -588,4 +588,5 @@ void Mushroom::draw() const {
 	if (!p.valid)
 		return;
 
+	Draw::qonmap(Rspr::mushroom, -0.01, p.x, p.y, 0.0);
 }

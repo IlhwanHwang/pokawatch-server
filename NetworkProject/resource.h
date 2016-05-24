@@ -33,6 +33,7 @@ public:
 	static Sprite beamV[4];
 	static Sprite spark[4];
 	static Sprite sparkboom[4];
+	static Sprite mushroom;
 
 	static Sprite hero;
 	static Sprite stun[4];

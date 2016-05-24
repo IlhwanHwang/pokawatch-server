@@ -30,6 +30,7 @@ Sprite Rspr::beamH[4];
 Sprite Rspr::beamV[4];
 Sprite Rspr::spark[4];
 Sprite Rspr::sparkboom[4];
+Sprite Rspr::mushroom;
 
 Sprite Rspr::hero;
 Sprite Rspr::stun[4];
@@ -78,6 +79,7 @@ void Resource::init() {
 	MULTILOAD(buf, stun, 4, "stun%d.png");
 	MULTILOAD(buf, spark, 4, "spark%d.png");
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d.png");
+	Rspr::mushroom.load("mushroom.png").dot();
 
 	Rspr::hero.load("hero.png").dot().setOffset(30.0, 50.0);
 
