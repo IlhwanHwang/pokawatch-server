@@ -26,18 +26,21 @@ void Draw::init() {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_ALPHA_TEST);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glViewport(0, 0, w, h);
 	glutReshapeFunc(reshape);
 }
 
-DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, Color& c, float alpha) :
+DrawRequest::DrawRequest(const Sprite& spr, int ind, float depth, float x, float y, float sx, float sy, Color& c, float alpha) :
 	depth(depth), x(x), y(y), c(c), alpha(alpha) {
 	buf = spr.getBuf(ind);
-	w = spr.getW();
-	h = spr.getH();
-	ofx = spr.getOfx();
-	ofy = spr.getOfy();
+	w = spr.getW() * sx;
+	h = spr.getH() * sy;
+	ofx = spr.getOfx() * sx;
+	ofy = spr.getOfy() * sy;
 }
 
 void DrawRequest::draw() const {

@@ -18,6 +18,7 @@ private:
 public:
 	Sprite& load(const char* fn);
 	Sprite& setOffset(float x, float y);
+	Sprite& dot();
 	GLuint getBuf(int i) const { return bufs[i]; }
 	float getW() const { return w; }
 	float getH() const { return h; }

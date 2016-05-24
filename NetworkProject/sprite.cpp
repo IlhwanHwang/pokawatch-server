@@ -32,8 +32,8 @@ Sprite& Sprite::load(const char* fn) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uw, uh, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	bufs.push_back(buf);
 	std::cout << "Sprite: " << fn << " is successfully loaded" << std::endl;
@@ -49,6 +49,17 @@ Sprite& Sprite::load(const char* fn) {
 Sprite& Sprite::setOffset(float ofx, float ofy) {
 	this->ofx = ofx;
 	this->ofy = h - ofy;
+
+	return (*this);
+}
+
+Sprite& Sprite::dot() {
+	w *= 2.0;
+	h *= 2.0;
+	uw *= 2;
+	uh *= 2;
+	ofx *= 2.0;
+	ofy *= 2.0;
 
 	return (*this);
 }

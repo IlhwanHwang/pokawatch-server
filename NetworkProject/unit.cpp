@@ -28,6 +28,8 @@ void Unit::init() {
 	p.y = orgy;
 	p.invincible = INVINCIBLE_SPAN;
 	p.state = STATE_IDLE;
+
+	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -41,6 +43,7 @@ Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.x = orgx;
 	p.y = orgy;
 	death = 0;
+
 	this->name = name;
 }
 
@@ -65,9 +68,9 @@ bool Unit::move(protocol_direction direction) {
 	int dy = 0;
 
 	switch (direction) {
-	case DIRECTION_RIGHT: dx = 1;  break;
+	case DIRECTION_RIGHT: dx = 1; animationFlip = false; break;
 	case DIRECTION_UP:    dy = 1;  break;
-	case DIRECTION_LEFT:  dx = -1; break;
+	case DIRECTION_LEFT:  dx = -1; animationFlip = true; break;
 	case DIRECTION_DOWN:  dy = -1; break;
 	default: error("Invalid input"); break;
 	}
@@ -115,9 +118,9 @@ void Unit::attack(protocol_direction direction) {
 	}
 
 	switch (direction) {
-	case DIRECTION_RIGHT:	p.state = STATE_ATTACK_RIGHT;	break;
+	case DIRECTION_RIGHT:	p.state = STATE_ATTACK_RIGHT;   animationFlip = false;	break;
 	case DIRECTION_UP:		p.state = STATE_ATTACK_UP;		break;
-	case DIRECTION_LEFT:	p.state = STATE_ATTACK_LEFT;	break;
+	case DIRECTION_LEFT:	p.state = STATE_ATTACK_LEFT;   animationFlip = true;	break;
 	case DIRECTION_DOWN:	p.state = STATE_ATTACK_DOWN;	break;
 	default: std::cerr << name << ": Invalid input" << std::endl; break;
 	}
@@ -150,9 +153,9 @@ void Unit::skill(protocol_direction direction) {
 	}
 
 	switch (direction) {
-	case DIRECTION_RIGHT:	p.state = STATE_SKILL_RIGHT;	break;
+	case DIRECTION_RIGHT:	p.state = STATE_SKILL_RIGHT;   animationFlip = false;	break;
 	case DIRECTION_UP:		p.state = STATE_SKILL_UP;		break;
-	case DIRECTION_LEFT:	p.state = STATE_SKILL_LEFT;	break;
+	case DIRECTION_LEFT:	p.state = STATE_SKILL_LEFT;   animationFlip = true;	break;
 	case DIRECTION_DOWN:	p.state = STATE_SKILL_DOWN;	break;
 	default: error("Invalid input"); break;
 	}
@@ -261,8 +264,20 @@ void Unit::update() {
 	if (p.state == STATE_NULL)
 		return;
 
+	/*
 	if (Key::keyCheckPressed('/'))
 		damage();
+	if (Key::keyCheckPressed('1'))
+		spawn(DEP_CSE);
+	if (Key::keyCheckPressed('2'))
+		spawn(DEP_LIFE);
+	if (Key::keyCheckPressed('3'))
+		spawn(DEP_PHYS);
+	if (Key::keyCheckPressed('4'))
+		spawn(DEP_ME);
+	if (Key::keyCheckPressed('5'))
+		spawn(DEP_CHEM);
+		*/
 
 	// Animation by moving
 	if (moveOffPhase > 0.0) {
@@ -338,16 +353,20 @@ void Unit::draw() const {
 	const float drawx = (float)p.x + moveOffX;
 	const float drawy = (float)p.y + moveOffY;
 
-	Draw::qonmap(*body, 0, 0.0, drawx, drawy, p.invincible > 0 ? Color::gray : Color::white, 1.0);
+	Draw::qonmapISB(
+		*body, 0, 0.0,
+		drawx, drawy,
+		animationFlip ? -1.0 : 1.0, 1.0,
+		p.invincible > 0 ? Color::gray : Color::white, 1.0);
 	if (p.hero) {
-		Draw::qonmap(Rspr::hero, -0.1, drawx, drawy);
+		Draw::qonmap(Rspr::hero, -0.05, drawx, drawy);
 	}
 
 	// Health status
-	float ddx = 20 / GUI_CELL_WIDTH;
+	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;
 	for (int i = 0; i < p.health; i++) {
-		Draw::qonmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 2.0);
+		Draw::qonmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 1.5);
 		dx += ddx;
 	}
 }
@@ -361,9 +380,19 @@ void Flag::update() {
 }
 
 void Flag::draw() const {
-	Sprite& n = Rspr::flagNull;
-	Sprite& f = Rspr::flagFlag;
-	Draw::onmap(p.team == TEAM_NULL ? n : f, (float)p.x, (float)p.y);
+	Sprite* f;
+	switch (p.team) {
+	case TEAM_NULL:
+		f = &Rspr::flagNull;
+		break;
+	case TEAM_POSTECH:
+		f = &Rspr::flagPostech;
+		break;
+	case TEAM_KAIST:
+		f = &Rspr::flagKaist;
+		break;
+	}
+	Draw::onmap(*f, (float)p.x, (float)p.y);
 }
 
 Poison::Poison() {
