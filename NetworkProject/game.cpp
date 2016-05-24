@@ -239,8 +239,8 @@ void Game::ruleAttack() // rules related to attack
 				}
 				for (int a = 0; a < UNIT_NUM_MAX; a++)			// make stun units in squre 3*3
 				{
-					if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(3);
+					if (((unitArray[a].getX() - u.getX()) <= 1) && ((unitArray[a].getX() - u.getX()) >= -1) && ((unitArray[a].getY() - u.getY()) <= 1) && ((unitArray[a].getY() - u.getY()) >= -1))
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(5);
 				}
 				break;
 			case DEP_PHYS:										// case of phys
@@ -425,8 +425,8 @@ void Game::ruleSkill() // rules related to skill
 				}
 				for (int a = 0; a < UNIT_NUM_MAX; a++)				// make units stun in 7*7 squres
 				{
-					if (abs((unitArray[a].getX() - u.getX()) <= 3) && (abs(unitArray[a].getY() - u.getY()) <= 3))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(1);
+					if (((unitArray[a].getX() - u.getX()) <= 3) && ((unitArray[a].getX() - u.getX()) >= -3) && ((unitArray[a].getY() - u.getY()) <= 3) && ((unitArray[a].getY() - u.getY()) >= -3))
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(5);
 				}
 				break;
 			case DEP_PHYS:											// case of phys
