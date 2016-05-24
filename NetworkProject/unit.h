@@ -45,6 +45,7 @@ private:
 	int orgx, orgy;
 
 	int death;
+	bool animationFlip;
 
 	float moveOffX, moveOffY, moveOffPhase;
 	protocol_direction moveOffDirection;

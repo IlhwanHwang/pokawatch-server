@@ -35,7 +35,8 @@ public:
 	static Sprite tileDark;
 
 	static Sprite flagNull;
-	static Sprite flagFlag;
+	static Sprite flagPostech;
+	static Sprite flagKaist;
 
 	static Sprite number[10];
 };
