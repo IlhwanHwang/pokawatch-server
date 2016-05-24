@@ -218,6 +218,8 @@ void Game::ruleAttack()
 			c == COMMAND_ATTACK_DOWN ) && u.getCooltime() == 0)
 		{
 			int b;
+			int indexForValidPetal = getValidPetalIndex();
+			int indexForValidPoison = getValidPoisonIndex();
 			switch (u.getDep())
 			{
 			case DEP_CSE:
@@ -280,30 +282,45 @@ void Game::ruleAttack()
 				}
 				break;
 			case DEP_LIFE:
-
 				switch (c)
 				{
 				case COMMAND_ATTACK_RIGHT:
-					u.attack(DIRECTION_RIGHT);
-					if(b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
+					
+					if (indexForValidPetal != INVALID_PETAL_INDEX)
+					{
+						u.attack(DIRECTION_RIGHT);
+						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
+					}
 
 					break;
 				case COMMAND_ATTACK_UP:
-					u.attack(DIRECTION_UP);
-					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() , u.getY() + 1, DIRECTION_UP);
+					
+					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					{
+						u.attack(DIRECTION_UP);
+						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() + 1, DIRECTION_UP);
+					}
 					break;
 				case COMMAND_ATTACK_LEFT:
-					u.attack(DIRECTION_LEFT);
-					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
+
+					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					{
+						u.attack(DIRECTION_LEFT);
+						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
+					}
 
 					break;
 				case COMMAND_ATTACK_DOWN:
-					u.attack(DIRECTION_DOWN);
-					if (b = getValidPetalIndex() != INVALID_PETAL_INDEX) petalArray[b].spawn(u.getTeam(), u.getX(), u.getY() - 1 , DIRECTION_DOWN);
+
+					if (indexForValidPetal = getValidPetalIndex() != INVALID_PETAL_INDEX)
+					{
+						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
+						u.attack(DIRECTION_DOWN);
+					}
 					break;
 				}
 				break;
-			case DEP_CHEM:
+			case DEP_CHEM: // 이거 도 index 바꿔놔야 제대로 작동함.... ~!!!!!! mushroom도 하셈
 				switch (c)
 				{
 				case COMMAND_ATTACK_RIGHT:
@@ -825,8 +842,9 @@ void Game::turn() {
 	printf("petal \n");
 	for (int i = 0; i < PETAL_NUM_MAX; i++)
 	{
-		printf("%d", petalArray[i].getProtocol()->valid);
+		printf("%d ", petalArray[i].getProtocol()->valid);
 	}
+	printf("petal end\n");
 }
 
 int Game::getValidPoisonIndex()

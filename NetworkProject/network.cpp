@@ -33,11 +33,6 @@ void Network::ErrorHandling(char *message)
 	exit(1);
 }
 
-void Network::communicate(int cnt)
-{
-	printf("와우 오졌따리");
-}
-
 void Network::makeServerSocket()
 {
 	string portString = PORT_STRING;
@@ -63,7 +58,7 @@ void Network::makeServerSocket()
 	// 연결 요청 대기 상태
 	if (listen(hServSock, UNIT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
 
-	printf("listen");
+	printf("Server Listen\n");
 }
 
 void Network::acceptClient()
@@ -83,7 +78,6 @@ void Network::sendToClient(char *messageToClient)
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE-1, 0);
-		printf("THIS : %d\n", WhatDo);
 	}
 }
 
@@ -93,8 +87,6 @@ void Network::recieveFromClient()
 	{
 		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE-1, 0);
 		messageFromClient[i][strLen] = '\0';
-		printf("%s WAS COMMAND %c%c\n", messageFromClient[i], messageFromClient[i][0], messageFromClient[i][1]);
-
 	}
 }
 
