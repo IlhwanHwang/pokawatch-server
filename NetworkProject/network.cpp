@@ -33,11 +33,6 @@ void Network::ErrorHandling(char *message)
 	exit(1);
 }
 
-void Network::communicate(int cnt)
-{
-	printf("와우 오졌따리");
-}
-
 void Network::makeServerSocket()
 {
 	string portString = PORT_STRING;
@@ -63,7 +58,7 @@ void Network::makeServerSocket()
 	// 연결 요청 대기 상태
 	if (listen(hServSock, UNIT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
 
-	printf("listen");
+	printf("Server Listen\n");
 }
 
 void Network::acceptClient()
@@ -83,7 +78,6 @@ void Network::sendToClient(char *messageToClient)
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE-1, 0);
-		printf("THIS : %d\n", WhatDo);
 	}
 }
 
@@ -93,8 +87,6 @@ void Network::recieveFromClient()
 	{
 		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE-1, 0);
 		messageFromClient[i][strLen] = '\0';
-		printf("%s WAS COMMAND %c%c\n", messageFromClient[i], messageFromClient[i][0], messageFromClient[i][1]);
-
 	}
 }
 
@@ -162,11 +154,14 @@ void Network::getProtocolDataFromServer()
 	}
 
 	protocol_data *newData = (protocol_data*)messageToClient;
-
+	printf("UNIT INFO\n");
 	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d hero : %d cooltime : %d respawn : %d stun : %d\n", newData->unit[i].team, newData->unit[i].dep, newData->unit[i].x, newData->unit[i].y, newData->unit[i].state, newData->unit[i].health, newData->unit[i].hero, newData->unit[i].cooltime, newData->unit[i].respawn, newData->unit[i].stun);
-
+	printf("FLAG INFO\n");
 	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", newData->flag[i].team, newData->flag[i].x, newData->flag[i].y);
-
+	printf("PETAL INFO\n");
+	for (int i = 0; i < PETAL_NUM_MAX; i++) printf("team %d direction %d valid %d x %d y %d", newData->petal[i].team, newData->petal[i].direction, newData->petal[i].valid, newData->petal[i].x, newData->petal[i].y);
+	printf("SCORE\n");
+	printf("[POSTECH] %d [KAIST] %d\n", newData->score[TEAM_POSTECH - 1], newData->score[TEAM_KAIST - 1]);
 
 	
 	printf("\n");

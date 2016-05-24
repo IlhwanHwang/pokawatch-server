@@ -401,7 +401,7 @@ Poison::Poison() {
 }
 
 void Poison::spawn(protocol_team team, int x, int y) {
-	if (p.x < 0 || p.y < 0 || p.x >= MAP_WIDTH || p.y >= MAP_HEIGHT) {
+	if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
 		error("Spawned outside");
 		return;
 	}
@@ -449,10 +449,17 @@ Petal::Petal() {
 }
 
 void Petal::spawn(protocol_team team, int x, int y, protocol_direction direction) {
+	/*
 	if (p.x < 0 || p.y < 0 || p.x >= MAP_WIDTH || p.y >= MAP_HEIGHT) {
 		error("Spawned outside");
 		return;
 	}
+	*/
+	if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
+		error("Spawned outside");
+		return;
+	}
+
 
 	if (p.valid) {
 		error("Already spawned instance");
