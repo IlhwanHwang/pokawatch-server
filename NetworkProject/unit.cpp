@@ -43,7 +43,6 @@ Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.x = orgx;
 	p.y = orgy;
 	death = 0;
-	animationPhase = 0.0;
 
 	this->name = name;
 }
@@ -78,7 +77,7 @@ bool Unit::move(protocol_direction direction) {
 
 	p.x += dx;
 	p.y += dy;
-	moveOffPhase = 1.0;
+	moveOffAction = true;
 
 	if (p.x < 0 || p.x >= MAP_WIDTH || p.y < 0 || p.y >= MAP_HEIGHT) {
 		p.x -= dx;
@@ -225,7 +224,7 @@ void Unit::turn() {
 	if (p.state == STATE_NULL)
 		return;
 
-	animationPhase = 0.0;
+	moveOffAction = false;
 
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
@@ -267,32 +266,8 @@ void Unit::update() {
 	if (p.state == STATE_NULL)
 		return;
 
-	if (animationPhase < 1.0) {
-		animationPhase += DELTA_ANIMATION;
-	}
-	else {
-		animationPhase = 1.0;
-	}
-
-	/*
-	if (Key::keyCheckPressed('/'))
-		damage();
-	if (Key::keyCheckPressed('1'))
-		spawn(DEP_CSE);
-	if (Key::keyCheckPressed('2'))
-		spawn(DEP_LIFE);
-	if (Key::keyCheckPressed('3'))
-		spawn(DEP_PHYS);
-	if (Key::keyCheckPressed('4'))
-		spawn(DEP_ME);
-	if (Key::keyCheckPressed('5'))
-		spawn(DEP_CHEM);
-		*/
-
 	// Animation by moving
-	if (moveOffPhase > 0.0) {
-		moveOffPhase -= DELTA_PER_TURN;
-		
+	if (moveOffAction) {
 		float dx = 0.0, dy = 0.0;
 		switch (moveOffDirection) {
 		case DIRECTION_RIGHT: dx = -1.0; break;
@@ -301,24 +276,18 @@ void Unit::update() {
 		case DIRECTION_DOWN: dy = 1.0; break;
 		}
 
-		float aniPhase;
-		if (moveOffPhase > 0.5)
-			aniPhase = 1.0;
-		else
-			aniPhase = moveOffPhase * 2.0;
-
-		float mag = Spline::accandfric(aniPhase);
+		float mag = 1.0 - Spline::accandfric(Gui::aniPhase());
 		dx *= mag;
 		dy *= mag;
 
 		moveOffX = dx;
 		moveOffY = dy;
-		moveOffY += Spline::accjump(aniPhase) * 0.2;
+		moveOffZ = Spline::accjump(Gui::aniPhase()) * 0.2;
 	}
 	else {
-		moveOffPhase = 0.0;
 		moveOffX = 0.0;
 		moveOffY = 0.0;
+		moveOffZ = 0.0;
 	}
 	// End of animation by moving
 }
@@ -343,6 +312,7 @@ void Unit::draw() const {
 	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + WINDOW_WIDTH / 2.0;
 	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + WINDOW_HEIGHT / 2.0;
 
+	Draw::draw(Rspr::faceFrame, x, y);
 	Draw::draw(*face, x, y);
 	if (p.state == STATE_DEAD)
 		Draw::number(p.respawn, x, y);
@@ -365,19 +335,59 @@ void Unit::draw() const {
 
 	Draw::qonmapSB(
 		*body, 0.0,
-		drawx, drawy,
+		drawx, drawy, moveOffZ,
 		animationFlip ? -1.0 : 1.0, 1.0,
 		p.invincible > 0 ? Color::gray : Color::white, 1.0);
 	if (p.hero) {
-		Draw::qonmap(Rspr::hero, -0.05, drawx, drawy);
+		Draw::qonmap(Rspr::hero, -0.05, drawx, drawy, moveOffZ);
 	}
+	if (p.state == STATE_STUN) {
+		Draw::qonmap(Rspr::stun[Gui::aniIndpPhaseCombinate(4, 0.1)], 0.05, drawx, drawy, moveOffZ + 1.2);
+	}
+
+	// Attack motion
+	drawAttackMotion();
 
 	// Health status
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(p.health - 1) / 2.0 * ddx;
 	for (int i = 0; i < p.health; i++) {
-		Draw::qonmap(Rspr::unitHeart, 2.0, drawx + dx, drawy + 1.5);
+		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
+	}
+}
+
+void Unit::drawAttackMotion() const {
+	if (STATE_KIND_ATTACK(p.state)) {
+		if (p.dep == DEP_PHYS) {
+			int ind = Gui::aniIndpPhaseCombinate(4, 0.1);
+
+			switch (p.state) {
+			case STATE_ATTACK_RIGHT:
+				for (int x = p.x + 1; x < MAP_WIDTH; x++)
+					Draw::qonmap(Rspr::beamH[ind], 0.0, x, p.y, 0.5);
+				break;
+			case STATE_ATTACK_LEFT:
+				for (int x = p.x - 1; x >= 0; x--)
+					Draw::qonmap(Rspr::beamH[3 - ind], 0.0, x, p.y, 0.5);
+				break;
+			case STATE_ATTACK_UP:
+				for (int y = p.y + 1; y < MAP_HEIGHT; y++)
+					Draw::qonmap(Rspr::beamV[ind], 0.0, p.x, y, 0.5);
+				break;
+			case STATE_ATTACK_DOWN:
+				for (int y = p.y - 1; y >= 0; y--)
+					Draw::qonmap(Rspr::beamV[3 - ind], 0.0, p.x, y, 0.5);
+				break;
+			}
+
+		}
+
+		if (p.dep == DEP_CSE) {
+			if (Gui::aniPhase() < 1.0) {
+				Draw::qonmap(Rspr::spark[Gui::aniPhaseCombinate(4)], -0.01, p.x, p.y, 0.0);
+			}
+		}
 	}
 }
 
@@ -402,7 +412,7 @@ void Flag::draw() const {
 		f = &Rspr::flagKaist;
 		break;
 	}
-	Draw::onmap(*f, (float)p.x, (float)p.y);
+	Draw::onmap(*f, (float)p.x, (float)p.y, 0.0);
 }
 
 Poison::Poison() {
@@ -450,7 +460,7 @@ void Poison::draw() const {
 	if (!p.valid)
 		return;
 
-	Draw::qonmap(Rspr::poison, -1.0, p.x, p.y);
+	Draw::qonmap(Rspr::poison, -1.0, p.x, p.y, 0.0);
 }
 
 Petal::Petal() {
@@ -516,7 +526,7 @@ void Petal::draw() const {
 	if (!p.valid)
 		return;
 
-	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y);
+	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y, 0.0);
 }
 
 Mushroom::Mushroom() {

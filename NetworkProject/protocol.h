@@ -36,6 +36,9 @@ typedef enum {
 	STATE_STUN
 } protocol_state;
 
+#define STATE_KIND_ATTACK(x) ((x) == STATE_ATTACK_RIGHT || (x) == STATE_ATTACK_DOWN || (x) == STATE_ATTACK_LEFT || (x) == STATE_ATTACK_UP)
+#define STATE_KIND_SKILL(x) ((x) == STATE_SKILL_RIGHT || (x) == STATE_SKILL_DOWN || (x) == STATE_SKILL_LEFT || (x) == STATE_SKILL_UP)
+
 typedef enum {
 	DIRECTION_NULL,
 	DIRECTION_RIGHT,
@@ -118,6 +121,11 @@ typedef enum {
 	COMMAND_SPAWN_CHEM,
 	COMMAND_FLAG
 } protocol_command;
+
+#define COMMAND_KIND_MOVE(x) ((x) == COMMAND_MOVE_RIGHT || (x) == COMMAND_MOVE_DOWN || (x) == COMMAND_MOVE_LEFT || (x) == COMMAND_MOVE_UP)
+#define COMMAND_KIND_ATTACK(x) ((x) == COMMAND_ATTACK_RIGHT || (x) == COMMAND_ATTACK_DOWN || (x) == COMMAND_ATTACK_LEFT || (x) == COMMAND_ATTACK_UP)
+#define COMMAND_KIND_SKILL(x) ((x) == COMMAND_SKILL_RIGHT || (x) == COMMAND_SKILL_DOWN || (x) == COMMAND_SKILL_LEFT || (x) == COMMAND_SKILL_UP)
+#define COMMAND_KIND_SPAWN(x) ((x) == COMMAND_SPAWN_CSE || (x) == COMMAND_SPAWN_PHYS || (x) == COMMAND_SPAWN_LIFE || (x) == COMMAND_SPAWN_ME || (x) == COMMAND_SPAWN_CHEM)
 
 typedef struct {
 	protocol_command command[UNIT_NUM_MAX];

@@ -118,6 +118,9 @@
     <ClCompile Include="server.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default_v.glsl">
