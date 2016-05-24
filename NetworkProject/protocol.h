@@ -54,6 +54,7 @@ typedef struct {
 	int cooltime;
 	int respawn;
 	int stun;
+	int invincible;
 } protocol_unit;
 
 typedef struct {
@@ -127,6 +128,8 @@ typedef struct {
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
+#define ACTUAL_WINDOW_WIDTH 640
+#define ACTUAL_WINDOW_HEIGHT 480
 
 #define FRAME_INTERVAL 16
 #define FRAME_PER_TURN 30
@@ -180,6 +183,7 @@ typedef struct {
 #define BLACKHOLE_DAMAGE 10
 #define ACCIDENT_DAMAGE 10
 
+#define INVINCIBLE_SPAN 5
 
 #define DEATH_PENALTY 10
 #define FLAG_SCORE 50

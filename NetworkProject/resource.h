@@ -36,6 +36,8 @@ public:
 
 	static Sprite flagNull;
 	static Sprite flagFlag;
+
+	static Sprite number[10];
 };
 
 class Resource {

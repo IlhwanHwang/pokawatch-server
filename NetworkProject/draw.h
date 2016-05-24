@@ -16,8 +16,7 @@
 #include "gui.h"
 
 struct Color {
-	static Color white;
-	static Color black;
+	static Color white, black, gray;
 	static Color merge(Color& c1, Color& c2, float x);
 	float r, g, b;
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
@@ -83,4 +82,6 @@ public:
 	static void qonmap(Sprite& spr, float depth, float x, float y) {
 		qonmap(spr, 0, depth, x, y, Color::white, 1.0);
 	}
+
+	static void number(int num, float x, float y);
 };
