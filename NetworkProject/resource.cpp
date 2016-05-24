@@ -4,6 +4,7 @@
 //
 
 #include "resource.h"
+#include <string>
 
 Sprite Rspr::temp;
 Sprite Rspr::error;
@@ -21,12 +22,16 @@ Sprite Rspr::faceME;
 Sprite Rspr::faceLIFE;
 Sprite Rspr::facePHYS;
 Sprite Rspr::faceDEAD;
+Sprite Rspr::faceFrame;
 
 Sprite Rspr::petal;
 Sprite Rspr::poison;
 Sprite Rspr::beamH[4];
+Sprite Rspr::beamV[4];
+Sprite Rspr::spark[4];
 
 Sprite Rspr::hero;
+Sprite Rspr::stun[4];
 
 Sprite Rspr::tileLight;
 Sprite Rspr::tileDark;
@@ -36,7 +41,16 @@ Sprite Rspr::flagKaist;
 
 Sprite Rspr::number[10];
 
+#define MULTILOAD(buf, res, num, filename) \
+	for (int i = 0; i < num; i++) \
+	{ \
+		sprintf(buf, filename, i); \
+		Rspr::res[i].load(buf).dot(); \
+	}
+
 void Resource::init() {
+	char buf[100];
+
 	Rspr::temp.load("cse_temp.png").setOffset(20.0, 80.0).dot();
 	Rspr::error.load("error.png");
 
@@ -53,14 +67,14 @@ void Resource::init() {
 	Rspr::faceLIFE.load("face_life.png");
 	Rspr::facePHYS.load("face_phys.png");
 	Rspr::faceDEAD.load("face_dead.png");
+	Rspr::faceFrame.load("face_frame.png");
 
 	Rspr::petal.load("petal.png").dot().setOffset(16.0, 80.0);
 	Rspr::poison.load("poison.png").dot();
-	for (int i = 0; i < 4; i++) {
-		char fn[] = "beam_h0.png";
-		fn[6] = i + '0';
-		Rspr::beamH[i].load(fn).dot();
-	}
+	MULTILOAD(buf, beamH, 4, "beam_h%d.png");
+	MULTILOAD(buf, beamV, 4, "beam_v%d.png");
+	MULTILOAD(buf, stun, 4, "stun%d.png");
+	MULTILOAD(buf, spark, 4, "spark%d.png");
 
 	Rspr::hero.load("hero.png").dot().setOffset(30.0, 50.0);
 
@@ -70,9 +84,5 @@ void Resource::init() {
 	Rspr::flagPostech.load("flag_postech.png").dot();
 	Rspr::flagKaist.load("flag_kaist.png").dot();
 
-	for (int i = 0; i < 10; i++) {
-		char fn[] = "num_0.png";
-		fn[4] = i + '0';
-		Rspr::number[i].load(fn).dot();
-	}
+	MULTILOAD(buf, number, 10, "num_%d.png");
 }

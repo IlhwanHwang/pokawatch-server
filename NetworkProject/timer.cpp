@@ -41,6 +41,7 @@ void Timer::init(int interval, int perturn) {
 void Timer::turn() {
 	//std::cout << "Turn!" << std::endl;
 	// add any per turn action
+	Gui::turn();
 	Network::turn();
 	if(Network::getGameStart()[0]==GAME_START_CHAR && Game::getTurnLeft()>0) Game::turn();
 	if (Game::getTurnLeft <= 0)
@@ -68,6 +69,8 @@ void Timer::update(int count) {
 		Game::release();
 		Network::setGameStart(0, GAME_START_CHAR);
 	}
+
+	Gui::update();
 
 	// add any per frame actions
 	// such as update() and draw() for all object

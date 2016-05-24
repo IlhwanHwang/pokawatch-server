@@ -25,12 +25,16 @@ public:
 	static Sprite faceLIFE;
 	static Sprite facePHYS;
 	static Sprite faceDEAD;
+	static Sprite faceFrame;
 
 	static Sprite petal;
 	static Sprite poison;
 	static Sprite beamH[4];
+	static Sprite beamV[4];
+	static Sprite spark[4];
 
 	static Sprite hero;
+	static Sprite stun[4];
 
 	static Sprite tileLight;
 	static Sprite tileDark;

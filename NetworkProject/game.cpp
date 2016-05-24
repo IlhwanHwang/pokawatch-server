@@ -73,7 +73,7 @@ void Game::draw() {		// draw routine
 		for (int j = 0; j < MAP_HEIGHT; j++) {
 			Sprite& light = Rspr::tileLight;
 			Sprite& dark = Rspr::tileDark;
-			Draw::onmap((i + j) % 2 == 0 ? light : dark, i, j);
+			Draw::onmap((i + j) % 2 == 0 ? light : dark, i, j, 0.0);
 		}
 	}
 

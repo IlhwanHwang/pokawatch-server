@@ -8,7 +8,7 @@
 #include <cmath>
 
 #define M_PI 3.1415926
-#define HAISTNESS 2.0
+#define HAISTNESS 0.5
 
 class Spline {
 public:

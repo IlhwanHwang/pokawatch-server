@@ -57,11 +57,11 @@ public:
 	static void draw(Sprite& spr, float x, float y) {
 		drawSB(spr, x, y, 1.0, 1.0, Color::white, 1.0);
 	}
-	static void onmapSB(Sprite& spr, float x, float y, float sx, float sy, Color& c, float alpha) {
-		drawSB(spr, Gui::unitX(x), Gui::unitY(y), sx, sy, c, alpha);
+	static void onmapSB(Sprite& spr, float x, float y, float z, float sx, float sy, Color& c, float alpha) {
+		drawSB(spr, Gui::unitX(x), Gui::unitY(y + z), sx, sy, c, alpha);
 	}
-	static void onmap(Sprite& spr, float x, float y) {
-		onmapSB(spr, x, y, 1.0, 1.0, Color::white, 1.0);
+	static void onmap(Sprite& spr, float x, float y, float z) {
+		onmapSB(spr, x, y, z, 1.0, 1.0, Color::white, 1.0);
 	}
 
 	static void qdrawSB(Sprite& spr, float depth, float x, float y, float sx, float sy, Color& c, float alpha) {
@@ -70,14 +70,14 @@ public:
 	static void qdraw(Sprite& spr, float depth, float x, float y) {
 		qdrawSB(spr, depth, x, y, 1.0, 1.0, Color::white, 1.0);
 	}
-	static void qonmapSB(Sprite& spr, float depth, float x, float y, float sx, float sy, Color& c, float alpha) {
-		qdrawSB(spr, depth - y, Gui::unitX(x), Gui::unitY(y), sx, sy, c, alpha);
+	static void qonmapSB(Sprite& spr, float depth, float x, float y, float z, float sx, float sy, Color& c, float alpha) {
+		qdrawSB(spr, depth - y, Gui::unitX(x), Gui::unitY(y + z), sx, sy, c, alpha);
 	}
-	static void qonmapB(Sprite& spr, float depth, float x, float y, Color& c, float alpha) {
-		qonmapSB(spr, depth, x, y, 1.0, 1.0, c, alpha);
+	static void qonmapB(Sprite& spr, float depth, float x, float y, float z, Color& c, float alpha) {
+		qonmapSB(spr, depth, x, y, z, 1.0, 1.0, c, alpha);
 	}
-	static void qonmap(Sprite& spr, float depth, float x, float y) {
-		qonmapSB(spr, depth, x, y, 1.0, 1.0, Color::white, 1.0);
+	static void qonmap(Sprite& spr, float depth, float x, float y, float z) {
+		qonmapSB(spr, depth, x, y, z, 1.0, 1.0, Color::white, 1.0);
 	}
 
 	static void number(int num, float x, float y);
