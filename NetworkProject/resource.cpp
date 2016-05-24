@@ -29,6 +29,7 @@ Sprite Rspr::poison;
 Sprite Rspr::beamH[4];
 Sprite Rspr::beamV[4];
 Sprite Rspr::spark[4];
+Sprite Rspr::sparkboom[4];
 
 Sprite Rspr::hero;
 Sprite Rspr::stun[4];
@@ -40,6 +41,7 @@ Sprite Rspr::flagPostech;
 Sprite Rspr::flagKaist;
 
 Sprite Rspr::number[10];
+Sprite Rspr::bignumber[10];
 
 #define MULTILOAD(buf, res, num, filename) \
 	for (int i = 0; i < num; i++) \
@@ -69,12 +71,13 @@ void Resource::init() {
 	Rspr::faceDEAD.load("face_dead.png");
 	Rspr::faceFrame.load("face_frame.png");
 
-	Rspr::petal.load("petal.png").dot().setOffset(16.0, 80.0);
+	Rspr::petal.load("petal.png").dot();
 	Rspr::poison.load("poison.png").dot();
 	MULTILOAD(buf, beamH, 4, "beam_h%d.png");
 	MULTILOAD(buf, beamV, 4, "beam_v%d.png");
 	MULTILOAD(buf, stun, 4, "stun%d.png");
 	MULTILOAD(buf, spark, 4, "spark%d.png");
+	MULTILOAD(buf, sparkboom, 4, "sparkboom%d.png");
 
 	Rspr::hero.load("hero.png").dot().setOffset(30.0, 50.0);
 
@@ -85,4 +88,5 @@ void Resource::init() {
 	Rspr::flagKaist.load("flag_kaist.png").dot();
 
 	MULTILOAD(buf, number, 10, "num_%d.png");
+	MULTILOAD(buf, bignumber, 10, "bignum%d.png");
 }

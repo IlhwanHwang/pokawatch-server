@@ -82,3 +82,28 @@ void Draw::number(int num, float x, float y) {
 		dx -= ddx;
 	}
 }
+
+void Draw::bignumber(int num, float x, float y) {
+	const float ddx = 60.0;
+
+	int numcopy = num;
+	int ind = 0;
+
+	while (numcopy > 0) {
+		numcopy /= 10;
+		ind++;
+	}
+
+	if (ind == 0)
+		ind = 1;
+
+	float dx = (ind - 1) / 2.0 * ddx;
+	numcopy = num;
+
+	for (int i = 0; i < ind; i++) {
+		int digit = numcopy % 10;
+		numcopy /= 10;
+		draw(Rspr::bignumber[digit], x + dx, y);
+		dx -= ddx;
+	}
+}

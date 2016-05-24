@@ -32,6 +32,7 @@ public:
 	static Sprite beamH[4];
 	static Sprite beamV[4];
 	static Sprite spark[4];
+	static Sprite sparkboom[4];
 
 	static Sprite hero;
 	static Sprite stun[4];
@@ -44,6 +45,7 @@ public:
 	static Sprite flagKaist;
 
 	static Sprite number[10];
+	static Sprite bignumber[10];
 };
 
 class Resource {

@@ -100,8 +100,9 @@ void Game::draw() {
 	Draw::flush();
 
 	// Overlay informations
-	Draw::number(score[0], WINDOW_WIDTH * 0.1, WINDOW_HEIGHT * 0.9);
-	Draw::number(score[1], WINDOW_WIDTH * 0.9, WINDOW_HEIGHT * 0.9);
+	Draw::number(score[0], WINDOW_WIDTH * 0.1, WINDOW_HEIGHT * 0.91);
+	Draw::number(score[1], WINDOW_WIDTH * 0.9, WINDOW_HEIGHT * 0.91);
+	Draw::bignumber(turnleft, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
 }
 
 void Game::release() {
@@ -240,8 +241,8 @@ void Game::ruleAttack()
 				}
 				for (int a = 0; a < UNIT_NUM_MAX; a++)
 				{
-					if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(3);
+					if (abs((unitArray[a].getX() - u.getX())) <= 1 && (abs(unitArray[a].getY() - u.getY()) <= 1))
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(5);
 				}
 				break;
 			case DEP_PHYS:
@@ -482,8 +483,8 @@ void Game::ruleSkill()
 				}
 				for (int a = 0; a < UNIT_NUM_MAX; a++)
 				{
-					if (abs((unitArray[a].getX() - u.getX()) <= 3) && (abs(unitArray[a].getY() - u.getY()) <= 3))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(1);
+					if (abs((unitArray[a].getX() - u.getX()) ) <= 3 && (abs(unitArray[a].getY() - u.getY()) <= 3))
+						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(5);
 				}
 				break;
 			case DEP_PHYS:

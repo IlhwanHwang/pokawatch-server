@@ -53,6 +53,7 @@ private:
 
 	int moveStun;
 	int healthMax;
+	int healthPrevious;
 	
 	void init();
 

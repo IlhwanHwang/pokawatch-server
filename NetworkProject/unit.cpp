@@ -22,6 +22,7 @@ void Unit::init() {
 
 	moveStun = 0;
 	p.health = healthMax;
+	healthPrevious = p.health;
 	p.stun = 0;
 	p.cooltime = 0;
 	p.x = orgx;
@@ -177,6 +178,8 @@ void Unit::damage(int h) {
 		return;
 	}
 
+	if (p.health == healthPrevious)
+		healthPrevious = p.health;
 	p.health -= h;
 
 	if (p.health <= 0) {
@@ -225,6 +228,7 @@ void Unit::turn() {
 		return;
 
 	moveOffAction = false;
+	healthPrevious = p.health;
 
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
@@ -309,15 +313,15 @@ void Unit::draw() const {
 		}
 	}
 
-	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + WINDOW_WIDTH / 2.0;
-	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + WINDOW_HEIGHT / 2.0;
+	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + GUI_MAP_X;
+	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + GUI_MAP_Y;
 
 	Draw::draw(Rspr::faceFrame, x, y);
 	Draw::draw(*face, x, y);
 	if (p.state == STATE_DEAD)
 		Draw::number(p.respawn, x, y);
 
-	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
+	if (p.state == STATE_NULL || (p.state == STATE_DEAD && p.health == healthPrevious)) {
 		return;
 	}
 
@@ -333,11 +337,13 @@ void Unit::draw() const {
 	const float drawx = (float)p.x + moveOffX;
 	const float drawy = (float)p.y + moveOffY;
 
-	Draw::qonmapSB(
-		*body, 0.0,
-		drawx, drawy, moveOffZ,
-		animationFlip ? -1.0 : 1.0, 1.0,
-		p.invincible > 0 ? Color::gray : Color::white, 1.0);
+	Color c = Color::white;
+
+	if (p.invincible > 0 || (p.health != healthPrevious && Gui::aniPhase() >= 1.0)) {
+		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
+	}
+
+	Draw::qonmapSB(*body, 0.0, drawx, drawy, moveOffZ, animationFlip ? -1.0 : 1.0, 1.0, c, 1.0);
 	if (p.hero) {
 		Draw::qonmap(Rspr::hero, -0.05, drawx, drawy, moveOffZ);
 	}
@@ -349,9 +355,10 @@ void Unit::draw() const {
 	drawAttackMotion();
 
 	// Health status
+	int showHealth = Gui::aniPhase() < 1.0 ? healthPrevious : p.health;
 	float ddx = 16 / GUI_CELL_WIDTH;
-	float dx = -(float)(p.health - 1) / 2.0 * ddx;
-	for (int i = 0; i < p.health; i++) {
+	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
+	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
 	}
@@ -380,12 +387,36 @@ void Unit::drawAttackMotion() const {
 					Draw::qonmap(Rspr::beamV[3 - ind], 0.0, p.x, y, 0.5);
 				break;
 			}
-
 		}
 
 		if (p.dep == DEP_CSE) {
 			if (Gui::aniPhase() < 1.0) {
 				Draw::qonmap(Rspr::spark[Gui::aniPhaseCombinate(4)], -0.01, p.x, p.y, 0.0);
+			}
+		}
+	}
+
+	if (STATE_KIND_SKILL(p.state)) {
+		if (p.dep == DEP_CSE) {
+			if (Gui::aniPhase() < 1.0) {
+				Sprite& spr = Rspr::sparkboom[Gui::aniPhaseCombinate(4)];
+				int x1, y1, x2, y2;
+
+				x1 = p.x - 3;
+				y1 = p.y - 3;
+				x2 = p.x + 3;
+				y2 = p.y + 3;
+
+				x1 = x1 < 0 ? 0 : x1;
+				x2 = x2 >= MAP_WIDTH ? MAP_WIDTH - 1 : x2;
+				y1 = y1 < 0 ? 0 : y1;
+				y2 = y2 >= MAP_HEIGHT ? MAP_HEIGHT - 1 : y2;
+
+				for (int i = x1; i <= x2; i++) {
+					for (int j = y1; j <= y2; j++) {
+						Draw::qonmap(spr, -0.01, i, j, 0.0);
+					}
+				}
 			}
 		}
 	}
@@ -526,7 +557,7 @@ void Petal::draw() const {
 	if (!p.valid)
 		return;
 
-	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y, 0.0);
+	Draw::qonmap(Rspr::petal, 0.0, p.x, p.y, 0.5);
 }
 
 Mushroom::Mushroom() {
