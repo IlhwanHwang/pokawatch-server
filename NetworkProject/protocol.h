@@ -85,7 +85,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
-#define UNIT_NUM_MAX 2
+#define UNIT_NUM_MAX 6
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -201,6 +201,6 @@ typedef struct {
 #define DEATH_PENALTY 10
 #define FLAG_SCORE 50
 
-#define HERO_DELAY 2
+#define HERO_DELAY 5
 
 #define ARBITRARY_BIG_NUM 999

@@ -23,15 +23,17 @@ private:
 	static int characterSelection;											// Information of selection of charactor(dep)
 	static char gameStart[2];												// game started? not(N) start(G)
 	static int command;														// selected command of client side
+	static char *serverIpArg;
 
 public:
 
-	static void init()								// initiate network state
+	static void init(char * argv)								// initiate network state
 	{
 		mode = MODE_NOTHING;
 		characterSelection = 0;
 		gameStart[0] = 'N';
 		gameStart[1] = '\0';
+		serverIpArg = argv;
 	}
 	static void ErrorHandling(char *message);		// Error handling
 

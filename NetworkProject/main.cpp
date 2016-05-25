@@ -45,7 +45,7 @@ void main(int argc, char **argv)
 	Key::init();
 	Game::init();
 	Shader::init();
-	Network::init();
+	Network::init(argv[1]);
 	Resource::init();
 
 	Timer::init(FRAME_INTERVAL, FRAME_PER_TURN);

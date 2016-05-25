@@ -28,6 +28,7 @@ int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection;												// Information of selection of charactor(dep)
 char Network::gameStart[2];														// game started? not(N) start(G)
 int Network::command;															// selected command of client side
+char * Network::serverIpArg;
 
 void Network::ErrorHandling(char *message)  //Error handling routine
 {
@@ -103,7 +104,7 @@ void Network::closeServerConnection() //server cosing routine
 
 void Network::makeClientSocket() // Client socket making routine
 {
-	string servIpString = SERV_IP_STRING;
+	string servIpString = serverIpArg;
 	string portNumString = PORT_STRING;
 	char * servIp = (char*)servIpString.c_str();
 	char * portNum = (char*)portNumString.c_str();

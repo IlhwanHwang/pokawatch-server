@@ -8,10 +8,10 @@
 
 Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
-//	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
-//	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
-//	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
-//	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
+	Unit(0, MAP_HEIGHT / 2, TEAM_POSTECH),
+	Unit(0, MAP_HEIGHT / 2 + 1, TEAM_POSTECH),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
+	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
 
 };
