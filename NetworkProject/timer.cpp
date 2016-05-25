@@ -39,17 +39,12 @@ void Timer::init(int interval, int perturn) {
 }
 
 void Timer::turn() {
-	//std::cout << "Turn!" << std::endl;
 	// add any per turn action
+
 	Gui::turn();
 	Network::turn();
-	if(Network::getGameStart()[0]==GAME_START_CHAR && Game::getTurnLeft()>0) Game::turn();
-	if (Game::getTurnLeft <= 0)
-	{
-		if (Game::getScore(TEAM_POSTECH - 1) > Game::getScore(TEAM_KAIST - 1)) printf("POSTECH WIN !\n");
-		if (Game::getScore(TEAM_POSTECH - 1) < Game::getScore(TEAM_KAIST - 1)) printf("KAIST WIN !\n");
-		if (Game::getScore(TEAM_POSTECH - 1) == Game::getScore(TEAM_KAIST - 1)) printf("DRAW !\n");
-	}
+
+	if(Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0) Game::turn();
 }
 
 void Timer::update(int count) {
@@ -81,7 +76,7 @@ void Timer::update(int count) {
 			Draw::naivefill(Rspr::infoClient3);
 	}
 
-	glutSwapBuffers();
+	glutSwapBuffers(); // Automatic Vsync.
 
 	Key::keyUpdate();
 }

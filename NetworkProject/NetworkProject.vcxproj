@@ -164,7 +164,6 @@
     <ClInclude Include="network.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="server.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="spline.h" />
     <ClInclude Include="sprite.h" />
@@ -183,7 +182,6 @@
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="resource.cpp" />
-    <ClCompile Include="server.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sprite.cpp" />

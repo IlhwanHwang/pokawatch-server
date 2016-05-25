@@ -7,6 +7,7 @@
 
 #include "sprite.h"
 
+// Every resource is saved on static context
 class Rspr {
 public:
 	static Sprite temp;

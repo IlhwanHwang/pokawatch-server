@@ -8,6 +8,7 @@
 #include "protocol.h"
 #include <iostream>
 
+// Abstract object interface
 class Object {
 protected:
 	const char* name;
@@ -17,7 +18,7 @@ public:
 	Object() { name = "Anonmous object"; }
 	virtual void turn() = 0; // called every turn
 	virtual void update() = 0; // called every frame
-	virtual void draw() const = 0; // called every frame (draw event)
+	virtual void draw() const = 0; // called every frame (draw event), no sideeffect is allowed.
 };
 
 // Recommended flow
@@ -47,6 +48,7 @@ private:
 	int death;
 	bool animationFlip;
 	
+	// Members for movement animation
 	float moveOffX, moveOffY, moveOffZ;
 	protocol_direction moveOffDirection;
 	bool moveOffAction;
@@ -74,8 +76,8 @@ public:
 
 	void release() { p.state = STATE_IDLE; init(); } // For the first time
 
-	void moveResetMovestun() { moveStun = 0; }
-	void moveOffDiscard() { moveOffDirection = DIRECTION_NULL; };
+	void moveResetMovestun() { moveStun = 0; } // Release movestun (just for me)
+	void moveOffDiscard() { moveOffDirection = DIRECTION_NULL; }; // Calling it after move makes unit jump on its position
 
 	void turn();
 	void update();
@@ -83,7 +85,7 @@ public:
 
 	bool isAlive() { return p.state != STATE_DEAD && p.state != STATE_NULL; }
 
-	const protocol_unit* getProtocol() const { return &p; }
+	const protocol_unit* getProtocol() const { return &p; } // Export unit information as protocol.
 
 	protocol_team getTeam() const { return p.team; }
 	protocol_dep getDep() const { return p.dep; }

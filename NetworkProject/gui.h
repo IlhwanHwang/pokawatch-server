@@ -17,9 +17,13 @@
 #define GUI_MAP_X (WINDOW_WIDTH / 2.0)
 #define GUI_MAP_Y (WINDOW_HEIGHT / 2.0 - 48.0)
 
+// Gui module defines various graphical values
+// Such as animation phase, map size, and so on.
 class Gui {
 private:
-	static float animationPhase, animationFullPhase, animationIndpPhase;
+	static float animationPhase; // phase from the begin to the end of movement
+	static float animationFullPhase; // phase from the begin to the end of turn
+	static float animationIndpPhase; // phase independent from turn flow
 	static int imin(int a, int b) { return a > b ? b : a; }
 public:
 	static float unitX(float x) { return GUI_MAP_X + (x - (MAP_WIDTH - 1) / 2.0) * GUI_CELL_WIDTH; }

@@ -59,6 +59,7 @@ Sprite Rspr::infoClient3;
 
 #define RESOURCE_LOCATION "images\\"
 
+// Macro to load multiple consecutive images at once
 #define MULTILOAD(buf, res, num, filename) \
 	for (int i = 0; i < num; i++) \
 	{ \
@@ -66,6 +67,7 @@ Sprite Rspr::infoClient3;
 		Rspr::res[i].load(buf).dot(); \
 	}
 
+// Single image load macro
 #define LOAD(res, filename) Rspr::res.load(RESOURCE_LOCATION filename ".png")
 
 void Resource::init() {

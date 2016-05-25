@@ -55,8 +55,7 @@ void DrawRequest::draw() const {
 void Draw::refresh() {
 	if (w != glutGet(GLUT_WINDOW_WIDTH) || h != glutGet(GLUT_WINDOW_HEIGHT))
 		glutReshapeWindow(w, h);
-	//w = glutGet(GLUT_WINDOW_WIDTH);
-	//h = glutGet(GLUT_WINDOW_HEIGHT);
+
 	glViewport(0, 0, w, h);
 }
 

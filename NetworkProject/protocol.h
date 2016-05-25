@@ -5,13 +5,18 @@
 
 #pragma once
 
-// do not touch. TEAM_POSTECH = 1, TEAM_KAIST = 2. for array index.
+// Protocol definitions. determine which information is contained on network communication.
+// Especially, protocol structure is seen by remote AI program.
+
+// Team enum
+// do not touch. TEAM_POSTECH = 1, TEAM_KAIST = 2, for array index purpose.
 typedef enum {
 	TEAM_NULL,
 	TEAM_POSTECH = 1,
 	TEAM_KAIST = 2
 } protocol_team;
 
+// Unit department enum
 typedef enum {
 	DEP_NULL,
 	DEP_CSE,
@@ -21,6 +26,7 @@ typedef enum {
 	DEP_CHEM
 } protocol_dep;
 
+// Unit state enum
 typedef enum {
 	STATE_NULL,
 	STATE_IDLE,
@@ -36,9 +42,11 @@ typedef enum {
 	STATE_STUN
 } protocol_state;
 
+// Macros categorizing states
 #define STATE_KIND_ATTACK(x) ((x) == STATE_ATTACK_RIGHT || (x) == STATE_ATTACK_DOWN || (x) == STATE_ATTACK_LEFT || (x) == STATE_ATTACK_UP)
 #define STATE_KIND_SKILL(x) ((x) == STATE_SKILL_RIGHT || (x) == STATE_SKILL_DOWN || (x) == STATE_SKILL_LEFT || (x) == STATE_SKILL_UP)
 
+// Direction enum
 typedef enum {
 	DIRECTION_NULL,
 	DIRECTION_RIGHT,
@@ -47,6 +55,7 @@ typedef enum {
 	DIRECTION_DOWN,
 } protocol_direction;
 
+// A complete unit structure.
 typedef struct {
 	protocol_team team;
 	protocol_dep dep;
@@ -60,11 +69,13 @@ typedef struct {
 	int invincible;
 } protocol_unit;
 
+// Flag structure
 typedef struct {
 	protocol_team team;
 	int x, y;
 } protocol_flag;
 
+// Poison, made by CHEM unit
 typedef struct {
 	bool valid;
 	protocol_team team;
@@ -72,6 +83,7 @@ typedef struct {
 	int span;
 } protocol_poison;
 
+// Petal, made by LIFE unit
 typedef struct {
 	bool valid;
 	protocol_team team;
@@ -79,6 +91,7 @@ typedef struct {
 	protocol_direction direction;
 } protocol_petal;
 
+// Mushroom, made by CHEM unit, a hero skill.
 typedef struct {
 	bool valid;
 	protocol_team team;
@@ -91,6 +104,7 @@ typedef struct {
 #define PETAL_NUM_MAX 12
 #define MUSHROOM_NUM_MAX 5
 
+// A complete network protocol.
 typedef struct {
 	protocol_unit unit[UNIT_NUM_MAX];
 	protocol_flag flag[FLAG_NUM_MAX];
@@ -101,6 +115,7 @@ typedef struct {
 	int turnleft;
 } protocol_data;
 
+// Command enum
 typedef enum {
 	COMMAND_MOVE_RIGHT,
 	COMMAND_MOVE_UP,
@@ -122,6 +137,7 @@ typedef enum {
 	COMMAND_FLAG
 } protocol_command;
 
+// Macros categorizing commands
 #define COMMAND_KIND_MOVE(x) ((x) == COMMAND_MOVE_RIGHT || (x) == COMMAND_MOVE_DOWN || (x) == COMMAND_MOVE_LEFT || (x) == COMMAND_MOVE_UP)
 #define COMMAND_KIND_ATTACK(x) ((x) == COMMAND_ATTACK_RIGHT || (x) == COMMAND_ATTACK_DOWN || (x) == COMMAND_ATTACK_LEFT || (x) == COMMAND_ATTACK_UP)
 #define COMMAND_KIND_SKILL(x) ((x) == COMMAND_SKILL_RIGHT || (x) == COMMAND_SKILL_DOWN || (x) == COMMAND_SKILL_LEFT || (x) == COMMAND_SKILL_UP)
@@ -131,6 +147,7 @@ typedef struct {
 	protocol_command command[UNIT_NUM_MAX];
 } protocol_command_array;
 
+// Other various macro definitions.
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
 

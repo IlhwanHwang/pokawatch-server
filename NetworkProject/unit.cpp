@@ -11,6 +11,7 @@
 #include "key.h"
 
 void Unit::init() {
+	// Differect health values for different units.
 	switch (p.dep) {
 	case DEP_CSE:  healthMax = 3; break;
 	case DEP_PHYS: healthMax = 3; break;
@@ -27,7 +28,7 @@ void Unit::init() {
 	p.cooltime = 0;
 	p.x = orgx;
 	p.y = orgy;
-	p.invincible = INVINCIBLE_SPAN;
+	p.invincible = INVINCIBLE_SPAN; // Invincible for a while after spawning
 	p.state = STATE_IDLE;
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
@@ -90,7 +91,7 @@ bool Unit::move(protocol_direction direction) {
 	else {
 		moveOffDirection = direction;
 		if (p.dep == DEP_ME) {
-			moveStun = 2;
+			moveStun = 2; // ME unit moves 1 cell per 2 turns.
 		}
 	}
 
@@ -126,6 +127,7 @@ void Unit::attack(protocol_direction direction) {
 	default: std::cerr << name << ": Invalid input" << std::endl; break;
 	}
 
+	// Attack has its own cooltime value.
 	switch (p.dep) {
 	case DEP_CSE:  p.cooltime = 6;  break;
 	case DEP_PHYS: p.cooltime = 0;  break;
@@ -161,6 +163,7 @@ void Unit::skill(protocol_direction direction) {
 	default: error("Invalid input"); break;
 	}
 
+	// A hero can use its skill only once.
 	p.hero = false;
 }
 
@@ -178,7 +181,7 @@ void Unit::damage(int h) {
 		return;
 	}
 
-	if (p.health == healthPrevious)
+	if (p.health == healthPrevious) // In the case that multiple damage dealt in one turn
 		healthPrevious = p.health;
 	p.health -= h;
 
@@ -300,6 +303,7 @@ void Unit::draw() const {
 	Sprite* face = &Rspr::error;
 	Sprite* body = &Rspr::error;;
 
+	// Unit face
 	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		face = &Rspr::faceDEAD;
 	}
@@ -321,6 +325,7 @@ void Unit::draw() const {
 	if (p.state == STATE_DEAD)
 		Draw::number(p.respawn, x, y);
 
+	// Nothing is drawn on map unless alive
 	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
 	}
@@ -339,6 +344,7 @@ void Unit::draw() const {
 
 	Color c = Color::white;
 
+	// Blinking effect
 	if (p.invincible > 0 || p.health < healthPrevious) {
 		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
 	}
@@ -503,12 +509,6 @@ Petal::Petal() {
 }
 
 void Petal::spawn(protocol_team team, int x, int y, protocol_direction direction) {
-	/*
-	if (p.x < 0 || p.y < 0 || p.x >= MAP_WIDTH || p.y >= MAP_HEIGHT) {
-		error("Spawned outside");
-		return;
-	}
-	*/
 	if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
 		error("Spawned outside");
 		return;
@@ -583,6 +583,11 @@ Mushroom::Mushroom() {
 }
 
 void Mushroom::spawn(protocol_team team, int x, int y) {
+	if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
+		error("Spawned outside");
+		return;
+	}
+
 	p.team = team;
 	p.x = x;
 	p.y = y;

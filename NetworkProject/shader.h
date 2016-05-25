@@ -16,8 +16,8 @@ private:
 	static GLuint defWidth;
 	static GLuint defHeight;
 	static GLuint defFlip;
-	static GLuint vboCanonical;
-	static GLuint vbo4thPlane;
+	static GLuint vboCanonical; // rectangle (-1.0, -1.0, 1.0, 1.0)
+	static GLuint vbo4thPlane; // rectangle (0.0, 0.0, 1.0, 1.0)
 
 public:
 	static void init();

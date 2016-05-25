@@ -5,16 +5,16 @@
 
 #pragma once
 
-// timer module working in static context
+// Timer class is used to sync and control flow of entire game
 class Timer {
 private:
 	static int frameInterval;
 	static int framePerTurn;
 
 public:
-	static void init(int, int);
-	static void turn();
-	static void update(int);
+	static void init(int, int); // Initialize timer with interval and frame per turn value.
+	static void turn(); // Proceed a turn, called by update().
+	static void update(int); // Update a frame, called back by GLUT
 
 	static int getFrameInterval() { return frameInterval; }
 	static int getFramePerTurn() { return framePerTurn; }
