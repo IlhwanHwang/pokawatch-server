@@ -683,7 +683,7 @@ void Game::ruleSpawn() // rules related to spawn
 			c == COMMAND_SPAWN_PHYS ||
 			c == COMMAND_SPAWN_LIFE ||
 			c == COMMAND_SPAWN_ME ||
-			c == COMMAND_SPAWN_CHEM) && u.getState() == STATE_DEAD)		// parse command, when the character is dead
+			c == COMMAND_SPAWN_CHEM) && u.getState() == STATE_DEAD && u.getDep() == DEP_NULL)		// parse command, when the character is dead
 		{
 			int b;
 			spawn[u.getTeam() - 1]++;
@@ -705,8 +705,8 @@ void Game::ruleSpawn() // rules related to spawn
 				u.spawn(DEP_CHEM);
 				break;
 			}
-			if (u.getTeam() == TEAM_POSTECH && (spawn[TEAM_POSTECH - 1] % HERO_DELAY == 0) && spawn[TEAM_POSTECH-1] != 0) u.setHero(true);		// make hero
-			if (u.getTeam() == TEAM_KAIST && (spawn[TEAM_KAIST - 1] % HERO_DELAY == 0) && spawn[TEAM_KAIST - 1] != 0) u.setHero(true);
+			if ((spawn[u.getTeam() - 1] % HERO_DELAY == 0) && (spawn[u.getTeam() -1] != 0)) u.setHero(true);		// make hero
+	
 		}
 
 	} // end of spawn
