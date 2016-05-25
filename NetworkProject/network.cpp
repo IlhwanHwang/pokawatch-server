@@ -175,6 +175,9 @@ void Network::getProtocolDataFromServer() // Message receving from server
 
 void Network::recieveGameStart()
 {
+	Draw::naivefill(Rspr::infoClient2);
+	glutSwapBuffers();
+
 	int strLen;
 	strLen = recv(hSocket, gameStart, sizeof(gameStart) - 1, 0); // data recieving
 	if (strLen == -1)

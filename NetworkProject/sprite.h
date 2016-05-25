@@ -6,20 +6,19 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <vector>
 
 class Sprite {
 private:
 	float ofx, ofy;
 	float w, h;
 	unsigned uw, uh;
-	std::vector<GLuint> bufs;
+	GLuint buf;
 
 public:
 	Sprite& load(const char* fn);
 	Sprite& setOffset(float x, float y);
 	Sprite& dot();
-	GLuint getBuf(int i) const { return bufs[i]; }
+	GLuint getBuf(int i) const { return buf; }
 	float getW() const { return w; }
 	float getH() const { return h; }
 	float getOfx() const { return ofx; }

@@ -119,6 +119,7 @@ void Game::draw() {		// draw routine
 
 void Game::release() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
+	Resource::postinit();
 	Draw::setsize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
 }
 

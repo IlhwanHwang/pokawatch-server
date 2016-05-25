@@ -78,7 +78,7 @@ void Timer::update(int count) {
 		if (Network::getCharacterSelection() == 0)
 			Draw::naivefill(Rspr::infoClient1);
 		else
-			Draw::naivefill(Rspr::infoClient2);
+			Draw::naivefill(Rspr::infoClient3);
 	}
 
 	glutSwapBuffers();

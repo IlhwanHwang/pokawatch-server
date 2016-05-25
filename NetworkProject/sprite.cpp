@@ -26,7 +26,6 @@ Sprite& Sprite::load(const char* fn) {
 		return (*this);
 	}
 
-	GLuint buf;
 	glGenTextures(1, &buf);
 	glBindTexture(GL_TEXTURE_2D, buf);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uw, uh, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
@@ -35,7 +34,6 @@ Sprite& Sprite::load(const char* fn) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	bufs.push_back(buf);
 	std::cout << "Sprite: " << fn << " is successfully loaded" << std::endl;
 
 	w = (float)uw;

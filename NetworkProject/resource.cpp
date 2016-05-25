@@ -55,64 +55,74 @@ Sprite Rspr::infoMain;
 Sprite Rspr::infoServer;
 Sprite Rspr::infoClient1;
 Sprite Rspr::infoClient2;
+Sprite Rspr::infoClient3;
+
+#define RESOURCE_LOCATION "images\\"
 
 #define MULTILOAD(buf, res, num, filename) \
 	for (int i = 0; i < num; i++) \
 	{ \
-		sprintf(buf, filename, i); \
+		sprintf(buf, RESOURCE_LOCATION filename ".png", i); \
 		Rspr::res[i].load(buf).dot(); \
 	}
+
+#define LOAD(res, filename) Rspr::res.load(RESOURCE_LOCATION filename ".png")
 
 void Resource::init() {
 	char buf[100];
 
-	Rspr::temp.load("cse_temp.png").setOffset(20.0, 80.0).dot();
-	Rspr::error.load("error.png");
+	LOAD(infoMain, "info_main").setOffset(0.0, 240.0);
+	LOAD(infoServer, "info_server").setOffset(0.0, 240.0);
+	LOAD(infoClient1, "info_client1").setOffset(0.0, 240.0);
+	LOAD(infoClient2, "info_client2").setOffset(0.0, 240.0);
+	LOAD(infoClient3, "info_client3").setOffset(0.0, 240.0);
+}
 
-	Rspr::unitCSE.load("body_cse.png").dot().setOffset(20.0, 74.0);
-	Rspr::unitCHEM.load("body_chem.png").dot().setOffset(20.0, 74.0);
-	Rspr::unitME.load("body_me.png").dot().setOffset(30.0, 70.0);
-	Rspr::unitLIFE.load("body_life.png").dot().setOffset(20.0, 74.0);
-	Rspr::unitPHYS.load("body_phys.png").dot().setOffset(20.0, 74.0);
-	Rspr::unitHeart.load("heart.png").dot();
+void Resource::postinit() {
+	char buf[100];
 
-	Rspr::faceCSE.load("face_cse.png");
-	Rspr::faceCHEM.load("face_chem.png");
-	Rspr::faceME.load("face_me.png");
-	Rspr::faceLIFE.load("face_life.png");
-	Rspr::facePHYS.load("face_phys.png");
-	Rspr::faceDEAD.load("face_dead.png");
-	Rspr::faceFrame.load("face_frame.png");
+	LOAD(temp, "temp").setOffset(20.0, 80.0).dot();
+	LOAD(error, "error");
 
-	Rspr::petal.load("petal.png").dot();
-	Rspr::poison.load("poison.png").dot();
-	MULTILOAD(buf, beamH, 4, "beam_h%d.png");
-	MULTILOAD(buf, beamV, 4, "beam_v%d.png");
-	MULTILOAD(buf, stun, 4, "stun%d.png");
-	MULTILOAD(buf, spark, 4, "spark%d.png");
-	MULTILOAD(buf, sparkboom, 4, "sparkboom%d.png");
-	Rspr::mushroom.load("mushroom.png").dot();
+	LOAD(unitCSE, "body_cse").dot().setOffset(20.0, 74.0);
+	LOAD(unitCHEM, "body_chem").dot().setOffset(20.0, 74.0);
+	LOAD(unitME, "body_me").dot().setOffset(30.0, 70.0);
+	LOAD(unitLIFE, "body_life").dot().setOffset(20.0, 74.0);
+	LOAD(unitPHYS, "body_phys").dot().setOffset(20.0, 74.0);
+	LOAD(unitHeart, "heart").dot();
 
-	Rspr::hero.load("hero.png").dot().setOffset(30.0, 50.0);
+	LOAD(faceCSE, "face_cse");
+	LOAD(faceCHEM, "face_chem");
+	LOAD(faceME, "face_me");
+	LOAD(faceLIFE, "face_life");
+	LOAD(facePHYS, "face_phys");
+	LOAD(faceDEAD, "face_dead");
+	LOAD(faceFrame, "face_frame");
 
-	Rspr::tileLight.load("tile_light.png").dot();
-	Rspr::tileDark.load("tile_dark.png").dot();
-	Rspr::flagNull.load("flag_null.png").dot();
-	Rspr::flagPostech.load("flag_postech.png").dot();
-	Rspr::flagKaist.load("flag_kaist.png").dot();
+	LOAD(petal, "petal").dot();
+	LOAD(poison, "poison").dot();
+	MULTILOAD(buf, beamH, 4, "beam_h%d");
+	MULTILOAD(buf, beamV, 4, "beam_v%d");
+	MULTILOAD(buf, stun, 4, "stun%d");
+	MULTILOAD(buf, spark, 4, "spark%d");
+	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
+	LOAD(mushroom, "mushroom").dot();
 
-	MULTILOAD(buf, number, 10, "num_%d.png");
-	MULTILOAD(buf, bignumber, 10, "bignum%d.png");
+	LOAD(hero, "hero").dot().setOffset(30.0, 50.0);
 
-	Rspr::bg.load("bg.png").dot();
-	Rspr::intengrad.load("intengrad.png").dot();
+	LOAD(tileLight, "tile_light").dot();
+	LOAD(tileDark, "tile_dark").dot();
+	LOAD(flagNull, "flag_null").dot();
+	LOAD(flagPostech, "flag_postech").dot();
+	LOAD(flagKaist, "flag_kaist").dot();
 
-	Rspr::winPostech.load("win_postech.png").dot();
-	Rspr::winKaist.load("win_kaist.png").dot();
-	Rspr::winDraw.load("win_draw.png").dot();
+	MULTILOAD(buf, number, 10, "num_%d");
+	MULTILOAD(buf, bignumber, 10, "bignum%d");
 
-	Rspr::infoMain.load("info_main.png").setOffset(0.0, 240.0);
-	Rspr::infoServer.load("info_server.png").setOffset(0.0, 240.0);
-	Rspr::infoClient1.load("info_client1.png").setOffset(0.0, 240.0);
-	Rspr::infoClient2.load("info_client2.png").setOffset(0.0, 240.0);
+	LOAD(bg, "bg").dot();
+	LOAD(intengrad, "intengrad").dot();
+
+	LOAD(winPostech, "win_postech").dot();
+	LOAD(winKaist, "win_kaist").dot();
+	LOAD(winDraw, "win_draw").dot();
 }

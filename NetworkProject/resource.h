@@ -59,9 +59,11 @@ public:
 	static Sprite infoServer;
 	static Sprite infoClient1;
 	static Sprite infoClient2;
+	static Sprite infoClient3;
 };
 
 class Resource {
 public:
 	static void init();
+	static void postinit();
 };

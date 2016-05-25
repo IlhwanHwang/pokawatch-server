@@ -22,8 +22,8 @@ GLuint Shader::vbo4thPlane;
 
 void Shader::init() {
 	shdDefault = glCreateProgram();
-	loadShader(shdDefault, GL_VERTEX_SHADER, "sprite_v.glsl");
-	loadShader(shdDefault, GL_FRAGMENT_SHADER, "sprite_f.glsl");
+	loadShader(shdDefault, GL_VERTEX_SHADER, "shader\\sprite_v.glsl");
+	loadShader(shdDefault, GL_FRAGMENT_SHADER, "shader\\sprite_f.glsl");
 	linkProgram(shdDefault);
 
 	glUniform1i(glGetUniformLocation(shdDefault, "tex"), 0);
