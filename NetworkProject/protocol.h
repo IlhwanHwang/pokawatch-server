@@ -26,6 +26,15 @@ typedef enum {
 	DEP_CHEM
 } protocol_dep;
 
+// Direction enum
+typedef enum {
+	DIRECTION_NULL,
+	DIRECTION_RIGHT,
+	DIRECTION_UP,
+	DIRECTION_LEFT,
+	DIRECTION_DOWN,
+} protocol_direction;
+
 // Unit state enum
 typedef enum {
 	STATE_NULL,
@@ -41,19 +50,6 @@ typedef enum {
 	STATE_SKILL_DOWN,
 	STATE_STUN
 } protocol_state;
-
-// Macros categorizing states
-#define STATE_KIND_ATTACK(x) ((x) == STATE_ATTACK_RIGHT || (x) == STATE_ATTACK_DOWN || (x) == STATE_ATTACK_LEFT || (x) == STATE_ATTACK_UP)
-#define STATE_KIND_SKILL(x) ((x) == STATE_SKILL_RIGHT || (x) == STATE_SKILL_DOWN || (x) == STATE_SKILL_LEFT || (x) == STATE_SKILL_UP)
-
-// Direction enum
-typedef enum {
-	DIRECTION_NULL,
-	DIRECTION_RIGHT,
-	DIRECTION_UP,
-	DIRECTION_LEFT,
-	DIRECTION_DOWN,
-} protocol_direction;
 
 // A complete unit structure.
 typedef struct {
@@ -117,6 +113,7 @@ typedef struct {
 
 // Command enum
 typedef enum {
+	COMMAND_NULL,
 	COMMAND_MOVE_RIGHT,
 	COMMAND_MOVE_UP,
 	COMMAND_MOVE_LEFT,
@@ -136,12 +133,6 @@ typedef enum {
 	COMMAND_SPAWN_CHEM,
 	COMMAND_FLAG
 } protocol_command;
-
-// Macros categorizing commands
-#define COMMAND_KIND_MOVE(x) ((x) == COMMAND_MOVE_RIGHT || (x) == COMMAND_MOVE_DOWN || (x) == COMMAND_MOVE_LEFT || (x) == COMMAND_MOVE_UP)
-#define COMMAND_KIND_ATTACK(x) ((x) == COMMAND_ATTACK_RIGHT || (x) == COMMAND_ATTACK_DOWN || (x) == COMMAND_ATTACK_LEFT || (x) == COMMAND_ATTACK_UP)
-#define COMMAND_KIND_SKILL(x) ((x) == COMMAND_SKILL_RIGHT || (x) == COMMAND_SKILL_DOWN || (x) == COMMAND_SKILL_LEFT || (x) == COMMAND_SKILL_UP)
-#define COMMAND_KIND_SPAWN(x) ((x) == COMMAND_SPAWN_CSE || (x) == COMMAND_SPAWN_PHYS || (x) == COMMAND_SPAWN_LIFE || (x) == COMMAND_SPAWN_ME || (x) == COMMAND_SPAWN_CHEM)
 
 typedef struct {
 	protocol_command command[UNIT_NUM_MAX];
@@ -172,9 +163,6 @@ typedef struct {
 //#define SERV_IP_STRING "119.202.87.115"
 #define SERV_IP_STRING "141.223.85.241"
 //#define SERV_IP_STRING "141.223.212.37"
-
-
-
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
@@ -221,3 +209,242 @@ typedef struct {
 #define HERO_DELAY 5
 
 #define ARBITRARY_BIG_NUM 999
+
+inline int team_to_index(protocol_team t) {
+	switch (t) {
+	case TEAM_POSTECH:
+		return 0;
+	case TEAM_KAIST:
+		return 1;
+	default:
+		return -1;
+	}
+}
+
+inline int direction_to_dx(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return 1;
+	case DIRECTION_UP:
+		return 0;
+	case DIRECTION_LEFT:
+		return -1;
+	case DIRECTION_DOWN:
+		return 0;
+	}
+}
+
+inline int direction_to_dy(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return 0;
+	case DIRECTION_UP:
+		return 1;
+	case DIRECTION_LEFT:
+		return 0;
+	case DIRECTION_DOWN:
+		return -1;
+	}
+}
+
+// categorizing states
+inline bool state_kind_attack(protocol_state s) {
+	switch (s) {
+	case STATE_ATTACK_RIGHT:
+	case STATE_ATTACK_UP:
+	case STATE_ATTACK_LEFT:
+	case STATE_ATTACK_DOWN:
+		return true;
+	default:
+		return false;
+	}
+}
+
+inline bool state_kind_skill(protocol_state s) {
+	switch (s) {
+	case STATE_SKILL_RIGHT:
+	case STATE_SKILL_UP:
+	case STATE_SKILL_LEFT:
+	case STATE_SKILL_DOWN:
+		return true;
+	default:
+		return false;
+	}
+}
+
+// converting states
+inline protocol_direction state_to_direction(protocol_state s) {
+	switch (s) {
+	case STATE_ATTACK_RIGHT:
+	case STATE_SKILL_RIGHT:
+		return DIRECTION_RIGHT;
+	case STATE_ATTACK_UP:
+	case STATE_SKILL_UP:
+		return DIRECTION_UP;
+	case STATE_ATTACK_LEFT:
+	case STATE_SKILL_LEFT:
+		return DIRECTION_LEFT;
+	case STATE_ATTACK_DOWN:
+	case STATE_SKILL_DOWN:
+		return DIRECTION_DOWN;
+	default:
+		return DIRECTION_NULL;
+	}
+}
+
+inline protocol_state direction_to_attackstate(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return STATE_ATTACK_RIGHT;
+	case DIRECTION_UP:
+		return STATE_ATTACK_UP;
+	case DIRECTION_LEFT:
+		return STATE_ATTACK_LEFT;
+	case DIRECTION_DOWN:
+		return STATE_ATTACK_DOWN;
+	default:
+		return STATE_NULL;
+	}
+}
+
+inline protocol_state direction_to_skillstate(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return STATE_SKILL_RIGHT;
+	case DIRECTION_UP:
+		return STATE_SKILL_UP;
+	case DIRECTION_LEFT:
+		return STATE_SKILL_LEFT;
+	case DIRECTION_DOWN:
+		return STATE_SKILL_DOWN;
+	default:
+		return STATE_NULL;
+	}
+}
+
+// categorizing commands
+inline bool command_kind_move(protocol_command x) {
+	return x == COMMAND_MOVE_RIGHT || x == COMMAND_MOVE_DOWN || x == COMMAND_MOVE_LEFT || x == COMMAND_MOVE_UP;
+}
+
+inline bool command_kind_attack(protocol_command x) {
+	return x == COMMAND_ATTACK_RIGHT || x == COMMAND_ATTACK_DOWN || x == COMMAND_ATTACK_LEFT || x == COMMAND_ATTACK_UP;
+}
+
+inline bool command_kind_skill(protocol_command x) {
+	return x == COMMAND_SKILL_RIGHT || x == COMMAND_SKILL_DOWN || x == COMMAND_SKILL_LEFT || x == COMMAND_SKILL_UP;
+}
+
+inline bool command_kind_spawn(protocol_command x) {
+	return x == COMMAND_SPAWN_CSE || x == COMMAND_SPAWN_PHYS || x == COMMAND_SPAWN_LIFE || x == COMMAND_SPAWN_ME || x == COMMAND_SPAWN_CHEM;
+}
+
+// coverting commands
+inline protocol_direction command_to_direction(protocol_command x) {
+	switch (x) {
+	case COMMAND_MOVE_RIGHT:
+	case COMMAND_ATTACK_RIGHT:
+	case COMMAND_SKILL_RIGHT:
+		return DIRECTION_RIGHT;
+	case COMMAND_MOVE_UP:
+	case COMMAND_ATTACK_UP:
+	case COMMAND_SKILL_UP:
+		return DIRECTION_UP;
+	case COMMAND_MOVE_LEFT:
+	case COMMAND_ATTACK_LEFT:
+	case COMMAND_SKILL_LEFT:
+		return DIRECTION_LEFT;
+	case COMMAND_MOVE_DOWN:
+	case COMMAND_ATTACK_DOWN:
+	case COMMAND_SKILL_DOWN:
+		return DIRECTION_DOWN;
+	default:
+		return DIRECTION_NULL;
+	}
+}
+
+inline protocol_dep command_to_dep(protocol_command x) {
+	switch (x) {
+	case COMMAND_SPAWN_CSE:
+		return DEP_CSE;
+	case COMMAND_SPAWN_PHYS:
+		return DEP_CSE;
+	case COMMAND_SPAWN_LIFE:
+		return DEP_CSE;
+	case COMMAND_SPAWN_ME:
+		return DEP_CSE;
+	case COMMAND_SPAWN_CHEM:
+		return DEP_CSE;
+	default:
+		return DEP_NULL;
+	}
+}
+
+inline protocol_command direction_to_movecommand(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return COMMAND_MOVE_RIGHT;
+	case DIRECTION_UP:
+		return COMMAND_MOVE_UP;
+	case DIRECTION_LEFT:
+		return COMMAND_MOVE_LEFT;
+	case DIRECTION_DOWN:
+		return COMMAND_MOVE_DOWN;
+	default:
+		return COMMAND_NULL;
+	}
+}
+
+inline protocol_command direction_to_attackcommand(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return COMMAND_ATTACK_RIGHT;
+	case DIRECTION_UP:
+		return COMMAND_ATTACK_UP;
+	case DIRECTION_LEFT:
+		return COMMAND_ATTACK_LEFT;
+	case DIRECTION_DOWN:
+		return COMMAND_ATTACK_DOWN;
+	default:
+		return COMMAND_NULL;
+	}
+}
+
+inline protocol_command direction_to_skillcommand(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return COMMAND_SKILL_RIGHT;
+	case DIRECTION_UP:
+		return COMMAND_SKILL_UP;
+	case DIRECTION_LEFT:
+		return COMMAND_SKILL_LEFT;
+	case DIRECTION_DOWN:
+		return COMMAND_SKILL_DOWN;
+	default:
+		return COMMAND_NULL;
+	}
+}
+
+inline protocol_command dep_to_spawncommand(protocol_dep dep) {
+	switch (dep) {
+	case DEP_CSE:
+		return COMMAND_SPAWN_CSE;
+	case DEP_PHYS:
+		return COMMAND_SPAWN_PHYS;
+	case DEP_LIFE:
+		return COMMAND_SPAWN_LIFE;
+	case DEP_ME:
+		return COMMAND_SPAWN_ME;
+	case DEP_CHEM:
+		return COMMAND_SPAWN_CHEM;
+	default:
+		return COMMAND_NULL;
+	}
+}
+
+#define DEP_SELECT(dep, s1, s2, s3, s4, s5) \
+	((dep) == DEP_CSE ? (s1) : \
+	((dep) == DEP_PHYS ? (s2) : \
+	((dep) == DEP_LIFE ? (s3) : \
+	((dep) == DEP_ME ? (s4) : (s5) \
+	))))

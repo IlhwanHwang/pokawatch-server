@@ -58,6 +58,12 @@ private:
 	int healthPrevious;
 	
 	void init();
+	void flip(protocol_direction direction) {
+		if (direction == DIRECTION_RIGHT)
+			animationFlip = false;
+		if (direction == DIRECTION_LEFT)
+			animationFlip = true;
+	};
 
 	void drawAttackMotion() const;
 
