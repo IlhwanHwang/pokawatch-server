@@ -13,7 +13,7 @@
 
 #include "timer.h"
 #include "client.h"
-#include "server.h"
+//#include "server.h"
 #include "client.h"
 #include "protocol.h"
 #include "unit.h"

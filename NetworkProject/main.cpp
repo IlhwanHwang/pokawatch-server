@@ -15,7 +15,7 @@
 
 #include "shader.h"
 #include "timer.h"
-#include "server.h"
+//#include "server.h"
 #include "key.h"
 #include "protocol.h"
 #include "unit.h"

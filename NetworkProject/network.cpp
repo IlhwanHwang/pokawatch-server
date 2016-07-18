@@ -71,8 +71,8 @@ void Network::acceptClient()
 	for (int i = 0; i < UNIT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
-		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
+		//hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
+		//if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
 	}
 }
 
@@ -88,9 +88,36 @@ void Network::recieveFromClient() // Message recieving routine of server side
 {
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
-		messageFromClient[i][strLen] = '\0';
+		//int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
+		//messageFromClient[i][strLen] = '\0';
+		messageFromClient[i][0] = '\0';
 	}
+
+	if (Key::keyCheckOn('d')) Network::setCommand(COMMAND_MOVE_RIGHT);
+	if (Key::keyCheckOn('w')) Network::setCommand(COMMAND_MOVE_UP);
+	if (Key::keyCheckOn('a')) Network::setCommand(COMMAND_MOVE_LEFT);
+	if (Key::keyCheckOn('s')) Network::setCommand(COMMAND_MOVE_DOWN);
+
+	if (Key::keyCheckOn('d') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_RIGHT);
+	if (Key::keyCheckOn('w') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_UP);
+	if (Key::keyCheckOn('a') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_LEFT);
+	if (Key::keyCheckOn('s') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_DOWN);
+
+	if (Key::keyCheckOn('d') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_RIGHT);
+	if (Key::keyCheckOn('w') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_UP);
+	if (Key::keyCheckOn('a') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_LEFT);
+	if (Key::keyCheckOn('s') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_DOWN);
+
+	if (Key::keyCheckOn('1')) Network::setCommand(COMMAND_SPAWN_CSE);
+	if (Key::keyCheckOn('2')) Network::setCommand(COMMAND_SPAWN_PHYS);
+	if (Key::keyCheckOn('3')) Network::setCommand(COMMAND_SPAWN_LIFE);
+	if (Key::keyCheckOn('4')) Network::setCommand(COMMAND_SPAWN_ME);
+	if (Key::keyCheckOn('5')) Network::setCommand(COMMAND_SPAWN_CHEM);
+
+	if (Key::keyCheckPressed('l')) Network::setCommand(COMMAND_FLAG);
+
+	string b = to_string(command);
+	strcpy(messageFromClient[0], b.c_str());
 }
 
 void Network::closeServerConnection() //server cosing routine
@@ -242,13 +269,13 @@ void Network::update() // frame turn routine
 		{
 			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
 			{
-				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
-
+				Game::getUnit(i).spawn(DEP_CSE);
+				//Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 			}
 			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))
 			{
-				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
-
+				Game::getUnit(i).spawn(DEP_PHYS);
+				//Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 			}
 		}
 
