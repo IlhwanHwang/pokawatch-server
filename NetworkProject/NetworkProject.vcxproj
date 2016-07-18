@@ -173,6 +173,7 @@
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ai.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="game.cpp" />

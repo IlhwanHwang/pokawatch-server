@@ -22,7 +22,7 @@ private:
 	static int mode;														// determine server/ client/ nothing
 	static int characterSelection;											// Information of selection of charactor(dep)
 	static char gameStart[2];												// game started? not(N) start(G)
-	static int command;														// selected command of client side
+	static int command[(UNIT_NUM_MAX)/2];														// selected command of client side
 	static char *serverIpArg;
 
 public:
@@ -54,14 +54,14 @@ public:
 	static void turn();								// Per turn routine for network
 
 	//getter and setter
-	static protocol_command getCommand(int index) {return (protocol_command)atoi(messageFromClient[index]); } 
+	static protocol_command getCommand_enum(int index) {return (protocol_command)atoi(messageFromClient[index]); } 
 	static int getMode() { return mode; }
-	static int getCommand() { return command; }
+	static int getCommand(int i) { return command[i]; }
 	static int getCharacterSelection() { return characterSelection; }
 	static char *getGameStart() { return gameStart; }
 
 	static void setMode(int x) { mode = x; }
-	static void setCommand(int x) { command = x; }
+	static void setCommand(int i, int x) { command[i] = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
 	static void setCharacterSelection(int x) { characterSelection = x; }
 
