@@ -71,8 +71,8 @@ void Network::acceptClient()
 	for (int i = 0; i < UNIT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		//hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
-		//if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
+		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
+		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
 	}
 }
 
@@ -88,9 +88,8 @@ void Network::recieveFromClient() // Message recieving routine of server side
 {
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-		//int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
-		//messageFromClient[i][strLen] = '\0';
-		messageFromClient[i][0] = '\0';
+		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
+		messageFromClient[i][strLen] = '\0';
 	}
 
 	if (Key::keyCheckOn('d')) Network::setCommand(COMMAND_MOVE_RIGHT);
