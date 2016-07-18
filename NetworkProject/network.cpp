@@ -246,7 +246,7 @@ void Network::turn() // turn routine
 
 void Network::update() // frame turn routine
 {
-	if (Network::getMode() == MODE_NOTHING && Key::keyCheckPressed(MODE_SERVER_KEY))		// mode selection (SERVER)
+	if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
 	{
 		char gameStartMessage[2];
 		gameStartMessage[0] = GAME_START_CHAR;
@@ -268,13 +268,11 @@ void Network::update() // frame turn routine
 		{
 			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
 			{
-				Game::getUnit(i).spawn(DEP_CSE);
-				//Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
+				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 			}
 			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))
 			{
-				Game::getUnit(i).spawn(DEP_PHYS);
-				//Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
+				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 			}
 		}
 
