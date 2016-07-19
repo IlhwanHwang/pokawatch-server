@@ -11,7 +11,7 @@
 #include "key.h"
 
 void Unit::init() {
-	// Differect health values for different units.
+	// Different health values for different units.
 	healthMax = DEP_SELECT(p.dep, 3, 3, 3, 5, 3);
 	moveStun = 0;
 	p.health = healthMax;
@@ -24,6 +24,7 @@ void Unit::init() {
 	p.state = STATE_IDLE;
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
+	aniInvincible = false;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -147,13 +148,9 @@ void Unit::damage(int h) {
 		return;
 	}
 
-	if (p.health == healthPrevious) // In the case that multiple damage dealt in one turn
-		healthPrevious = p.health;
-	p.health -= h;
-
-	if (p.health <= 0) {
-		kill();
-	}
+	damaged += h;
+	//p.health -= h;
+	aniDamaged = true;
 }
 
 void Unit::heal(int h) {
@@ -165,21 +162,15 @@ void Unit::heal(int h) {
 		return;
 	}
 
-	p.health += h;
-
-	if (p.health > healthMax) {
-		p.health = healthMax;
-	}
+	healed += h;
+	aniHealed = true;
 }
 
 void Unit::stun(int s) {
 	if (p.state == STATE_NULL)
-		return;
+		return;	
 
-	p.stun = s;
-	if (s > 0) {
-		p.state = STATE_STUN;
-	}
+	p.stun += s;
 }
 
 void Unit::kill() {
@@ -191,12 +182,20 @@ void Unit::kill() {
 	p.dep = DEP_NULL;
 }
 
+void Unit::turninit() {
+	healthPrevious = p.health;
+	moveOffAction = false;
+	aniDamaged = false;
+	aniHealed = false;
+	healed = 0;
+	damaged = 0;
+}
+
 void Unit::turn() {
 	if (p.state == STATE_NULL)
 		return;
 
-	moveOffAction = false;
-	healthPrevious = p.health;
+	turninit();
 
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
@@ -232,6 +231,41 @@ void Unit::turn() {
 			}
 		}
 	}
+}
+
+void Unit::flush() {
+	p.health += healed - damaged;
+
+	if (p.health <= 0) {
+		kill();
+	}
+
+	if (p.health > healthMax) {
+		p.health = healthMax;
+	}
+	/*
+	if (p.state == STATE_NULL)
+		return;
+
+	if (p.invincible > 0) {
+		p.health = pp.health;
+	}
+
+	if (p.health <= 0) {
+		kill();
+		return;
+	}
+
+	if (p.stun > 0) {
+		p.state = STATE_STUN;
+		p.cooltime = pp.cooltime;
+		p.hero = pp.hero;
+		return;
+	}
+	*/
+}
+
+void Unit::postturn() {
 }
 
 void Unit::update() {
@@ -293,7 +327,7 @@ void Unit::draw() const {
 	Color c = Color::white;
 
 	// Blinking effect
-	if (p.invincible > 0 || p.health < healthPrevious) {
+	if (p.invincible > 0 || (aniDamaged && Gui::isPost())) {
 		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
 	}
 
@@ -309,12 +343,9 @@ void Unit::draw() const {
 	drawAttackMotion();
 
 	// Health status
-	int showHealth = p.health;
+	int showHealth = Gui::isPost() ? p.health : healthPrevious;
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
-	if (p.health < healthPrevious) {
-		dx -= ddx * (healthPrevious - p.health) * 0.5 * (1.0 - Gui::aniPhase());
-	}
 	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;

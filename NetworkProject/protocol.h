@@ -150,6 +150,8 @@ typedef struct {
 #define DELTA_PER_TURN (1.0 / FRAME_PER_TURN)
 #define ANIMATION_SPAN 15
 #define DELTA_ANIMATION (1.0 / ANIMATION_SPAN)
+#define POSTANIMATION_SPAN (FRAME_PER_TURN - ANIMATION_SPAN)
+#define DELTA_POSTANIMATION (1.0 / POSTANIMATION_SPAN)
 
 #define RESPAWN_COOLTIME 10
 
@@ -218,6 +220,17 @@ inline int team_to_index(protocol_team t) {
 		return 1;
 	default:
 		return -1;
+	}
+}
+
+inline protocol_team team_invert(protocol_team t) {
+	switch (t) {
+	case TEAM_POSTECH:
+		return TEAM_KAIST;
+	case TEAM_KAIST:
+		return TEAM_POSTECH;
+	default:
+		return TEAM_NULL;
 	}
 }
 
@@ -422,6 +435,21 @@ inline protocol_command direction_to_skillcommand(protocol_direction d) {
 		return COMMAND_SKILL_DOWN;
 	default:
 		return COMMAND_NULL;
+	}
+}
+
+inline protocol_direction direction_flip(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return DIRECTION_LEFT;
+	case DIRECTION_UP:
+		return DIRECTION_DOWN;
+	case DIRECTION_LEFT:
+		return DIRECTION_RIGHT;
+	case DIRECTION_DOWN:
+		return DIRECTION_UP;
+	default:
+		return DIRECTION_NULL;
 	}
 }
 

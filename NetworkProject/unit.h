@@ -47,6 +47,9 @@ private:
 
 	int death;
 	bool animationFlip;
+	bool aniInvincible;
+	bool aniDamaged;
+	bool aniHealed;
 	
 	// Members for movement animation
 	float moveOffX, moveOffY, moveOffZ;
@@ -56,7 +59,9 @@ private:
 	int moveStun;
 	int healthMax;
 	int healthPrevious;
-	
+	int damaged;
+	int healed;
+
 	void init();
 	void flip(protocol_direction direction) {
 		if (direction == DIRECTION_RIGHT)
@@ -85,7 +90,10 @@ public:
 	void moveResetMovestun() { moveStun = 0; } // Release movestun (just for me)
 	void moveOffDiscard() { moveOffDirection = DIRECTION_NULL; }; // Calling it after move makes unit jump on its position
 
+	void turninit();
 	void turn();
+	void flush();
+	void postturn();
 	void update();
 	void draw() const;
 
@@ -157,6 +165,7 @@ public:
 	int getX() const { return p.x; }
 	int getY() const { return p.y; }
 	int getSpan() const { return p.span; }
+	bool isValid() const { return p.valid; }
 };
 
 class Petal : public Object {
@@ -180,6 +189,7 @@ public:
 	int getX() const { return p.x; }
 	int getY() const { return p.y; }
 	int getDirection() const { return p.direction; }
+	bool isValid() const { return p.valid; }
 };
 
 class Mushroom : public Object {
@@ -199,6 +209,7 @@ public:
 	protocol_team getTeam() const { return p.team; }
 	int getX() const { return p.x; }
 	int getY() const { return p.y; }
+	bool isValid() const { return p.valid; }
 
 	const protocol_mushroom* getProtocol() const { return &p; }
 };

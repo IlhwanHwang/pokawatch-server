@@ -138,10 +138,7 @@ void Game::ruleMove() // rules related to move command
 		if (s != STATE_NULL && s != STATE_DEAD) {
 			alive.push_back(ind);
 
-			if (c == COMMAND_MOVE_RIGHT ||
-				c == COMMAND_MOVE_UP ||
-				c == COMMAND_MOVE_LEFT ||
-				c == COMMAND_MOVE_DOWN) {
+			if (command_kind_move(c)) {
 				movable.push_back(ind);
 			}
 		}
@@ -156,16 +153,8 @@ void Game::ruleMove() // rules related to move command
 			int ind = movable[i];
 			Unit& u = unitArray[ind];
 			protocol_command c = Network::getCommand(ind);
-			bool moved = false;
-
-			switch (c) // command parsing
-			{
-			case COMMAND_MOVE_RIGHT: moved = u.move(DIRECTION_RIGHT); break;
-			case COMMAND_MOVE_UP: moved = u.move(DIRECTION_UP); break;
-			case COMMAND_MOVE_LEFT: moved = u.move(DIRECTION_LEFT); break;
-			case COMMAND_MOVE_DOWN: moved = u.move(DIRECTION_DOWN); break;
-			}
-
+			protocol_direction d = command_to_direction(c);
+			bool moved = u.move(d);
 			bool duplicated = false;
 
 			if (moved) // control for move
@@ -200,12 +189,7 @@ void Game::ruleMove() // rules related to move command
 			if (duplicated) {
 				// if duplicated, then go back
 				u.moveResetMovestun();
-				switch (c) {
-				case COMMAND_MOVE_RIGHT: u.move(DIRECTION_LEFT); break;
-				case COMMAND_MOVE_UP: u.move(DIRECTION_DOWN); break;
-				case COMMAND_MOVE_LEFT: u.move(DIRECTION_RIGHT); break;
-				case COMMAND_MOVE_DOWN: u.move(DIRECTION_UP); break;
-				}
+				u.move(direction_flip(d));
 				u.moveOffDiscard();
 			}
 			else {
@@ -222,14 +206,62 @@ void Game::ruleAttack() // rules related to attack
 {
 	//attack command
 	
-	/* attack effect is differtent according to department and command direction
-	 * CSE	: make stun in the squre of 3*3 
-	 * PHYS	: straight wave beam and damage 
-	 * LIFE	: spread petal, damage other, heal its team
-	 * ME	: damage neighbors
-	 * CHEM	: leak chemical
+	/*
+	 * CSE	: Stun enemies in the region of 3 X 3 square within 3 turns
+	 * PHYS	: Cast a straight wave dealing 1 damage
+	 * LIFE	: Spawn a petal dealing 1 damage to enemies and 1 heal to friends
+	 * ME	: Damage 3 X 3 neighbors
+	 * CHEM	: Spread chemicals
 	 */
 
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	{
+		Unit& u = unitArray[i];
+		protocol_command c = Network::getCommand(i);
+		if (command_kind_skill(c)) {
+			protocol_direction d = command_to_direction(c);
+			u.attack(d);
+		}
+	}
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	{
+		Unit& u = unitArray[i];
+
+		if (!state_kind_attack(u.getState()) && u.getDep() != DEP_ME)
+			continue;
+
+		protocol_direction d = state_to_direction(u.getState());
+		protocol_team t = u.getTeam();
+		int x = u.getX();
+		int y = u.getY();
+		int dx = direction_to_dx(d);
+		int dy = direction_to_dy(d);
+
+		if (u.getDep() == DEP_CSE) {
+			regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, 3);
+		}
+		else if (u.getDep() == DEP_PHYS) {
+			regionDamage(team_invert(t), x, y, x + dx * MAP_WIDTH, y + dy * MAP_HEIGHT, 1);
+		}
+		else if (u.getDep() == DEP_LIFE) {
+			int indexForValidPetal = getValidPetalIndex();
+			petalArray[indexForValidPetal].spawn(t, x + dx, y + dy, d);
+		}
+		else if (u.getDep() == DEP_ME) {
+			regionDamage(team_invert(t), x - 1, y - 1, x + 1, y + 1, 1);
+		}
+		else if (u.getDep() == DEP_CHEM) {
+			for (int p = 1; p <= POISON_LENGTH; p++)
+			{
+				int indexForValidPoison = getValidPoisonIndex();
+				poisonArray[indexForValidPoison].spawn(t, x + dx * p, y + dy * p);
+			}
+		}
+	} // end of attack
+}
+
+void Game::ruleCollide() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
@@ -237,476 +269,114 @@ void Game::ruleAttack() // rules related to attack
 		if (!u.isAlive())
 			continue;
 
-		protocol_command c = Network::getCommand(i);
+		int x = u.getX();
+		int y = u.getY();
+		protocol_team t = u.getTeam();
 
-
-		if ((c == COMMAND_ATTACK_RIGHT ||
-			c == COMMAND_ATTACK_UP ||
-			c == COMMAND_ATTACK_LEFT ||
-			c == COMMAND_ATTACK_DOWN ) && u.getCooltime() == 0)  // parse command which is not in cooltime
+		for (int j = 0; j < PETAL_NUM_MAX; j++) // Petals
 		{
-			int b;
-			int indexForValidPetal = getValidPetalIndex();
-			int indexForValidPoison = getValidPoisonIndex();
-			switch (u.getDep())
+			Petal& p = petalArray[j];
+			if (p.isValid() && x == p.getX() && y == p.getY())
 			{
-			case DEP_CSE:										// case of CSE
-				switch (c)
-				{
-				case COMMAND_ATTACK_RIGHT:
-					u.attack(DIRECTION_RIGHT);
-					break;
-				case COMMAND_ATTACK_UP:
-					u.attack(DIRECTION_UP);
-					break;
-				case COMMAND_ATTACK_LEFT:
-					u.attack(DIRECTION_LEFT);
-					break;
-				case COMMAND_ATTACK_DOWN:
-					u.attack(DIRECTION_DOWN);
-					break;
+				if (p.getTeam() == t) {
+					u.heal(1);
 				}
-				for (int a = 0; a < UNIT_NUM_MAX; a++)			// make stun units in squre 3*3
-				{
-					if (abs((unitArray[a].getX() - u.getX())) <= 1 && (abs(unitArray[a].getY() - u.getY()) <= 1))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].setStun(5);
+				else {
+					u.damage(1);
 				}
-				break;
-			case DEP_PHYS:										// case of phys
-				switch (c)										// according to direction, damage units in the direction of attack 
-				{
-				case COMMAND_ATTACK_RIGHT:
-					u.attack(DIRECTION_RIGHT);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() > u.getX())
-							if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
-					}
-					break;
-				case COMMAND_ATTACK_UP:
-					u.attack(DIRECTION_UP);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() > u.getY())
-							if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
-					}
-					break;
-				case COMMAND_ATTACK_LEFT:
-					u.attack(DIRECTION_LEFT);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() < u.getX())
-							if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
-					}
-					break;
-				case COMMAND_ATTACK_DOWN:
-					u.attack(DIRECTION_DOWN);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() < u.getY())
-							if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].damage(1);
-					}
-					break;
-				}
-				break;
-			case DEP_LIFE:											// case of LIFE sciece
-				switch (c)
-				{													// spread petal in attack direction
-				case COMMAND_ATTACK_RIGHT:
-					
-					if (indexForValidPetal != INVALID_PETAL_INDEX)
-					{
-						u.attack(DIRECTION_RIGHT);
-						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX() + 1, u.getY(), DIRECTION_RIGHT);
-					}
-
-					break;
-				case COMMAND_ATTACK_UP:
-					
-					if (indexForValidPetal != INVALID_PETAL_INDEX)
-					{
-						u.attack(DIRECTION_UP);
-						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() + 1, DIRECTION_UP);
-					}
-					break;
-				case COMMAND_ATTACK_LEFT:
-
-					if (indexForValidPetal != INVALID_PETAL_INDEX)
-					{
-						u.attack(DIRECTION_LEFT);
-						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX() - 1, u.getY(), DIRECTION_LEFT);
-					}
-
-					break;
-				case COMMAND_ATTACK_DOWN:
-
-					if (indexForValidPetal != INVALID_PETAL_INDEX)
-					{
-						petalArray[indexForValidPetal].spawn(u.getTeam(), u.getX(), u.getY() - 1, DIRECTION_DOWN);
-						u.attack(DIRECTION_DOWN);
-					}
-					break;
-				}
-				break;
-			case DEP_CHEM:										// case of chemistry
-				switch (c)
-				{												// leak chemical in front of the attack direction
-				case COMMAND_ATTACK_RIGHT:
-					for (int p = 0; p < POISON_LENGTH; p++)
-					{
-						indexForValidPoison = getValidPoisonIndex();
-						if (indexForValidPoison != INVALID_POISON_INDEX)
-						{
-							if(p==0) u.attack(DIRECTION_RIGHT);
-							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() + (p + 1), u.getY());
-						}
-					}
-
-					break;
-				case COMMAND_ATTACK_UP:
-					for (int p = 0; p < POISON_LENGTH; p++)
-					{
-						indexForValidPoison = getValidPoisonIndex();
-						if (indexForValidPoison != INVALID_POISON_INDEX)
-						{
-							if (p == 0) u.attack(DIRECTION_UP);
-							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() , u.getY() + (p+1));
-						}
-					}
-
-					break;
-				case COMMAND_ATTACK_LEFT:
-					for (int p = 0; p < POISON_LENGTH; p++)
-					{
-						indexForValidPoison = getValidPoisonIndex();
-						if (indexForValidPoison != INVALID_POISON_INDEX)
-						{
-							if (p == 0) u.attack(DIRECTION_LEFT);
-							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() - (p + 1), u.getY());
-						}
-					}
-					break;
-				case COMMAND_ATTACK_DOWN:
-					for (int p = 0; p < POISON_LENGTH; p++)
-					{
-						indexForValidPoison = getValidPoisonIndex();
-						if (indexForValidPoison != INVALID_POISON_INDEX)
-						{
-							if (p == 0) u.attack(DIRECTION_RIGHT);
-							poisonArray[indexForValidPoison].spawn(u.getTeam(), u.getX() , u.getY() - (p + 1));
-						}
-					}
-					break;
-				}
-
-				break;
+				p.invalidate();
 			}
-
 		}
 
+		for (int j = 0; j < POISON_NUM_MAX; j++) // Poisons
+		{
+			Poison& p = poisonArray[j];
+			if (p.isValid() && t != p.getTeam() && x == p.getX() && y == p.getY())
+			{
+				u.damage(1);
+			}
+		}
+
+		for (int j = 0; j < MUSHROOM_NUM_MAX; j++) // Mushrooms
+		{
+			Mushroom& m = mushroomArray[j];
+			if (m.isValid() && t != m.getTeam() && x == m.getX() && y == m.getY())
+			{
+				u.damage(1);
+				m.invalidate();
+			}
+		}
 	}
-	// End of attack command
 }
 
 void Game::ruleSkill() // rules related to skill
 {
 	//skill command
 
-	/* skill effect is differtent according to department and command direction
-	* CSE	: make stun in the squre of 7*7
-	* PHYS	: make black hole
-	* LIFE	: heal its team in the direction of skill
-	* ME	: go in the direction of skil if meet enemy make an accident
-	* CHEM	: make poisonous mushroom
+	/*
+	* CSE	: Stun enemies in the region of 7 X 7 square within 5 turns 
+	* PHYS	: Spawn a black hole
+	* LIFE	: Heal all friends
+	* ME	: Assault to the direction and kill the very first enemy on the way
+	* CHEM	: Spawn a mushroom
 	*/
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
-		int indexForValidMushroom = getValidMushroomIndex();
-
-
-		if ( ((c == COMMAND_SKILL_RIGHT ||
-			c == COMMAND_SKILL_UP ||
-			c == COMMAND_SKILL_LEFT ||
-			c == COMMAND_SKILL_DOWN) ) && u.getHero() == TRUE && u.getCooltime() == 0)	//parse command which is not cooltime and who is hero 
-		{
-			int b;
-			switch (u.getDep())
-			{
-			case DEP_CSE:											// case of cse
-				switch (c)
-				{
-				case COMMAND_SKILL_RIGHT:
-					u.skill(DIRECTION_RIGHT);
-					break;
-				case COMMAND_SKILL_UP:
-					u.skill(DIRECTION_UP);
-					break;
-				case COMMAND_SKILL_LEFT:
-					u.skill(DIRECTION_LEFT);
-					break;
-				case COMMAND_SKILL_DOWN:
-					u.skill(DIRECTION_DOWN);
-					break;
-				}
-				for (int a = 0; a < UNIT_NUM_MAX; a++)				// make units stun in 7*7 squres
-				{
-					if (abs((unitArray[a].getX() - u.getX()) ) <= 3 && (abs(unitArray[a].getY() - u.getY()) <= 3))
-						if (unitArray[a].getTeam() != u.getTeam()) unitArray[a].stun(5);
-				}
-				break;
-			case DEP_PHYS:											// case of phys
-				switch (c)
-				{
-				case COMMAND_SKILL_RIGHT:
-					u.skill(DIRECTION_RIGHT);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)			// make black hole
-					{
-						if (abs((unitArray[a].getX() + 2 - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1))
-							if (unitArray[a].getTeam() != u.getTeam())unitArray[a].damage(BLACKHOLE_DAMAGE);
-					}
-					break;
-				case COMMAND_SKILL_UP:
-					u.skill(DIRECTION_UP);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() + 2 - u.getY()) <= 1))
-							if (unitArray[a].getTeam() != u.getTeam())unitArray[a].damage(BLACKHOLE_DAMAGE);
-					}
-					break;
-				case COMMAND_SKILL_LEFT:
-					u.skill(DIRECTION_LEFT);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (abs((unitArray[a].getX() - 2 - u.getX()) <= 1) && (abs(unitArray[a].getY() - u.getY()) <= 1))
-							if (unitArray[a].getTeam() != u.getTeam())unitArray[a].damage(BLACKHOLE_DAMAGE);
-					}
-					break;
-				case COMMAND_SKILL_DOWN:
-					u.skill(DIRECTION_DOWN);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (abs((unitArray[a].getX() - u.getX()) <= 1) && (abs(unitArray[a].getY() - 2 - u.getY()) <= 1))
-							if (unitArray[a].getTeam() != u.getTeam())unitArray[a].damage(BLACKHOLE_DAMAGE);
-					}
-					break;
-				}
-
-				break;
-			case DEP_LIFE:										// case of life
-
-				switch (c)
-				{
-				case COMMAND_SKILL_RIGHT:
-					u.skill(DIRECTION_RIGHT);					// make heal of same team in direction of skill
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() > u.getX())
-							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
-					}
-					break;
-				case COMMAND_SKILL_UP:
-					u.skill(DIRECTION_UP);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() > u.getY())
-							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
-					}
-					break;
-				case COMMAND_SKILL_LEFT:
-					u.skill(DIRECTION_LEFT);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getY() == u.getY() && unitArray[a].getX() < u.getX())
-							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
-					}
-					break;
-				case COMMAND_SKILL_DOWN:
-					u.skill(DIRECTION_DOWN);
-					for (int a = 0; a < UNIT_NUM_MAX; a++)
-					{
-						if (a != i && unitArray[a].getX() == u.getX() && unitArray[a].getY() < u.getY())
-							if (unitArray[a].getTeam() == u.getTeam()) unitArray[a].heal(ARBITRARY_BIG_NUM);
-					}
-					break;
-				}
-				break;
-			case DEP_ME:										// case of me
-				switch (c)
-				{
-					int minmax;
-					int minmaxIndex;
-
-				case COMMAND_SKILL_RIGHT:						// make an accident if there is a unit in the direction of skil or go to end of map in the direction of skill
-					u.skill(DIRECTION_RIGHT);
-					minmax = MAP_WIDTH;
-					minmaxIndex = -1;
-					for (int w = 0; w < UNIT_NUM_MAX; w++)
-					{
-						if(unitArray[w].getY() == u.getY() && unitArray[w].getX() > u.getX())
-							if (minmax > unitArray[w].getX())
-							{
-								minmax = unitArray[w].getX();
-								minmaxIndex = w;
-							}
-					}
-					if (minmaxIndex != -1)
-					{
-						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
-						u.setPosition(unitArray[minmaxIndex].getX(), u.getY());
-					}
-					else u.setPosition(MAP_WIDTH - 1, u.getY());
-					break;
-				case COMMAND_SKILL_UP:
-					u.skill(DIRECTION_UP);
-					minmax = MAP_HEIGHT;
-					minmaxIndex = -1;
-					for (int w = 0; w < UNIT_NUM_MAX; w++)
-					{
-						if (unitArray[w].getX() == u.getX() && unitArray[w].getY() > u.getY())
-							if (minmax > unitArray[w].getY())
-							{
-								minmax = unitArray[w].getY();
-								minmaxIndex = w;
-							}
-					}
-					if (minmaxIndex != -1)
-					{
-						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
-						u.setPosition(u.getX(), unitArray[minmaxIndex].getY());
-					}
-					else u.setPosition(u.getX(), MAP_HEIGHT-1);
-
-					break;
-				case COMMAND_SKILL_LEFT:
-					u.skill(DIRECTION_LEFT);
-					minmax = 0;
-					minmaxIndex = -1;
-					for (int w = 0; w < UNIT_NUM_MAX; w++)
-					{
-						if (unitArray[w].getY() == u.getY() && unitArray[w].getX() < u.getX())
-							if (minmax < unitArray[w].getX())
-							{
-								minmax = unitArray[w].getX();
-								minmaxIndex = w;
-							}
-					}
-					if (minmaxIndex != -1)
-					{
-						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
-						u.setPosition(unitArray[minmaxIndex].getX(), u.getY());
-					}
-					else u.setPosition(0, u.getY());
-					break;
-				case COMMAND_SKILL_DOWN:
-					u.skill(DIRECTION_DOWN);
-					minmax = 0;
-					minmaxIndex = -1;
-					for (int w = 0; w < UNIT_NUM_MAX; w++)
-					{
-						if (unitArray[w].getX() == u.getX() && unitArray[w].getY() < u.getY())
-							if (minmax < unitArray[w].getY())
-							{
-								minmax = unitArray[w].getY();
-								minmaxIndex = w;
-							}
-					}
-					if (minmaxIndex != -1)
-					{
-						unitArray[minmaxIndex].damage(ACCIDENT_DAMAGE);
-						u.setPosition(u.getX(), unitArray[minmaxIndex].getY());
-					}
-					else u.setPosition(u.getX(), 0);
-					break;
-				}
-				break;
-			case DEP_CHEM:											// case of chem
-				switch (c)
-				{
-				case COMMAND_SKILL_RIGHT:							// make poisonous mushroom
-
-					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
-					{
-						u.skill(DIRECTION_RIGHT);
-						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() + 1 , u.getY());
-					}
-
-					break;
-				case COMMAND_ATTACK_UP:
-
-					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
-					{
-						u.skill(DIRECTION_RIGHT);
-						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() , u.getY() + 1);
-					}
-					break;
-				case COMMAND_ATTACK_LEFT:
-
-					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
-					{
-						u.skill(DIRECTION_RIGHT);
-						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX() -1, u.getY());
-					}
-
-					break;
-				case COMMAND_ATTACK_DOWN:
-
-					if (indexForValidMushroom != INVALID_MUSHROOM_INDEX)
-					{
-						u.skill(DIRECTION_RIGHT);
-						mushroomArray[indexForValidMushroom].spawn(u.getTeam(), u.getX(), u.getY() - 1);
-					}
-					break;
-				}
-				break;
-			}//end of case
-			u.setHero(false);
+		if (command_kind_skill(c)) {
+			protocol_direction d = command_to_direction(c);
+			u.skill(d);
 		}
+	}
 
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	{
+		Unit& u = unitArray[i];
+		
+		if (!state_kind_skill(u.getState()))
+			continue;
+
+		protocol_direction d = state_to_direction(u.getState());
+		protocol_team t = u.getTeam();
+		int x = u.getX();
+		int y = u.getY();
+		int dx = direction_to_dx(d);
+		int dy = direction_to_dy(d);
+
+		if (u.getDep() == DEP_CSE) {
+			regionStun(team_invert(t), x - 3, y - 3, x + 3, y + 3, 5);
+		}
+		else if (u.getDep() == DEP_PHYS) {
+			// Not implemented
+		}
+		else if (u.getDep() == DEP_LIFE) {
+			regionHealAll(t, 1);
+		}
+		else if (u.getDep() == DEP_ME) {
+			// Not implemented
+		}
+		else if (u.getDep() == DEP_CHEM) {
+			int indexForValidMushroom = getValidMushroomIndex();
+			mushroomArray[indexForValidMushroom].spawn(t, x + dx, y + dy);
+		}
 	} // end of skill
 }
 
 void Game::ruleSpawn() // rules related to spawn
 {
-	//spawn command
-	
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
-
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 
-		if ((c == COMMAND_SPAWN_CSE ||
-			c == COMMAND_SPAWN_PHYS ||
-			c == COMMAND_SPAWN_LIFE ||
-			c == COMMAND_SPAWN_ME ||
-			c == COMMAND_SPAWN_CHEM) && u.getState() == STATE_DEAD && u.getDep() == DEP_NULL)		// parse command, when the character is dead
+		if (command_kind_spawn(c) && u.getState() == STATE_DEAD)
 		{
-			int b;
-			spawn[u.getTeam() - 1]++;
-			switch (c)													// spawn
-			{
-			case COMMAND_SPAWN_CSE:
-				u.spawn(DEP_CSE);
-				break;
-			case COMMAND_SPAWN_PHYS:
-				u.spawn(DEP_PHYS);
-				break;
-			case COMMAND_SPAWN_LIFE:
-				u.spawn(DEP_LIFE);
-				break;
-			case COMMAND_SPAWN_ME:
-				u.spawn(DEP_ME);
-				break;
-			case COMMAND_SPAWN_CHEM:
-				u.spawn(DEP_CHEM);
-				break;
-			}
-			if ((spawn[u.getTeam() - 1] % HERO_DELAY == 0) && (spawn[u.getTeam() -1] != 0)) u.setHero(true);		// make hero
-	
+			int& tspawn = spawn[team_to_index(u.getTeam())];
+			tspawn++;
+			u.spawn(command_to_dep(c));
+			if ((tspawn % HERO_DELAY == 0) && (tspawn != 0)) u.setHero(true);
 		}
 
 	} // end of spawn
@@ -714,24 +384,23 @@ void Game::ruleSpawn() // rules related to spawn
 
 void Game::ruleFlag() // rules related to flag
 {
-	// flag command
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 
-		if (c == COMMAND_FLAG)
+		if (c == COMMAND_FLAG && u.getState() == STATE_IDLE)
 		{
-			for (int f = 0; f < FLAG_NUM_MAX; f++)
+			for (int j = 0; j < FLAG_NUM_MAX; j++)
 			{
-				if (u.getX() == flagArray[f].getX() && u.getY() == flagArray[f].getY())
+				Flag& f = flagArray[j];
+				if (u.getX() == f.getX() && u.getY() == f.getY())
 				{
-					flagArray[f].own(u.getTeam());											// change flag's own
+					f.own(u.getTeam());
 					break;
 				}
 			}
 		}
-
 	} // end of flag
 }
 
@@ -747,80 +416,45 @@ void Game::turn() {
 
 	// things are done by rules
 	ruleMove();
-	ruleAttack();
-	ruleSkill();
 	ruleSpawn();
+
+	ruleSkill();
+	ruleAttack();
+	ruleCollide();
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].flush();
+
 	ruleFlag();
-	
-	for (int a = 0; a < UNIT_NUM_MAX; a++) // give damage when collision
-	{
-		Unit& u = unitArray[a];
-		if (!u.isAlive())
-			continue;
 
-		for (int b = 0; b < PETAL_NUM_MAX; b++) // petal collision check
-		{
-			if (petalArray[b].getProtocol()->valid && u.getY() == petalArray[b].getY() && u.getX() == petalArray[b].getX())
-			{
-				if (u.getTeam() != petalArray[b].getTeam())
-				{
-					u.damage(1);
-					petalArray[b].invalidate();
-				}
-				else u.heal(1);
-			}
-		}
-		for (int b = 0; b < POISON_NUM_MAX; b++) // poison collision check
-		{
-			if (poisonArray[b].getProtocol()->valid && u.getY() == poisonArray[b].getY() && u.getX() == poisonArray[b].getX())
-			{
-				if (u.getTeam() != poisonArray[b].getTeam()) u.damage(1);
-			}
-		}
-		for (int b = 0; b < MUSHROOM_NUM_MAX; b++) // mushroom collision check
-		{
-			if (mushroomArray[b].getProtocol()->valid && u.getY() == mushroomArray[b].getY() && u.getX() == mushroomArray[b].getX())
-			{
-				if (u.getTeam() != mushroomArray[b].getTeam())
-				{
-					u.damage(1);
-					mushroomArray[b].invalidate();
-				}
-			}
-		}
-	}
-
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
-		Unit& u = unitArray[i];
-		if (u.getDep() == DEP_ME && u.isAlive()) // when near me units get damage
-		{
-			for (int a = 0; a < UNIT_NUM_MAX; a++)
-			{
-				Unit& other = unitArray[a];
-				if (u.getTeam() != other.getTeam())
-					if (abs(u.getX() - other.getX()) + abs(u.getY() - other.getY()) <= 1)
-						other.damage(2);
-			}
-		}
-	}
-
-
-
-	score[TEAM_POSTECH-1] = 0;
-	score[TEAM_KAIST-1] = 0;
+	score[team_to_index(TEAM_POSTECH)] = 0;
+	score[team_to_index(TEAM_KAIST)] = 0;
 	for (int i = 0; i < UNIT_NUM_MAX; i++)					// score calculating
 	{
-		if(unitArray[i].getTeam() == TEAM_KAIST) score[TEAM_POSTECH-1] = score[TEAM_POSTECH-1] + DEATH_PENALTY*unitArray[i].getDeath();
-		if(unitArray[i].getTeam() == TEAM_POSTECH) score[TEAM_KAIST - 1] = score[TEAM_KAIST - 1] + DEATH_PENALTY*unitArray[i].getDeath();
+		Unit& u = unitArray[i];
+		protocol_team t = u.getTeam();
+		score[team_to_index(team_invert(t))] += DEATH_PENALTY * u.getDeath();
 	}
 	for (int i = 0; i < FLAG_NUM_MAX; i++)
 	{
-		if (flagArray[i].getTeam() == TEAM_POSTECH) score[TEAM_POSTECH - 1] = score[TEAM_POSTECH - 1] + FLAG_SCORE;
-		if (flagArray[i].getTeam() == TEAM_KAIST) score[TEAM_KAIST - 1] = score[TEAM_KAIST - 1] + FLAG_SCORE;
+		Flag& f = flagArray[i];
+		protocol_team t = f.getTeam();
+		score[team_to_index(t)] += FLAG_SCORE;
 	}
-	if(Network::getMode() == MODE_SERVER) makeProtocol();	// make protocol
 
+	if(Network::getMode() == MODE_SERVER) makeProtocol();	// make protocol
+}
+
+void Game::regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun) {
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	{
+		Unit& u = unitArray[i];
+		if (u.getTeam() == t) {
+			if (u.getX() >= x1 && u.getX() <= x2 && u.getY() >= y1 && u.getX() <= y2) {
+				u.damage(damage);
+				u.heal(heal);
+				u.stun(stun);
+			}
+		}
+	}
 }
 
 int Game::getValidPoisonIndex()
