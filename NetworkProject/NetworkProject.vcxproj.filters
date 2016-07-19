@@ -74,6 +74,9 @@
     <ClInclude Include="debug.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
+    <ClInclude Include="ai.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

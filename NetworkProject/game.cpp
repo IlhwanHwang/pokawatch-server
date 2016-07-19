@@ -132,7 +132,7 @@ void Game::ruleMove() // rules related to move command
 		// Priority for first team at the even turn, second team otherwise.
 		int ind = (turnleft % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[ind];
-		protocol_command c = Network::getCommand(ind);
+		protocol_command c = Network::getCommandEnum(ind);
 		protocol_state s = u.getState();
 
 		if (s != STATE_NULL && s != STATE_DEAD) {
@@ -155,7 +155,7 @@ void Game::ruleMove() // rules related to move command
 		for (int i = 0; i < movable.size(); i++) {
 			int ind = movable[i];
 			Unit& u = unitArray[ind];
-			protocol_command c = Network::getCommand(ind);
+			protocol_command c = Network::getCommandEnum(ind);
 			bool moved = false;
 
 			switch (c) // command parsing
@@ -237,7 +237,7 @@ void Game::ruleAttack() // rules related to attack
 		if (!u.isAlive())
 			continue;
 
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 
 
 		if ((c == COMMAND_ATTACK_RIGHT ||
@@ -424,7 +424,7 @@ void Game::ruleSkill() // rules related to skill
 	{
 
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		int indexForValidMushroom = getValidMushroomIndex();
 
 
@@ -677,7 +677,7 @@ void Game::ruleSpawn() // rules related to spawn
 	{
 
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 
 		if ((c == COMMAND_SPAWN_CSE ||
 			c == COMMAND_SPAWN_PHYS ||
@@ -718,7 +718,7 @@ void Game::ruleFlag() // rules related to flag
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 
 		if (c == COMMAND_FLAG)
 		{

@@ -9,6 +9,7 @@
 #include "protocol.h"
 #include "game.h"
 #include "key.h"
+#include "ai.h"
 
 #include "draw.h"
 #include "resource.h"
@@ -26,7 +27,7 @@ char Network::messageFromClient[UNIT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Mess
 char Network::messageToServer[MESSAGE_TO_SERVER_SIZE];							// Message buffer of client side
 int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection;												// Information of selection of charactor(dep)
-char Network::gameStart[2];														// game started? not(N) start(G)
+char Network::gameStart[3];														// game started? not(N) start(G)
 int Network::command[(UNIT_NUM_MAX)/2];															// selected command of client side
 char * Network::serverIpArg;
 
@@ -285,28 +286,8 @@ void Network::update() // frame turn routine
 
 		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection() > 0 && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
 		{
-			if (Key::keyCheckPressed('d')) Network::setCommand(COMMAND_MOVE_RIGHT);
-			if (Key::keyCheckPressed('w')) Network::setCommand(COMMAND_MOVE_UP);
-			if (Key::keyCheckPressed('a')) Network::setCommand(COMMAND_MOVE_LEFT);
-			if (Key::keyCheckPressed('s')) Network::setCommand(COMMAND_MOVE_DOWN);
-
-			if (Key::keyCheckPressed('d') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_RIGHT);
-			if (Key::keyCheckPressed('w') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_UP);
-			if (Key::keyCheckPressed('a') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_LEFT);
-			if (Key::keyCheckPressed('s') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_DOWN);
-
-			if (Key::keyCheckPressed('d') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_RIGHT);
-			if (Key::keyCheckPressed('w') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_UP);
-			if (Key::keyCheckPressed('a') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_LEFT);
-			if (Key::keyCheckPressed('s') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_DOWN);
-
-			if (Key::keyCheckPressed('1')) Network::setCommand(COMMAND_SPAWN_CSE);
-			if (Key::keyCheckPressed('2')) Network::setCommand(COMMAND_SPAWN_PHYS);
-			if (Key::keyCheckPressed('3')) Network::setCommand(COMMAND_SPAWN_LIFE);
-			if (Key::keyCheckPressed('4')) Network::setCommand(COMMAND_SPAWN_ME);
-			if (Key::keyCheckPressed('5')) Network::setCommand(COMMAND_SPAWN_CHEM);
-
-			if (Key::keyCheckPressed('l')) Network::setCommand(COMMAND_FLAG);
+			Ai::ai();
+			
 		}
 	}
 

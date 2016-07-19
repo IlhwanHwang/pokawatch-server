@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ai.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="game.h" />
