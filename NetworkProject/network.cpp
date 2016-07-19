@@ -16,17 +16,17 @@
 using namespace std;
 
 SOCKET Network::hServSock;														// Server socket variable of server/client side
-SOCKET Network::hClntSock[UNIT_NUM_MAX];										// Client socket variable of server side
+SOCKET Network::hClntSock[CLIENT_NUM_MAX];										// Client socket variable of server side
 SOCKET Network::hSocket;														// Client socket variable of client side
 SOCKADDR_IN Network::servAddr;													// Server address variable of server/client side
-SOCKADDR_IN Network::clntAddr[UNIT_NUM_MAX];									// Client address variable of server side
-int Network::szClntAddr[UNIT_NUM_MAX];											// Client address size variable of server side
+SOCKADDR_IN Network::clntAddr[CLIENT_NUM_MAX];									// Client address variable of server side
+int Network::szClntAddr[CLIENT_NUM_MAX];											// Client address size variable of server side
 char Network::messageToClient[MESSAGE_T0_CLIENT_SIZE];							// Message buffer of server side
-char Network::messageFromClient[UNIT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Message buffer of server side
+char Network::messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Message buffer of server side
 char Network::messageToServer[MESSAGE_TO_SERVER_SIZE];							// Message buffer of client side
 int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection;												// Information of selection of charactor(dep)
-char Network::gameStart[2];														// game started? not(N) start(G)
+char Network::gameStart[3];														// game started? not(N) start(G)
 int Network::command;															// selected command of client side
 char * Network::serverIpArg;
 
@@ -60,7 +60,7 @@ void Network::makeServerSocket() // Server Socket making routine
 	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) ErrorHandling("bind() error");
 
 	// Listeing for client
-	if (listen(hServSock, UNIT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
+	if (listen(hServSock, CLIENT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
 
 	printf("Server Listen\n");
 }
@@ -68,17 +68,30 @@ void Network::makeServerSocket() // Server Socket making routine
 void Network::acceptClient()
 {
 	//accept client's request
-	for (int i = 0; i < UNIT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
 		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
 	}
 }
 
+void Network::sendGameStart(void)
+{
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
+	{
+		char gameStartMessage[3];
+		gameStartMessage[0] = GAME_START_CHAR;
+		gameStartMessage[1] = i + '1';
+		gameStartMessage[2] = '\0';
+
+		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE - 1, 0);
+	}
+}
+
 void Network::sendToClient(char *messageToClient) // Message sending routine of client side
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE - 1, 0);
 	}
@@ -86,37 +99,11 @@ void Network::sendToClient(char *messageToClient) // Message sending routine of 
 
 void Network::recieveFromClient() // Message recieving routine of server side
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
 		messageFromClient[i][strLen] = '\0';
 	}
-
-	if (Key::keyCheckOn('d')) Network::setCommand(COMMAND_MOVE_RIGHT);
-	if (Key::keyCheckOn('w')) Network::setCommand(COMMAND_MOVE_UP);
-	if (Key::keyCheckOn('a')) Network::setCommand(COMMAND_MOVE_LEFT);
-	if (Key::keyCheckOn('s')) Network::setCommand(COMMAND_MOVE_DOWN);
-
-	if (Key::keyCheckOn('d') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_RIGHT);
-	if (Key::keyCheckOn('w') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_UP);
-	if (Key::keyCheckOn('a') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_LEFT);
-	if (Key::keyCheckOn('s') && Key::keyCheckOn('j')) Network::setCommand(COMMAND_ATTACK_DOWN);
-
-	if (Key::keyCheckOn('d') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_RIGHT);
-	if (Key::keyCheckOn('w') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_UP);
-	if (Key::keyCheckOn('a') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_LEFT);
-	if (Key::keyCheckOn('s') && Key::keyCheckOn('k')) Network::setCommand(COMMAND_SKILL_DOWN);
-
-	if (Key::keyCheckOn('1')) Network::setCommand(COMMAND_SPAWN_CSE);
-	if (Key::keyCheckOn('2')) Network::setCommand(COMMAND_SPAWN_PHYS);
-	if (Key::keyCheckOn('3')) Network::setCommand(COMMAND_SPAWN_LIFE);
-	if (Key::keyCheckOn('4')) Network::setCommand(COMMAND_SPAWN_ME);
-	if (Key::keyCheckOn('5')) Network::setCommand(COMMAND_SPAWN_CHEM);
-
-	if (Key::keyCheckPressed('l')) Network::setCommand(COMMAND_FLAG);
-
-	string b = to_string(command);
-	strcpy(messageFromClient[0], b.c_str());
 }
 
 void Network::closeServerConnection() //server cosing routine
@@ -248,9 +235,9 @@ void Network::update() // frame turn routine
 {
 	if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
 	{
-		char gameStartMessage[2];
+		char gameStartMessage[3];
 		gameStartMessage[0] = GAME_START_CHAR;
-		gameStartMessage[1] = '\0';
+		gameStartMessage[2] = '\0';
 
 		Draw::naivefill(Rspr::infoServer);
 		glutSwapBuffers();
@@ -278,6 +265,8 @@ void Network::update() // frame turn routine
 
 		Game::release();
 		Network::sendToClient(gameStartMessage);											// send Game start to clients
+
+		Network::sendGameStart();															// send Gamestart to clients
 		Network::setGameStart(0, GAME_START_CHAR);											// game started
 	}
 
