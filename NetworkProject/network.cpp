@@ -17,13 +17,13 @@
 using namespace std;
 
 SOCKET Network::hServSock;														// Server socket variable of server/client side
-SOCKET Network::hClntSock[UNIT_NUM_MAX];										// Client socket variable of server side
+SOCKET Network::hClntSock[CLIENT_NUM_MAX];										// Client socket variable of server side
 SOCKET Network::hSocket;														// Client socket variable of client side
 SOCKADDR_IN Network::servAddr;													// Server address variable of server/client side
-SOCKADDR_IN Network::clntAddr[UNIT_NUM_MAX];									// Client address variable of server side
-int Network::szClntAddr[UNIT_NUM_MAX];											// Client address size variable of server side
+SOCKADDR_IN Network::clntAddr[CLIENT_NUM_MAX];									// Client address variable of server side
+int Network::szClntAddr[CLIENT_NUM_MAX];											// Client address size variable of server side
 char Network::messageToClient[MESSAGE_T0_CLIENT_SIZE];							// Message buffer of server side
-char Network::messageFromClient[UNIT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Message buffer of server side
+char Network::messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Message buffer of server side
 char Network::messageToServer[MESSAGE_TO_SERVER_SIZE];							// Message buffer of client side
 int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection;												// Information of selection of charactor(dep)
@@ -61,7 +61,7 @@ void Network::makeServerSocket() // Server Socket making routine
 	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) ErrorHandling("bind() error");
 
 	// Listeing for client
-	if (listen(hServSock, UNIT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
+	if (listen(hServSock, CLIENT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
 
 	printf("Server Listen\n");
 }
@@ -69,8 +69,8 @@ void Network::makeServerSocket() // Server Socket making routine
 void Network::acceptClient()
 {
 	//accept client's request
-	for (int i = 0; i < UNIT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
 		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
@@ -79,7 +79,7 @@ void Network::acceptClient()
 
 void Network::sendToClient(char *messageToClient) // Message sending routine of client side
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE - 1, 0);
 	}
@@ -87,18 +87,9 @@ void Network::sendToClient(char *messageToClient) // Message sending routine of 
 
 void Network::recieveFromClient() // Message recieving routine of server side
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
+	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
 		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
-		// 여기를 변경 -> 우선,
-		// 우선 하나의 client로부터 받는 message에 대한 정의를 내리고, 그것을 파싱하는 방법, struct를 주면 될듯, string command[i] = COMMAND_RIGHT 이런식이면될듯,
-		// command 입력을 받도록 parcing,
-
-		// move(r), move(l), move(u) move(d)
-		// skill(r), skill(l), skill(u), skill(d)
-		// flag()
-
-
 		messageFromClient[i][strLen] = '\0';
 	}
 }
@@ -215,8 +206,7 @@ void Network::turn() // turn routine
 
 	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // for client when game started 
 	{
-		for(int i=0; i<(UNIT_NUM_MAX)/2; i++)
-			Network::sendToServer((char *)(to_string(Network::getCommand(i))).c_str());			// send command
+		Network::sendToServer((char *)(to_string(Network::getCommand())).c_str());			// send command
 		Network::getProtocolDataFromServer();												// get protocol data of that time
 	}
 	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR) // for server when game started

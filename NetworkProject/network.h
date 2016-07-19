@@ -11,13 +11,13 @@
 class Network {																// EVERY THING RELATED TO NETWORK OPERATION IS IN HERE
 private:
 	static SOCKET hServSock;												// Server socket variable of server/client side
-	static SOCKET hClntSock[UNIT_NUM_MAX];									// Client socket variable of server side
+	static SOCKET hClntSock[CLIENT_NUM_MAX];									// Client socket variable of server side
 	static SOCKET hSocket;													// Client socket variable of client side
 	static SOCKADDR_IN servAddr;											// Server address variable of server/client side
-	static SOCKADDR_IN clntAddr[UNIT_NUM_MAX];								// Client address variable of server side
-	static int szClntAddr[UNIT_NUM_MAX];									// Client address size variable of server side
+	static SOCKADDR_IN clntAddr[CLIENT_NUM_MAX];								// Client address variable of server side
+	static int szClntAddr[CLIENT_NUM_MAX];									// Client address size variable of server side
 	static char messageToClient[MESSAGE_T0_CLIENT_SIZE];					// Message buffer of server side
-	static char messageFromClient[UNIT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];	// Message buffer of server side
+	static char messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];	// Message buffer of server side
 	static char messageToServer[MESSAGE_TO_SERVER_SIZE];					// Message buffer of client side
 	static int mode;														// determine server/ client/ nothing
 	static int characterSelection;											// Information of selection of charactor(dep)
@@ -46,7 +46,7 @@ public:
 	static void closeServerConnection();			// Server closing routine
 	
 	static void makeClientSocket();					// Client socket making routine
-	static void connectToServer(){}					// Client connet to server 
+	static void connectToServer() {}					// Client connet to server 
 	static void getProtocolDataFromServer();		// Client message recieving routine
 	static void recieveGameStart();					// Client message recieving for game start
 	static void sendToServer(char message[]);		// Client message sending routine
@@ -61,12 +61,12 @@ public:
 	static int getCommand(int i) { return command[i]; }
 	static int getCharacterSelection() { return characterSelection; }
 	static char *getGameStart() { return gameStart; }
-	static int getTeam() { return team - '0'; }
+	static int getTeam() { return team; }
 
 	static void setMode(int x) { mode = x; }
 	static void setCommand(int i, int x) { command[i] = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
 	static void setCharacterSelection(int x) { characterSelection = x; }
-	static void setTeam(char x) { team = x; }
+	static void setTeam(char x) { team = x-'1'; }
 	
 };

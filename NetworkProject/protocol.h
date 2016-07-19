@@ -98,6 +98,7 @@ typedef struct {
 	int x, y;
 } protocol_mushroom;
 
+#define CLIENT_NUM_MAX 2
 #define UNIT_NUM_MAX 6
 #define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
