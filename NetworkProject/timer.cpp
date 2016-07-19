@@ -70,7 +70,11 @@ void Timer::update(int count) {
 		Draw::naivefill(Rspr::infoMain);
 	}
 	if (Network::getMode() == MODE_CLIENT) {
-		if (Network::getCharacterSelection() == 0)
+		int cnt = 0;
+		for (int i = 0; i < UNIT_NUM_MAX; i++)
+			if(Network::getCharacterSelection(i) == 0) cnt++;
+
+		if (cnt == UNIT_NUM_MAX)
 			Draw::naivefill(Rspr::infoClient1);
 		else
 			Draw::naivefill(Rspr::infoClient3);

@@ -20,7 +20,7 @@ private:
 	static char messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];	// Message buffer of server side
 	static char messageToServer[MESSAGE_TO_SERVER_SIZE];					// Message buffer of client side
 	static int mode;														// determine server/ client/ nothing
-	static int characterSelection;											// Information of selection of charactor(dep)
+	static int characterSelection[UNIT_NUM_MAX];											// Information of selection of charactor(dep)
 	static char gameStart[3];												// game started? [0] : not(N) start(G), [1] : team_information
 	static int command[(UNIT_NUM_MAX)/2];														// selected command of client side
 	static char *serverIpArg;
@@ -31,7 +31,7 @@ public:
 	static void init(char * argv)								// initiate network state
 	{
 		mode = MODE_NOTHING;
-		characterSelection = 0;
+		for(int i=0; i<UNIT_NUM_MAX; i++) characterSelection[i] = 0;
 		gameStart[0] = 'N';
 		gameStart[1] = '0' + TEAM_NULL;
 		gameStart[2] = '\0';
@@ -59,14 +59,14 @@ public:
 	static protocol_command getCommandEnum(int index) {return (protocol_command)atoi(messageFromClient[index]); } 
 	static int getMode() { return mode; }
 	static int getCommand(int i) { return command[i]; }
-	static int getCharacterSelection() { return characterSelection; }
+	static int getCharacterSelection(int i) { return characterSelection[i]; }
 	static char *getGameStart() { return gameStart; }
 	static int getTeam() { return team; }
 
 	static void setMode(int x) { mode = x; }
 	static void setCommand(int i, int x) { command[i] = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
-	static void setCharacterSelection(int x) { characterSelection = x; }
-	static void setTeam(char x) { team = x-'1'; }
+	static void setCharacterSelection(int i, int x) { characterSelection[i] = x; }
+	static void setTeam(int x) { team = x+1; }
 	
 };

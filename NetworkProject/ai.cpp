@@ -6,13 +6,24 @@
 //예시 ai는 random하게 작성될 수 있도록 작성
 //random character 선택, random command로 움직이도록 작성
 
+#include <string.h>
 #include "ai.h"
 #include "network.h"
 
+void Ai::aiInit(void)
+{
+	Ai::CharacterInit(0,DEP_CSE);
+}
 void Ai::ai(void)
 {
 
 }
+
+void Ai::CharacterInit(int i, int x)
+{
+	Network::setCharacterSelection(i,(protocol_dep)x);
+}
+
 void Ai::move(int i, char x)
 {
 	if (Network::getTeam() == TEAM_POSTECH)
