@@ -139,7 +139,7 @@ typedef struct {
 } protocol_command_array;
 
 // Other various macro definitions.
-#define MAP_WIDTH 15
+#define MAP_WIDTH 21
 #define MAP_HEIGHT 15
 
 #define WINDOW_WIDTH 1280

@@ -2,6 +2,7 @@
 
 #include "unit.h"
 #include "protocol.h"
+#include "effect.h"
 
 class Game {											//EVERY THING REALTED TO GAME IS HERE
 
@@ -24,6 +25,8 @@ private:
 	static void ruleSkill();									// rules related to skill command
 	static void ruleSpawn();									// rules related to spawn command
 	static void ruleFlag();										// rules related to flag command
+
+	static void drawFaces();
 
 public:
 	static void init();											// initialize game

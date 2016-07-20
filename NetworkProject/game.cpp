@@ -5,6 +5,7 @@
 #include "network.h"
 #include "draw.h"
 #include "resource.h"
+#include "effect.h"
 
 Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
@@ -31,7 +32,6 @@ int Game::score[2];
 int Game::turnleft;
 int Game::death[2];										// record how many death occured in each team
 int Game::spawn[2];										// record how many spawn occured in each team
-
 
 void Game::init() // game initialization
 {
@@ -71,6 +71,37 @@ void Game::update() {	// update routine
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].update();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].update();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].update();
+
+	Effect::update();
+}
+
+void Game::drawFaces() {
+	const float xoffset = 64;
+	const float x[6] = { 
+		xoffset, 
+		xoffset, 
+		xoffset, 
+		ACTUAL_WINDOW_WIDTH - xoffset, 
+		ACTUAL_WINDOW_WIDTH - xoffset,
+		ACTUAL_WINDOW_WIDTH - xoffset };
+	const float y[6] = { GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128, GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128 };
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		Sprite* face = &Rspr::error;
+		
+		if (u.getState() == STATE_NULL || u.getState() == STATE_DEAD) {
+			face = &Rspr::faceDEAD;
+		}
+		else {
+			face = DEP_SELECT(u.getDep(), &Rspr::faceCSE, &Rspr::facePHYS, &Rspr::faceLIFE, &Rspr::faceME, &Rspr::faceCHEM);
+		}
+
+		Draw::draw(Rspr::faceFrame, x[i], y[i]);
+		Draw::draw(*face, x[i], y[i]);
+		if (u.getState() == STATE_DEAD)
+			Draw::number(u.getRespawn(), x[i], y[i]);
+	}
 }
 
 void Game::draw() {		// draw routine
@@ -97,9 +128,12 @@ void Game::draw() {		// draw routine
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
 
+	Effect::draw();
+
 	Draw::flush();
 
 	// Overlay informations
+	drawFaces();
 	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::postech, 0.5);
 	Draw::number(score[0], WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91);
 	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.85, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::kaist, 0.5);
@@ -218,7 +252,7 @@ void Game::ruleAttack() // rules related to attack
 	{
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
-		if (command_kind_skill(c)) {
+		if (command_kind_attack(c)) {
 			protocol_direction d = command_to_direction(c);
 			u.attack(d);
 		}
@@ -240,6 +274,7 @@ void Game::ruleAttack() // rules related to attack
 
 		if (u.getDep() == DEP_CSE) {
 			regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, 3);
+			Effect::push(new EffectCSEAttack(x, y));
 		}
 		else if (u.getDep() == DEP_PHYS) {
 			regionDamage(team_invert(t), x, y, x + dx * MAP_WIDTH, y + dy * MAP_HEIGHT, 1);
@@ -444,11 +479,23 @@ void Game::turn() {
 }
 
 void Game::regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun) {
+	if (x1 > x2) {
+		int tmp = x1;
+		x1 = x2;
+		x2 = tmp;
+	}
+	
+	if (y1 > y2) {
+		int tmp = y1;
+		y1 = y2;
+		y2 = tmp;
+	}
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
 		if (u.getTeam() == t) {
-			if (u.getX() >= x1 && u.getX() <= x2 && u.getY() >= y1 && u.getX() <= y2) {
+			if (u.getX() >= x1 && u.getX() <= x2 && u.getY() >= y1 && u.getY() <= y2) {
 				u.damage(damage);
 				u.heal(heal);
 				u.stun(stun);
@@ -468,6 +515,7 @@ int Game::getValidPoisonIndex()
 	if (b < POISON_NUM_MAX) return b;
 	else return INVALID_POISON_INDEX;
 }
+
 int Game::getValidMushroomIndex()
 {
 	int b;
@@ -479,6 +527,7 @@ int Game::getValidMushroomIndex()
 	if (b < MUSHROOM_NUM_MAX) return b;
 	else return INVALID_MUSHROOM_INDEX;
 }
+
 int Game::getValidPetalIndex()
 {
 	int b;

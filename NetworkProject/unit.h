@@ -70,8 +70,6 @@ private:
 			animationFlip = true;
 	};
 
-	void drawAttackMotion() const;
-
 public:
 	Unit(int x, int y, protocol_team team);
 	Unit(int x, int y, protocol_team team, const char* name);

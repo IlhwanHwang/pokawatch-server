@@ -75,7 +75,7 @@ bool Unit::move(protocol_direction direction) {
 		return false;
 	}
 	else {
-		moveOffDirection = direction;
+		moveOffDirection = direction_flip(direction);
 		if (p.dep == DEP_ME) {
 			moveStun = 2; // ME unit moves 1 cell per 2 turns.
 		}
@@ -135,6 +135,9 @@ void Unit::skill(protocol_direction direction) {
 }
 
 void Unit::damage(int h) {
+	if (h <= 0)
+		return;
+
 	if (p.state == STATE_NULL)
 		return;
 
@@ -154,6 +157,9 @@ void Unit::damage(int h) {
 }
 
 void Unit::heal(int h) {
+	if (h <= 0)
+		return;
+
 	if (p.state == STATE_NULL)
 		return;
 	
@@ -167,6 +173,9 @@ void Unit::heal(int h) {
 }
 
 void Unit::stun(int s) {
+	if (s <= 0)
+		return;
+
 	if (p.state == STATE_NULL)
 		return;	
 
@@ -243,26 +252,6 @@ void Unit::flush() {
 	if (p.health > healthMax) {
 		p.health = healthMax;
 	}
-	/*
-	if (p.state == STATE_NULL)
-		return;
-
-	if (p.invincible > 0) {
-		p.health = pp.health;
-	}
-
-	if (p.health <= 0) {
-		kill();
-		return;
-	}
-
-	if (p.stun > 0) {
-		p.state = STATE_STUN;
-		p.cooltime = pp.cooltime;
-		p.hero = pp.hero;
-		return;
-	}
-	*/
 }
 
 void Unit::postturn() {
@@ -294,24 +283,7 @@ void Unit::update() {
 }
 
 void Unit::draw() const {
-	Sprite* face = &Rspr::error;
 	Sprite* body = &Rspr::error;;
-
-	// Unit face
-	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
-		face = &Rspr::faceDEAD;
-	}
-	else {
-		face = DEP_SELECT(p.dep, &Rspr::faceCSE, &Rspr::facePHYS, &Rspr::faceLIFE, &Rspr::faceME, &Rspr::faceCHEM);
-	}
-
-	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + GUI_MAP_X;
-	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + GUI_MAP_Y;
-
-	Draw::draw(Rspr::faceFrame, x, y);
-	Draw::draw(*face, x, y);
-	if (p.state == STATE_DEAD)
-		Draw::number(p.respawn, x, y);
 
 	// Nothing is drawn on map unless alive
 	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
@@ -339,9 +311,6 @@ void Unit::draw() const {
 		Draw::qonmap(Rspr::stun[Gui::aniIndpPhaseCombinate(4, 0.1)], 0.05, drawx, drawy, moveOffZ + 1.2);
 	}
 
-	// Attack motion
-	drawAttackMotion();
-
 	// Health status
 	int showHealth = Gui::isPost() ? p.health : healthPrevious;
 	float ddx = 16 / GUI_CELL_WIDTH;
@@ -349,64 +318,6 @@ void Unit::draw() const {
 	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
-	}
-}
-
-void Unit::drawAttackMotion() const {
-	if (state_kind_attack(p.state)) {
-		if (p.dep == DEP_PHYS) {
-			int ind = Gui::aniIndpPhaseCombinate(4, 0.1);
-
-			switch (p.state) {
-			case STATE_ATTACK_RIGHT:
-				for (int x = p.x + 1; x < MAP_WIDTH; x++)
-					Draw::qonmap(Rspr::beamH[ind], 0.0, x, p.y, 0.5);
-				break;
-			case STATE_ATTACK_LEFT:
-				for (int x = p.x - 1; x >= 0; x--)
-					Draw::qonmap(Rspr::beamH[3 - ind], 0.0, x, p.y, 0.5);
-				break;
-			case STATE_ATTACK_UP:
-				for (int y = p.y + 1; y < MAP_HEIGHT; y++)
-					Draw::qonmap(Rspr::beamV[ind], 0.0, p.x, y, 0.5);
-				break;
-			case STATE_ATTACK_DOWN:
-				for (int y = p.y - 1; y >= 0; y--)
-					Draw::qonmap(Rspr::beamV[3 - ind], 0.0, p.x, y, 0.5);
-				break;
-			}
-		}
-
-		if (p.dep == DEP_CSE) {
-			if (Gui::aniPhase() < 1.0) {
-				Draw::qonmap(Rspr::spark[Gui::aniPhaseCombinate(4)], -0.01, p.x, p.y, 0.0);
-			}
-		}
-	}
-
-	if (state_kind_skill(p.state)) {
-		if (p.dep == DEP_CSE) {
-			if (Gui::aniPhase() < 1.0) {
-				Sprite& spr = Rspr::sparkboom[Gui::aniPhaseCombinate(4)];
-				int x1, y1, x2, y2;
-
-				x1 = p.x - 3;
-				y1 = p.y - 3;
-				x2 = p.x + 3;
-				y2 = p.y + 3;
-
-				x1 = x1 < 0 ? 0 : x1;
-				x2 = x2 >= MAP_WIDTH ? MAP_WIDTH - 1 : x2;
-				y1 = y1 < 0 ? 0 : y1;
-				y2 = y2 >= MAP_HEIGHT ? MAP_HEIGHT - 1 : y2;
-
-				for (int i = x1; i <= x2; i++) {
-					for (int j = y1; j <= y2; j++) {
-						Draw::qonmap(spr, -0.01, i, j, 0.0);
-					}
-				}
-			}
-		}
 	}
 }
 

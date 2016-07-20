@@ -28,7 +28,11 @@ Sprite Rspr::petal;
 Sprite Rspr::poison;
 Sprite Rspr::beamH[4];
 Sprite Rspr::beamV[4];
-Sprite Rspr::spark[4];
+Sprite Rspr::attackPHYSPH[4];
+Sprite Rspr::attackPHYSPV[4];
+Sprite Rspr::attackPHYSKH[4];
+Sprite Rspr::attackPHYSKV[4];
+Sprite Rspr::attackCSE[4];
 Sprite Rspr::sparkboom[4];
 Sprite Rspr::mushroom;
 
@@ -105,8 +109,12 @@ void Resource::postinit() {
 	LOAD(poison, "poison").dot();
 	MULTILOAD(buf, beamH, 4, "beam_h%d");
 	MULTILOAD(buf, beamV, 4, "beam_v%d");
+	MULTILOAD(buf, attackPHYSPH, 4, "attack_phys_p_h_%d");
+	MULTILOAD(buf, attackPHYSPV, 4, "attack_phys_p_v_%d");
+	MULTILOAD(buf, attackPHYSKH, 4, "attack_phys_k_h_%d");
+	MULTILOAD(buf, attackPHYSKV, 4, "attack_phys_k_v_%d");
 	MULTILOAD(buf, stun, 4, "stun%d");
-	MULTILOAD(buf, spark, 4, "spark%d");
+	MULTILOAD(buf, attackCSE, 4, "attack_cse_%d");
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
 	LOAD(mushroom, "mushroom").dot();
 
