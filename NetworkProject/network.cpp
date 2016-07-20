@@ -24,7 +24,7 @@ SOCKADDR_IN Network::clntAddr[CLIENT_NUM_MAX];									// Client address variabl
 int Network::szClntAddr[CLIENT_NUM_MAX];											// Client address size variable of server side
 char Network::messageToClient[MESSAGE_T0_CLIENT_SIZE];							// Message buffer of server side
 char Network::messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE*3];			// Message buffer of server side
-char Network::messageToServer[MESSAGE_TO_SERVER_SIZE];							// Message buffer of client side
+char Network::messageToServer[MESSAGE_TO_SERVER_SIZE*3];							// Message buffer of client side
 int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection[UNIT_NUM_MAX];												// Information of selection of charactor(dep)
 char Network::gameStart[3];														// game started? not(N) start(G)
@@ -94,7 +94,7 @@ void Network::recieveFromClient() // Message recieving routine of server side
 {
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE*3 - 1, 0);
+		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
 		messageFromClient[i][strLen] = '\0';
 	}
 }
@@ -129,6 +129,7 @@ void Network::makeClientSocket() // Client socket making routine
 	{
 		ErrorHandling("hSocketet(), error");
 	}
+
 	printf("Socket made\n");
 
 	memset(&servAddr, 0, sizeof(servAddr));
@@ -209,11 +210,11 @@ void Network::turn() // turn routine
 	// in timer each turn this function is called
 	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // for client when game started 
 	{
-		char toSend[1 + MESSAGE_TO_SERVER_SIZE * (UNIT_NUM_MAX) / 2];
-		toSend[0] = Network::getTeam();
+		char toSend[MESSAGE_TO_SERVER_SIZE];
+
 		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)
 		{
-			strcpy(&toSend[1 + i*MESSAGE_TO_SERVER_SIZE],(char *)(to_string(Network::getCommand(i))).c_str());
+			toSend[i] = getCommand(i) + '0';
 		}
 		Network::sendToServer(toSend);														// send command
 		Network::getProtocolDataFromServer();												// get protocol data of that time
@@ -221,7 +222,17 @@ void Network::turn() // turn routine
 	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR) // for server when game started
 	{
 		char *protocolToSend;
-		Network::recieveFromClient();														// recieve command from clients;
+		//Network::recieveFromClient();		// recieve command from clients;		
+		
+		for (int i = 0; i < CLIENT_NUM_MAX; i++)
+		{
+			int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
+			messageFromClient[i][strLen] = '\0';
+			cout << "내가 받은 것은 이거지" << i << "번쨰 client는" << messageFromClient[i] << endl;
+			cout << "0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
+		}
+
+
 		protocolToSend = (char*)(Game::getProtocolPointer());
 		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
 		Network::sendToClient(protocolToSend);												// send protocol data to client
@@ -230,7 +241,7 @@ void Network::turn() // turn routine
 
 void Network::update() // frame turn routine
 {
-	/*
+	
 	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
 	{
 		Network::setMode(MODE_CLIENT);														// set as client 
@@ -252,9 +263,10 @@ void Network::update() // frame turn routine
 		setTeam(atoi(teamInfo));
 
 	}// if invalid input, we should give error message
-	*/
 
-	if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
+
+
+	/*if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
 	{
 		char gameStartMessage[2];
 		gameStartMessage[0] = GAME_START_CHAR;
@@ -275,26 +287,29 @@ void Network::update() // frame turn routine
 		{
 			for (int j = 0; j < CLIENT_NUM_MAX; j++)
 			{
-				Game::getUnit(((UNIT_NUM_MAX)/2) * j + i).spawn((protocol_dep)(messageFromClient[j][i*MESSAGE_TO_SERVER_SIZE]-'0'));
+				Game::getUnit(((UNIT_NUM_MAX)/2) * j + i).spawn((protocol_dep)(messageFromClient[j][i]-'0'));
+				cout<<messageFromClient<<"was came"<<endl;
+				cout<<j<<"팀의"<<i<<"번쨰 캐릭터에 해당하는"<<messageFromClient[j][i]-'0'<<endl;
 			}
 		}
 
 		Game::release();
 		sendToClient(gameStartMessage);
 		setGameStart(0, GAME_START_CHAR);
-	}
+	}*/
+
 
 	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character
 	{
 		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection(0) == 0)			// mapping for key and characters
 		{
 			Ai::aiInit();
-			
 
-			char characterInfo[3*MESSAGE_TO_SERVER_SIZE];
+			char characterInfo[((UNIT_NUM_MAX) / 2) + 1];
 			for(int i=0; i<(UNIT_NUM_MAX)/2; i++)
 			{
-				strcpy(characterInfo+i*MESSAGE_TO_SERVER_SIZE, (char *)(to_string(Network::getCharacterSelection(i))).c_str());				
+				//strcpy(characterInfo+i*MESSAGE_TO_SERVER_SIZE, (char *)(to_string(Network::getCharacterSelection(i))).c_str());
+				characterInfo[i] =  Network::getCharacterSelection(i) + '0';
 			}
 
 			sendToServer(characterInfo);
@@ -302,7 +317,6 @@ void Network::update() // frame turn routine
 
 			Network::recieveGameStart();
 			printf("GameStart!");
-
 		}
 
 //		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection() > 0 && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
@@ -311,5 +325,4 @@ void Network::update() // frame turn routine
 			Ai::ai();
 		}
 	}
-
 }

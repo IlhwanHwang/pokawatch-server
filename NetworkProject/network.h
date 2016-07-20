@@ -18,7 +18,7 @@ private:
 	static int szClntAddr[CLIENT_NUM_MAX];									// Client address size variable of server side
 	static char messageToClient[MESSAGE_T0_CLIENT_SIZE];					// Message buffer of server side
 	static char messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE*3];	// Message buffer of server side
-	static char messageToServer[MESSAGE_TO_SERVER_SIZE];					// Message buffer of client side
+	static char messageToServer[MESSAGE_TO_SERVER_SIZE*3];					// Message buffer of client side
 	static int mode;														// determine server/ client/ nothing
 	static int characterSelection[UNIT_NUM_MAX];											// Information of selection of charactor(dep)
 	static char gameStart[3];												// game started? [0] : not(N) start(G), [1] : team_information
@@ -56,7 +56,7 @@ public:
 	static void turn();								// Per turn routine for network
 
 	//getter and setter
-	static protocol_command getCommandEnum(int index) {return (protocol_command)atoi(messageFromClient[index]); } 
+	static protocol_command getCommandEnum(int index) {return index>=(UNIT_NUM_MAX/2) ? (protocol_command)(messageFromClient[1][index- (UNIT_NUM_MAX / 2)] - '0') : (protocol_command)(messageFromClient[0][index] - '0'); }
 	static int getMode() { return mode; }
 	static int getCommand(int i) { return command[i]; }
 	static int getCharacterSelection(int i) { return characterSelection[i]; }
