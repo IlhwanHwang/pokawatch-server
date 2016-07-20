@@ -78,7 +78,7 @@ void Network::acceptClient()
 	// give their team
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int WhatDo = send(hClntSock[i], (char *)(to_string(i)).c_str(), sizeof((char *)(to_string(i)).c_str()) - 1, 0);
+		int WhatDo = send(hClntSock[i], (char *)(to_string(i+1)).c_str(), sizeof((char *)(to_string(i+1)).c_str()) - 1, 0);
 	}
 }
 
@@ -231,12 +231,24 @@ void Network::turn() // turn routine
 void Network::update() // frame turn routine
 {
 	/*
-z	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
+	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
 	{
 		Network::setMode(MODE_CLIENT);														// set as client 
 		printf("mode- client chose\n");
 		Network::makeClientSocket();														// client socket made
 		Network::connectToServer();															// connect to server
+		// 팀정보 받아서 저장하기.
+		
+		int strLen;
+		char teamInfo[8];
+		strLen = recv(hSocket, teamInfo, sizeof(teamInfo) - 1, 0); // data recieving
+		if (strLen == -1)
+		{
+			Network::ErrorHandling("read() error");
+		}
+		teamInfo[strLen] = '\0';
+		setTeam(teamInfo[0]-'0');
+
 	}// if invalid input, we should give error message
 	*/
 
@@ -250,7 +262,7 @@ z	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
 		glutSwapBuffers();
 
 		Network::setMode(MODE_SERVER);														// set as server
-		printf("mode- server chosn\n");
+		printf("mode - server chosn\n");
 		Network::makeServerSocket();														// server socket made
 		printf("socket made \n");
 		Network::acceptClient();															// accepting client

@@ -41,8 +41,8 @@ void Ai::move(int i, char x)
 	}
 	else
 	{
-		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX)/2, COMMAND_MOVE_RIGHT);
-		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_MOVE_LEFT);
+		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX)/2, COMMAND_MOVE_LEFT);
+		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_MOVE_RIGHT);
 		else if (x == 'u') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_MOVE_UP);
 		else if (x == 'd') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_MOVE_DOWN);
 	}
@@ -59,8 +59,8 @@ void Ai::attack(int i, char x)
 	}
 	else
 	{
-		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_RIGHT);
-		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_LEFT);
+		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_LEFT);
+		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_RIGHT);
 		else if (x == 'u') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_UP);
 		else if (x == 'd') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_ATTACK_DOWN);
 	}
@@ -77,8 +77,8 @@ void Ai::skill(int i, char x)
 	}
 	else
 	{
-		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_RIGHT);
-		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_LEFT);
+		if (x == 'r')	   Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_LEFT);
+		else if (x == 'l') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_RIGHT);
 		else if (x == 'u') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_UP);
 		else if (x == 'd') Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_SKILL_DOWN);
 	}
