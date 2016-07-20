@@ -22,6 +22,7 @@ Flag Game::flagArray[FLAG_NUM_MAX] = {					//initialize of flags
 	Flag(FLAG4_X, FLAG4_Y) , 
 	Flag(FLAG5_X, FLAG5_Y) 
 };
+
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
 Mushroom Game::mushroomArray[MUSHROOM_NUM_MAX];

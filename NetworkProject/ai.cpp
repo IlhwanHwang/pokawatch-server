@@ -10,10 +10,16 @@
 #include "ai.h"
 #include "network.h"
 
+int Network::team;
+
 void Ai::aiInit(void)
 {
 	Ai::CharacterInit(0,DEP_CSE);
+	Ai::CharacterInit(1, DEP_CSE);
+	Ai::CharacterInit(2, DEP_CSE);
 }
+
+
 void Ai::ai(void)
 {
 
