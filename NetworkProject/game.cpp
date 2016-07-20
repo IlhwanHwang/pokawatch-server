@@ -6,6 +6,7 @@
 #include "draw.h"
 #include "resource.h"
 #include "effect.h"
+#include "utility.h"
 
 Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
@@ -274,10 +275,18 @@ void Game::ruleAttack() // rules related to attack
 
 		if (u.getDep() == DEP_CSE) {
 			regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, 3);
-			Effect::push(new EffectCSEAttack(x, y));
+			Effect::push(new EffectCSEAttack(t, (float)x, (float)y));
 		}
 		else if (u.getDep() == DEP_PHYS) {
 			regionDamage(team_invert(t), x, y, x + dx * MAP_WIDTH, y + dy * MAP_HEIGHT, 1);
+			Effect::push(
+				new EffectPHYSAttack(
+					t, 
+					(float)(x + dx), 
+					(float)(y + dy), 
+					clamp((float)(x + dx * MAP_WIDTH), 0.0, (float)MAP_WIDTH - 1.0), 
+					clamp((float)(y + dy * MAP_HEIGHT), 0.0, (float)MAP_HEIGHT - 1.0))
+			);
 		}
 		else if (u.getDep() == DEP_LIFE) {
 			int indexForValidPetal = getValidPetalIndex();

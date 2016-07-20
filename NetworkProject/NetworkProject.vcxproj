@@ -170,7 +170,6 @@
     <ClInclude Include="sprite.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="unit.h" />
-    <ClInclude Include="utility.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +188,6 @@
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="unit.cpp" />
-    <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="default_f.glsl" />

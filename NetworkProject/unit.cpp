@@ -25,6 +25,7 @@ void Unit::init() {
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
 	aniInvincible = false;
+	deadBlind = false;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -183,12 +184,14 @@ void Unit::stun(int s) {
 }
 
 void Unit::kill() {
+	if (p.state == STATE_DEAD)
+		return;
+
 	p.state = STATE_DEAD;
 	p.respawn = RESPAWN_COOLTIME;
 	p.hero = false;
 	death++;
 	Game::setDeath(team_to_index(p.team), Game::getDeath(team_to_index(p.team)) + 1);
-	p.dep = DEP_NULL;
 }
 
 void Unit::turninit() {
@@ -243,6 +246,9 @@ void Unit::turn() {
 }
 
 void Unit::flush() {
+	if (p.state == STATE_DEAD)
+		return;
+
 	p.health += healed - damaged;
 
 	if (p.health <= 0) {
@@ -280,13 +286,16 @@ void Unit::update() {
 		moveOffZ = 0.0;
 	}
 	// End of animation by moving
+
+	if (p.state == STATE_DEAD && Gui::isPost())
+		deadBlind = true;
 }
 
 void Unit::draw() const {
-	Sprite* body = &Rspr::error;;
+	Sprite* body = &Rspr::error;
 
 	// Nothing is drawn on map unless alive
-	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
+	if (p.state == STATE_NULL || deadBlind) {
 		return;
 	}
 
