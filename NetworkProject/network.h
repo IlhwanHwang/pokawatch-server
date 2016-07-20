@@ -17,7 +17,7 @@ private:
 	static SOCKADDR_IN clntAddr[CLIENT_NUM_MAX];								// Client address variable of server side
 	static int szClntAddr[CLIENT_NUM_MAX];									// Client address size variable of server side
 	static char messageToClient[MESSAGE_T0_CLIENT_SIZE];					// Message buffer of server side
-	static char messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];	// Message buffer of server side
+	static char messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE*3];	// Message buffer of server side
 	static char messageToServer[MESSAGE_TO_SERVER_SIZE];					// Message buffer of client side
 	static int mode;														// determine server/ client/ nothing
 	static int characterSelection[UNIT_NUM_MAX];											// Information of selection of charactor(dep)

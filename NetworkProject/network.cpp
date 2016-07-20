@@ -23,7 +23,7 @@ SOCKADDR_IN Network::servAddr;													// Server address variable of server/
 SOCKADDR_IN Network::clntAddr[CLIENT_NUM_MAX];									// Client address variable of server side
 int Network::szClntAddr[CLIENT_NUM_MAX];											// Client address size variable of server side
 char Network::messageToClient[MESSAGE_T0_CLIENT_SIZE];							// Message buffer of server side
-char Network::messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE];			// Message buffer of server side
+char Network::messageFromClient[CLIENT_NUM_MAX][MESSAGE_TO_SERVER_SIZE*3];			// Message buffer of server side
 char Network::messageToServer[MESSAGE_TO_SERVER_SIZE];							// Message buffer of client side
 int Network::mode;																// determine server/ client/ nothing
 int Network::characterSelection[UNIT_NUM_MAX];												// Information of selection of charactor(dep)
@@ -94,7 +94,7 @@ void Network::recieveFromClient() // Message recieving routine of server side
 {
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
+		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE*3 - 1, 0);
 		messageFromClient[i][strLen] = '\0';
 	}
 }
@@ -238,16 +238,18 @@ void Network::update() // frame turn routine
 		Network::makeClientSocket();														// client socket made
 		Network::connectToServer();															// connect to server
 		// 팀정보 받아서 저장하기.
-		
-		int strLen;
+
+		int strLen;																			// 팀 정보 저장
 		char teamInfo[8];
 		strLen = recv(hSocket, teamInfo, sizeof(teamInfo) - 1, 0); // data recieving
+		
 		if (strLen == -1)
 		{
 			Network::ErrorHandling("read() error");
 		}
+
 		teamInfo[strLen] = '\0';
-		setTeam(teamInfo[0]-'0');
+		setTeam(atoi(teamInfo));
 
 	}// if invalid input, we should give error message
 	*/
@@ -269,40 +271,37 @@ void Network::update() // frame turn routine
 		printf("accepted\n");
 		Network::recieveFromClient();														// recieve spawn information
 
-		for (int i = 0; i < UNIT_NUM_MAX; i++)												// spawn units
+		for (int i = 0; i < UNIT_NUM_MAX/2; i++)												// spawn units
 		{
-			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
+			for (int j = 0; j < CLIENT_NUM_MAX; j++)
 			{
-				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
-			}
-			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))
-			{
-				Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
+				Game::getUnit(((UNIT_NUM_MAX)/2) * j + i).spawn((protocol_dep)(messageFromClient[j][i*MESSAGE_TO_SERVER_SIZE]-'0'));
 			}
 		}
+
+		Game::release();
+		sendToClient(gameStartMessage);
+		setGameStart(0, GAME_START_CHAR);
 	}
 
 	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character
 	{
 		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection(0) == 0)			// mapping for key and characters
 		{
-			int strLen;
-			//recieving team data
-			strLen = recv(hSocket, messageToClient, sizeof(messageToClient) - 1, 0);
-			if (strLen == -1)
-			{
-				Network::ErrorHandling("read() error");
-			}
-			messageToClient[strLen] = '\0';
-			setTeam(atoi(messageToClient));
-
 			Ai::aiInit();
-			/*
-			Network::sendToServer((char *)(to_string(Network::getCharacterSelection())).c_str());
-			printf("character chosen : %d", Network::getCharacterSelection());
+			
+
+			char characterInfo[3*MESSAGE_TO_SERVER_SIZE];
+			for(int i=0; i<(UNIT_NUM_MAX)/2; i++)
+			{
+				strcpy(characterInfo+i*MESSAGE_TO_SERVER_SIZE, (char *)(to_string(Network::getCharacterSelection(i))).c_str());				
+			}
+
+			sendToServer(characterInfo);
+			printf("character chosen\n");
+
 			Network::recieveGameStart();
 			printf("GameStart!");
-			*/
 
 		}
 
