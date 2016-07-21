@@ -9,11 +9,16 @@
 Sprite Rspr::temp;
 Sprite Rspr::error;
 
-Sprite Rspr::unitCSE;
-Sprite Rspr::unitCHEM;
-Sprite Rspr::unitME;
-Sprite Rspr::unitLIFE;
-Sprite Rspr::unitPHYS;
+Sprite Rspr::unitCSEP;
+Sprite Rspr::unitCHEMP;
+Sprite Rspr::unitMEP;
+Sprite Rspr::unitLIFEP;
+Sprite Rspr::unitPHYSP;
+Sprite Rspr::unitCSEK;
+Sprite Rspr::unitCHEMK;
+Sprite Rspr::unitMEK;
+Sprite Rspr::unitLIFEK;
+Sprite Rspr::unitPHYSK;
 Sprite Rspr::unitHeart;
 
 Sprite Rspr::faceCSE;
@@ -28,7 +33,11 @@ Sprite Rspr::petal;
 Sprite Rspr::poison;
 Sprite Rspr::beamH[4];
 Sprite Rspr::beamV[4];
-Sprite Rspr::spark[4];
+Sprite Rspr::attackPHYSPH[4];
+Sprite Rspr::attackPHYSPV[4];
+Sprite Rspr::attackPHYSKH[4];
+Sprite Rspr::attackPHYSKV[4];
+Sprite Rspr::attackCSE[4];
 Sprite Rspr::sparkboom[4];
 Sprite Rspr::mushroom;
 
@@ -86,11 +95,16 @@ void Resource::postinit() {
 	LOAD(temp, "temp").setOffset(20.0, 80.0).dot();
 	LOAD(error, "error");
 
-	LOAD(unitCSE, "body_cse").dot().setOffset(20.0, 74.0);
-	LOAD(unitCHEM, "body_chem").dot().setOffset(20.0, 74.0);
-	LOAD(unitME, "body_me").dot().setOffset(30.0, 70.0);
-	LOAD(unitLIFE, "body_life").dot().setOffset(20.0, 74.0);
-	LOAD(unitPHYS, "body_phys").dot().setOffset(20.0, 74.0);
+	LOAD(unitCSEP, "body_cse_p").dot().setOffset(20.0, 74.0);
+	LOAD(unitCHEMP, "body_chem_p").dot().setOffset(20.0, 74.0);
+	LOAD(unitMEP, "body_me_p").dot().setOffset(30.0, 70.0);
+	LOAD(unitLIFEP, "body_life_p").dot().setOffset(20.0, 74.0);
+	LOAD(unitPHYSP, "body_phys_p").dot().setOffset(20.0, 74.0);
+	LOAD(unitCSEK, "body_cse_k").dot().setOffset(20.0, 74.0);
+	LOAD(unitCHEMK, "body_chem_k").dot().setOffset(20.0, 74.0);
+	LOAD(unitMEK, "body_me_k").dot().setOffset(30.0, 70.0);
+	LOAD(unitLIFEK, "body_life_k").dot().setOffset(20.0, 74.0);
+	LOAD(unitPHYSK, "body_phys_k").dot().setOffset(20.0, 74.0);
 	LOAD(unitHeart, "heart").dot();
 
 	LOAD(faceCSE, "face_cse");
@@ -105,8 +119,12 @@ void Resource::postinit() {
 	LOAD(poison, "poison").dot();
 	MULTILOAD(buf, beamH, 4, "beam_h%d");
 	MULTILOAD(buf, beamV, 4, "beam_v%d");
+	MULTILOAD(buf, attackPHYSPH, 4, "attack_phys_p_h_%d");
+	MULTILOAD(buf, attackPHYSPV, 4, "attack_phys_p_v_%d");
+	MULTILOAD(buf, attackPHYSKH, 4, "attack_phys_k_h_%d");
+	MULTILOAD(buf, attackPHYSKV, 4, "attack_phys_k_v_%d");
 	MULTILOAD(buf, stun, 4, "stun%d");
-	MULTILOAD(buf, spark, 4, "spark%d");
+	MULTILOAD(buf, attackCSE, 4, "attack_cse_%d");
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
 	LOAD(mushroom, "mushroom").dot();
 

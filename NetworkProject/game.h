@@ -2,6 +2,7 @@
 
 #include "unit.h"
 #include "protocol.h"
+#include "effect.h"
 
 class Game {											//EVERY THING REALTED TO GAME IS HERE
 
@@ -20,9 +21,12 @@ private:
 
 	static void ruleMove();										// rules related to move command
 	static void ruleAttack();									// rules related to attack command
+	static void ruleCollide();
 	static void ruleSkill();									// rules related to skill command
 	static void ruleSpawn();									// rules related to spawn command
 	static void ruleFlag();										// rules related to flag command
+
+	static void drawFaces();
 
 public:
 	static void init();											// initialize game
@@ -31,6 +35,23 @@ public:
 	static void turn();											// turn routine
 	static void draw();											// draw routine
 	static void release();
+
+	static void regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun);
+	static void regionDamage(protocol_team t, int x1, int y1, int x2, int y2, int h) {
+		regionApply(t, x1, y1, x2, y2, h, 0, 0);
+	};
+	static void regionHeal(protocol_team t, int x1, int y1, int x2, int y2, int h) {
+		regionApply(t, x1, y1, x2, y2, 0, h, 0);
+	};
+	static void regionStun(protocol_team t, int x1, int y1, int x2, int y2, int stun) {
+		regionApply(t, x1, y1, x2, y2, 0, 0, stun);
+	};
+	static void regionDamageAll(protocol_team t, int h) {
+		regionDamage(t, 0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1, h);
+	}
+	static void regionHealAll(protocol_team t, int h) {
+		regionHeal(t, 0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1, h);
+	}
 
 	//getters and setters
 	static protocol_data getProtocol() { return protocolToSend; }

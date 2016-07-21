@@ -11,16 +11,8 @@
 #include "key.h"
 
 void Unit::init() {
-	// Differect health values for different units.
-	switch (p.dep) {
-	case DEP_CSE:  healthMax = 3; break;
-	case DEP_PHYS: healthMax = 3; break;
-	case DEP_LIFE: healthMax = 3; break;
-	case DEP_ME:   healthMax = 5; break;
-	case DEP_CHEM: healthMax = 3; break;
-	default: error("Invalid department"); break;
-	}
-
+	// Different health values for different units.
+	healthMax = DEP_SELECT(p.dep, 3, 3, 3, 5, 3);
 	moveStun = 0;
 	p.health = healthMax;
 	healthPrevious = p.health;
@@ -32,6 +24,8 @@ void Unit::init() {
 	p.state = STATE_IDLE;
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
+	aniInvincible = false;
+	deadBlind = false;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -66,16 +60,9 @@ bool Unit::move(protocol_direction direction) {
 		return false;
 	}
 
-	int dx = 0;
-	int dy = 0;
-
-	switch (direction) {
-	case DIRECTION_RIGHT: dx = 1; animationFlip = false; break;
-	case DIRECTION_UP:    dy = 1;  break;
-	case DIRECTION_LEFT:  dx = -1; animationFlip = true; break;
-	case DIRECTION_DOWN:  dy = -1; break;
-	default: error("Invalid input"); break;
-	}
+	int dx = direction_to_dx(direction);
+	int dy = direction_to_dy(direction);
+	flip(direction);
 
 	p.x += dx;
 	p.y += dy;
@@ -89,7 +76,7 @@ bool Unit::move(protocol_direction direction) {
 		return false;
 	}
 	else {
-		moveOffDirection = direction;
+		moveOffDirection = direction_flip(direction);
 		if (p.dep == DEP_ME) {
 			moveStun = 2; // ME unit moves 1 cell per 2 turns.
 		}
@@ -119,23 +106,9 @@ void Unit::attack(protocol_direction direction) {
 		return;
 	}
 
-	switch (direction) {
-	case DIRECTION_RIGHT:	p.state = STATE_ATTACK_RIGHT;   animationFlip = false;	break;
-	case DIRECTION_UP:		p.state = STATE_ATTACK_UP;		break;
-	case DIRECTION_LEFT:	p.state = STATE_ATTACK_LEFT;   animationFlip = true;	break;
-	case DIRECTION_DOWN:	p.state = STATE_ATTACK_DOWN;	break;
-	default: std::cerr << name << ": Invalid input" << std::endl; break;
-	}
-
-	// Attack has its own cooltime value.
-	switch (p.dep) {
-	case DEP_CSE:  p.cooltime = 6;  break;
-	case DEP_PHYS: p.cooltime = 0;  break;
-	case DEP_LIFE: p.cooltime = 10; break;
-	case DEP_ME:   p.cooltime = 0;  break;
-	case DEP_CHEM: p.cooltime = 4;  break;
-	default: std::cerr << name << ": Invalid department" << std::endl; break;
-	}
+	p.state = direction_to_attackstate(direction);
+	flip(direction);
+	p.cooltime = DEP_SELECT(p.dep, 6, 0, 10, 0, 4);
 }
 
 void Unit::skill(protocol_direction direction) {
@@ -155,19 +128,17 @@ void Unit::skill(protocol_direction direction) {
 		return;
 	}
 
-	switch (direction) {
-	case DIRECTION_RIGHT:	p.state = STATE_SKILL_RIGHT;   animationFlip = false;	break;
-	case DIRECTION_UP:		p.state = STATE_SKILL_UP;		break;
-	case DIRECTION_LEFT:	p.state = STATE_SKILL_LEFT;   animationFlip = true;	break;
-	case DIRECTION_DOWN:	p.state = STATE_SKILL_DOWN;	break;
-	default: error("Invalid input"); break;
-	}
+	p.state = direction_to_skillstate(direction);
+	flip(direction);
 
 	// A hero can use its skill only once.
 	p.hero = false;
 }
 
 void Unit::damage(int h) {
+	if (h <= 0)
+		return;
+
 	if (p.state == STATE_NULL)
 		return;
 
@@ -181,16 +152,14 @@ void Unit::damage(int h) {
 		return;
 	}
 
-	if (p.health == healthPrevious) // In the case that multiple damage dealt in one turn
-		healthPrevious = p.health;
-	p.health -= h;
-
-	if (p.health <= 0) {
-		kill();
-	}
+	damaged += h;
+	aniDamaged = true;
 }
 
 void Unit::heal(int h) {
+	if (h <= 0)
+		return;
+
 	if (p.state == STATE_NULL)
 		return;
 	
@@ -199,39 +168,45 @@ void Unit::heal(int h) {
 		return;
 	}
 
-	p.health += h;
-
-	if (p.health > healthMax) {
-		p.health = healthMax;
-	}
+	healed += h;
+	aniHealed = true;
 }
 
 void Unit::stun(int s) {
-	if (p.state == STATE_NULL)
+	if (s <= 0)
 		return;
 
-	p.stun = s;
-	if (s > 0) {
-		p.state = STATE_STUN;
-	}
+	if (p.state == STATE_NULL)
+		return;	
+
+	p.stun += s;
 }
 
 void Unit::kill() {
+	if (p.state == STATE_DEAD)
+		return;
+
 	p.state = STATE_DEAD;
 	p.respawn = RESPAWN_COOLTIME;
 	p.hero = false;
 	death++;
-	if (p.team == TEAM_POSTECH) Game::setDeath(TEAM_POSTECH - 1, Game::getDeath(TEAM_POSTECH - 1) + 1);
-	if (p.team == TEAM_KAIST) Game::setDeath(TEAM_KAIST - 1, Game::getDeath(TEAM_KAIST - 1) + 1);
-	p.dep = DEP_NULL;
+	Game::setDeath(team_to_index(p.team), Game::getDeath(team_to_index(p.team)) + 1);
+}
+
+void Unit::turninit() {
+	healthPrevious = p.health;
+	moveOffAction = false;
+	aniDamaged = false;
+	aniHealed = false;
+	healed = 0;
+	damaged = 0;
 }
 
 void Unit::turn() {
 	if (p.state == STATE_NULL)
 		return;
 
-	moveOffAction = false;
-	healthPrevious = p.health;
+	turninit();
 
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
@@ -269,19 +244,32 @@ void Unit::turn() {
 	}
 }
 
+void Unit::flush() {
+	if (p.state == STATE_DEAD)
+		return;
+
+	p.health += healed - damaged;
+
+	if (p.health <= 0) {
+		kill();
+	}
+
+	if (p.health > healthMax) {
+		p.health = healthMax;
+	}
+}
+
+void Unit::postturn() {
+}
+
 void Unit::update() {
 	if (p.state == STATE_NULL)
 		return;
 
 	// Animation by moving
 	if (moveOffAction) {
-		float dx = 0.0, dy = 0.0;
-		switch (moveOffDirection) {
-		case DIRECTION_RIGHT: dx = -1.0; break;
-		case DIRECTION_UP: dy = -1.0; break;
-		case DIRECTION_LEFT: dx = 1.0; break;
-		case DIRECTION_DOWN: dy = 1.0; break;
-		}
+		float dx = (float)direction_to_dx(moveOffDirection);
+		float dy = (float)direction_to_dy(moveOffDirection);
 
 		float mag = 1.0 - Spline::accandfric(Gui::aniPhase());
 		dx *= mag;
@@ -297,46 +285,37 @@ void Unit::update() {
 		moveOffZ = 0.0;
 	}
 	// End of animation by moving
+
+	if (p.state == STATE_DEAD && Gui::isPost())
+		deadBlind = true;
 }
 
 void Unit::draw() const {
-	Sprite* face = &Rspr::error;
-	Sprite* body = &Rspr::error;;
-
-	// Unit face
-	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
-		face = &Rspr::faceDEAD;
-	}
-	else {
-		switch (p.dep) {
-		case DEP_CSE: face = &Rspr::faceCSE; break;
-		case DEP_CHEM: face = &Rspr::faceCHEM; break;
-		case DEP_ME: face = &Rspr::faceME; break;
-		case DEP_LIFE: face = &Rspr::faceLIFE; break;
-		case DEP_PHYS: face = &Rspr::facePHYS; break;
-		}
-	}
-
-	float x = (orgx - MAP_WIDTH / 2) * GUI_CELL_WIDTH * 1.5 + GUI_MAP_X;
-	float y = (orgy - MAP_HEIGHT / 2) * GUI_CELL_HEIGHT * 3.0 + GUI_MAP_Y;
-
-	Draw::draw(Rspr::faceFrame, x, y);
-	Draw::draw(*face, x, y);
-	if (p.state == STATE_DEAD)
-		Draw::number(p.respawn, x, y);
+	Sprite* body = &Rspr::error;
 
 	// Nothing is drawn on map unless alive
-	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
+	if (p.state == STATE_NULL || deadBlind) {
 		return;
 	}
 
 	// Unit body
-	switch (p.dep) {
-	case DEP_CSE: body = &Rspr::unitCSE; break;
-	case DEP_CHEM: body = &Rspr::unitCHEM; break;
-	case DEP_ME: body = &Rspr::unitME; break;
-	case DEP_LIFE: body = &Rspr::unitLIFE; break;
-	case DEP_PHYS: body = &Rspr::unitPHYS; break;
+	if (p.team == TEAM_POSTECH) {
+		body = DEP_SELECT(
+			p.dep, 
+			&Rspr::unitCSEP, 
+			&Rspr::unitPHYSP, 
+			&Rspr::unitLIFEP, 
+			&Rspr::unitMEP, 
+			&Rspr::unitCHEMP);
+	}
+	if (p.team == TEAM_KAIST) {
+		body = DEP_SELECT(
+			p.dep,
+			&Rspr::unitCSEK,
+			&Rspr::unitPHYSK,
+			&Rspr::unitLIFEK,
+			&Rspr::unitMEK,
+			&Rspr::unitCHEMK);
 	}
 
 	const float drawx = (float)p.x + moveOffX;
@@ -345,7 +324,7 @@ void Unit::draw() const {
 	Color c = Color::white;
 
 	// Blinking effect
-	if (p.invincible > 0 || p.health < healthPrevious) {
+	if (p.invincible > 0 || (aniDamaged && Gui::isPost())) {
 		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
 	}
 
@@ -357,77 +336,13 @@ void Unit::draw() const {
 		Draw::qonmap(Rspr::stun[Gui::aniIndpPhaseCombinate(4, 0.1)], 0.05, drawx, drawy, moveOffZ + 1.2);
 	}
 
-	// Attack motion
-	drawAttackMotion();
-
 	// Health status
-	int showHealth = p.health;
+	int showHealth = Gui::isPost() ? p.health : healthPrevious;
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
-	if (p.health < healthPrevious) {
-		dx -= ddx * (healthPrevious - p.health) * 0.5 * (1.0 - Gui::aniPhase());
-	}
 	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
-	}
-}
-
-void Unit::drawAttackMotion() const {
-	if (STATE_KIND_ATTACK(p.state)) {
-		if (p.dep == DEP_PHYS) {
-			int ind = Gui::aniIndpPhaseCombinate(4, 0.1);
-
-			switch (p.state) {
-			case STATE_ATTACK_RIGHT:
-				for (int x = p.x + 1; x < MAP_WIDTH; x++)
-					Draw::qonmap(Rspr::beamH[ind], 0.0, x, p.y, 0.5);
-				break;
-			case STATE_ATTACK_LEFT:
-				for (int x = p.x - 1; x >= 0; x--)
-					Draw::qonmap(Rspr::beamH[3 - ind], 0.0, x, p.y, 0.5);
-				break;
-			case STATE_ATTACK_UP:
-				for (int y = p.y + 1; y < MAP_HEIGHT; y++)
-					Draw::qonmap(Rspr::beamV[ind], 0.0, p.x, y, 0.5);
-				break;
-			case STATE_ATTACK_DOWN:
-				for (int y = p.y - 1; y >= 0; y--)
-					Draw::qonmap(Rspr::beamV[3 - ind], 0.0, p.x, y, 0.5);
-				break;
-			}
-		}
-
-		if (p.dep == DEP_CSE) {
-			if (Gui::aniPhase() < 1.0) {
-				Draw::qonmap(Rspr::spark[Gui::aniPhaseCombinate(4)], -0.01, p.x, p.y, 0.0);
-			}
-		}
-	}
-
-	if (STATE_KIND_SKILL(p.state)) {
-		if (p.dep == DEP_CSE) {
-			if (Gui::aniPhase() < 1.0) {
-				Sprite& spr = Rspr::sparkboom[Gui::aniPhaseCombinate(4)];
-				int x1, y1, x2, y2;
-
-				x1 = p.x - 3;
-				y1 = p.y - 3;
-				x2 = p.x + 3;
-				y2 = p.y + 3;
-
-				x1 = x1 < 0 ? 0 : x1;
-				x2 = x2 >= MAP_WIDTH ? MAP_WIDTH - 1 : x2;
-				y1 = y1 < 0 ? 0 : y1;
-				y2 = y2 >= MAP_HEIGHT ? MAP_HEIGHT - 1 : y2;
-
-				for (int i = x1; i <= x2; i++) {
-					for (int j = y1; j <= y2; j++) {
-						Draw::qonmap(spr, -0.01, i, j, 0.0);
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -531,16 +446,8 @@ void Petal::turn() {
 	if (!p.valid)
 		return;
 
-	int dx = 0;
-	int dy = 0;
-
-	switch (p.direction) {
-	case DIRECTION_RIGHT: dx = 1;  break;
-	case DIRECTION_UP:    dy = 1;  break;
-	case DIRECTION_LEFT:  dx = -1; break;
-	case DIRECTION_DOWN:  dy = -1; break;
-	default: error("Invalid direction"); break;
-	}
+	int dx = direction_to_dx(p.direction);
+	int dy = direction_to_dy(p.direction);
 
 	p.x += dx;
 	p.y += dy;
@@ -554,13 +461,8 @@ void Petal::update() {
 	if (!p.valid)
 		return;
 
-	float dx = 0.0, dy = 0.0;
-	switch (p.direction) {
-	case DIRECTION_RIGHT: dx = -1.0; break;
-	case DIRECTION_UP: dy = -1.0; break;
-	case DIRECTION_LEFT: dx = 1.0; break;
-	case DIRECTION_DOWN: dy = 1.0; break;
-	}
+	float dx = (float)direction_to_dx(p.direction);
+	float dy = (float)direction_to_dy(p.direction);
 
 	float mag = 1.0 - Spline::accandfric(Gui::aniPhase());
 	dx *= mag;

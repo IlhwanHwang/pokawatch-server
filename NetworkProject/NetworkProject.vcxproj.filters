@@ -47,9 +47,6 @@
     <ClInclude Include="shader.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
-    <ClInclude Include="utility.h">
-      <Filter>헤더 파일\게임기반</Filter>
-    </ClInclude>
     <ClInclude Include="timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -74,6 +71,12 @@
     <ClInclude Include="debug.h">
       <Filter>헤더 파일\게임기반</Filter>
     </ClInclude>
+    <ClInclude Include="effect.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="ai.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -89,9 +92,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="lodepng.cpp">
-      <Filter>소스 파일\게임기반</Filter>
-    </ClCompile>
-    <ClCompile Include="utility.cpp">
       <Filter>소스 파일\게임기반</Filter>
     </ClCompile>
     <ClCompile Include="key.cpp">
@@ -123,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="debug.cpp">
       <Filter>소스 파일\게임기반</Filter>
+    </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ai.cpp">
       <Filter>소스 파일</Filter>

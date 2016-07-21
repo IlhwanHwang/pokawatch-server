@@ -156,6 +156,7 @@
     <ClInclude Include="ai.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="draw.h" />
+    <ClInclude Include="effect.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="InitShader.h" />
@@ -170,13 +171,13 @@
     <ClInclude Include="sprite.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="unit.h" />
-    <ClInclude Include="utility.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ai.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="draw.cpp" />
+    <ClCompile Include="effect.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="InitShader.cpp" />
@@ -189,7 +190,6 @@
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="unit.cpp" />
-    <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="default_f.glsl" />

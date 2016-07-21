@@ -21,8 +21,9 @@
 // Such as animation phase, map size, and so on.
 class Gui {
 private:
-	static float animationPhase; // phase from the begin to the end of movement
-	static float animationFullPhase; // phase from the begin to the end of turn
+	static float animationPhase; // phase from the begin to the end of the movement
+	static float animationPostPhase; // phase from the end of the movement to the end of the turn
+	static float animationFullPhase; // phase from the begin to the end of the turn
 	static float animationIndpPhase; // phase independent from turn flow
 	static int imin(int a, int b) { return a > b ? b : a; }
 public:
@@ -31,9 +32,12 @@ public:
 	static void turn();
 	static void update();
 	static float aniPhase() { return animationPhase; }
+	static float aniPostPhase() { return animationPostPhase; }
 	static float aniFullPhase() { return animationFullPhase; }
 	static float aniIndpPhase() { return animationIndpPhase; }
 	static int aniPhaseCombinate(int num) { return imin((int)(animationPhase * num), num - 1); }
+	static int aniPostPhaseCombinate(int num) { return imin((int)(animationPostPhase * num), num - 1); }
 	static int aniFullPhaseCombinate(int num) { return imin((int)(animationFullPhase * num), num - 1); }
 	static int aniIndpPhaseCombinate(int num, float rate) { return (int)(animationIndpPhase * rate) % num; }
+	static bool isPost() { return animationPhase >= 1.0; }
 };

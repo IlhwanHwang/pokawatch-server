@@ -13,11 +13,16 @@ public:
 	static Sprite temp;
 	static Sprite error;
 
-	static Sprite unitCSE;
-	static Sprite unitCHEM;
-	static Sprite unitME;
-	static Sprite unitLIFE;
-	static Sprite unitPHYS;
+	static Sprite unitCSEP;
+	static Sprite unitCHEMP;
+	static Sprite unitMEP;
+	static Sprite unitLIFEP;
+	static Sprite unitPHYSP;
+	static Sprite unitCSEK;
+	static Sprite unitCHEMK;
+	static Sprite unitMEK;
+	static Sprite unitLIFEK;
+	static Sprite unitPHYSK;
 	static Sprite unitHeart;
 
 	static Sprite faceCSE;
@@ -32,7 +37,11 @@ public:
 	static Sprite poison;
 	static Sprite beamH[4];
 	static Sprite beamV[4];
-	static Sprite spark[4];
+	static Sprite attackPHYSPH[4];
+	static Sprite attackPHYSPV[4];
+	static Sprite attackPHYSKH[4];
+	static Sprite attackPHYSKV[4];
+	static Sprite attackCSE[4];
 	static Sprite sparkboom[4];
 	static Sprite mushroom;
 
@@ -55,6 +64,8 @@ public:
 	static Sprite winPostech;
 	static Sprite winKaist;
 	static Sprite winDraw;
+
+	static Sprite kill[4];
 
 	static Sprite infoMain;
 	static Sprite infoServer;
