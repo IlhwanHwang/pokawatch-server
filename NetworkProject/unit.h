@@ -50,7 +50,6 @@ private:
 	bool aniInvincible;
 	bool aniDamaged;
 	bool aniHealed;
-	bool deadBlind;
 	
 	// Members for movement animation
 	float moveOffX, moveOffY, moveOffZ;
@@ -122,26 +121,6 @@ public:
 	void setCooltime(int cooltime) { p.cooltime = cooltime; }
 	void setRespawn(int respawn) { p.respawn = respawn; }
 	void setStun(int stun) { p.stun = stun; }
-};
-
-class Flag : public Object {
-private:
-	protocol_flag p;
-
-public:
-	Flag(int x, int y) { p.team = TEAM_NULL; p.x = x; p.y = y; };
-
-	void own(protocol_team team) { p.team = team; } // change its owner
-
-	void turn();
-	void update();
-	void draw() const;
-
-	const protocol_flag* getProtocol() const { return &p; }
-
-	protocol_team getTeam() const { return p.team; }
-	int getX() const { return p.x; }
-	int getY() const { return p.y; }
 };
 
 class Poison : public Object {

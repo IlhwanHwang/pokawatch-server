@@ -17,33 +17,28 @@ Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
 
 };
-Flag Game::flagArray[FLAG_NUM_MAX] = {					//initialize of flags
-	Flag(FLAG1_X, FLAG1_Y), 
-	Flag(FLAG2_X, FLAG2_Y) , 
-	Flag(FLAG3_X, FLAG3_Y) , 
-	Flag(FLAG4_X, FLAG4_Y) , 
-	Flag(FLAG5_X, FLAG5_Y) 
-};
-
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
 Mushroom Game::mushroomArray[MUSHROOM_NUM_MAX];
 protocol_data Game::protocolToSend;
 protocol_data * Game::protocolPointer;
-int Game::score[2];
-int Game::turnleft;
-int Game::death[2];										// record how many death occured in each team
-int Game::spawn[2];										// record how many spawn occured in each team
+protocol_team Game::owner;
+int Game::own[2], Game::win[2], Game::extra, Game::elapsed;
+int Game::death[2];
+bool Game::end = false;
 
 void Game::init() // game initialization
 {
-	score[0] = 0;
-	score[1] = 0;
-	turnleft = TURN_MAX;
+	owner = TEAM_NULL;
+	own[0] = 0;
+	own[1] = 0;
+	win[0] = 0;
+	win[1] = 0;
+	extra = 0;
+	elapsed = 0;
 	death[0] = 0;
 	death[1] = 0;
-	spawn[0] = 0;
-	spawn[1] = 0;
+	end = false;
 
 	glutDisplayFunc(draw);
 
@@ -53,23 +48,19 @@ void Game::init() // game initialization
 void Game::makeProtocol() // protocol data making routine
 {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) protocolToSend.unit[i] = *(unitArray[i].getProtocol());
-	for (int i = 0; i < FLAG_NUM_MAX; i++) protocolToSend.flag[i] = *(flagArray[i].getProtocol());
 	for (int i = 0; i < POISON_NUM_MAX; i++) protocolToSend.poison[i] = *(poisonArray[i].getProtocol());
 	for (int i = 0; i < PETAL_NUM_MAX; i++) protocolToSend.petal[i] = *(petalArray[i].getProtocol());
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) protocolToSend.mushroom[i] = *(mushroomArray[i].getProtocol());
-	protocolToSend.score[0] = score[0];
-	protocolToSend.score[1] = score[1];
-	protocolToSend.turnleft = turnleft;
+	protocolToSend.elapsed= elapsed;
 
 	protocolPointer = &protocolToSend;
 }
 
 void Game::update() {	// update routine
-	if (turnleft <= 0)
+	if (end)
 		return;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].update();
-	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].update();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].update();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].update();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].update();
@@ -83,9 +74,9 @@ void Game::drawFaces() {
 		xoffset, 
 		xoffset, 
 		xoffset, 
-		ACTUAL_WINDOW_WIDTH - xoffset, 
-		ACTUAL_WINDOW_WIDTH - xoffset,
-		ACTUAL_WINDOW_WIDTH - xoffset };
+		WINDOW_WIDTH - xoffset,
+		WINDOW_WIDTH - xoffset,
+		WINDOW_WIDTH - xoffset };
 	const float y[6] = { GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128, GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128 };
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
@@ -106,47 +97,92 @@ void Game::drawFaces() {
 	}
 }
 
-void Game::draw() {		// draw routine
+void Game::drawPoint() {
+	float x = (POINT_X1 + POINT_X2) / 2.0;
+	float y = (POINT_Y1 + POINT_Y2) / 2.0;
+
+	if (owner == TEAM_NULL) {
+		Draw::onmap(Rspr::pointNorm, x, y, 0.0);
+
+		if (own[team_to_index(TEAM_POSTECH)] > 0) {
+			float alpha = (float)(own[team_to_index(TEAM_POSTECH)]) / POINT_TURN_OWN / 2.0;
+			Draw::onmapB(Rspr::pointP, x, y, 0.0, Color::white, alpha);
+		}
+		if (own[team_to_index(TEAM_KAIST)] > 0) {
+			float alpha = (float)(own[team_to_index(TEAM_KAIST)]) / POINT_TURN_OWN / 2.0;
+			Draw::onmapB(Rspr::pointK, x, y, 0.0, Color::white, alpha);
+		}
+	}
+	else {
+		Sprite& spr = owner == TEAM_POSTECH ? Rspr::pointP : Rspr::pointK;
+		Draw::onmap(spr, x, y, 0.0);
+	}
+}
+
+void Game::drawOverlay() {
+	const float flagx = WINDOW_WIDTH * 0.5;
+	const float flagy = WINDOW_HEIGHT - 96.0;
+	if (owner == TEAM_NULL) {
+		Draw::draw(Rspr::flagNull, flagx, flagy);
+	}
+	if (owner == TEAM_POSTECH) {
+		Draw::draw(Rspr::flagP[Gui::aniFullPhaseCombinate(4)], flagx, flagy);
+	}
+	if (owner == TEAM_KAIST) {
+		Draw::draw(Rspr::flagK[Gui::aniFullPhaseCombinate(4)], flagx, flagy);
+	}
+	
+	const float barw = 256.0;
+	const float barpx = flagx - 96.0;
+	const float barpy = flagy;
+	Draw::draw(Rspr::pointBarFrame, barpx - barw / 2.0, barpy);
+	Draw::drawS(Rspr::pointBarP, barpx, barpy, (float)win[team_to_index(TEAM_POSTECH)] / POINT_TURN_WIN, 1.0);
+	const float barkx = flagx + 96.0;
+	const float barky = flagy;
+	Draw::draw(Rspr::pointBarFrame, barkx + barw / 2.0, barky);
+	Draw::drawS(Rspr::pointBarK, barkx, barky, (float)win[team_to_index(TEAM_KAIST)] / POINT_TURN_WIN, 1.0);
+}
+
+void Game::draw() {
 	Draw::draw(Rspr::bg, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
 
 	for (int i = 0; i < MAP_WIDTH; i++) {
 		for (int j = 0; j < MAP_HEIGHT; j++) {
-			if (turnleft > 50) {
+			if (extra <= 0) {
 				Draw::onmapB(Rspr::tileLight, i, j, 0.0, (i + j) % 2 == 0 ? Color::white : Color::lightgray, 1.0);
 			}
 			else {
 				Draw::onmapB(Rspr::tileLight, i, j, 0.0, 
 					(i + j) % 2 == 0 ?
-						(turnleft % 2 == 0 ? Color::lightgray : Color::cyan) :
-						(turnleft % 2 == 1 ? Color::lightgray : Color::magenta),
+						(elapsed % 2 == 0 ? Color::lightgray : Color::cyan) :
+						(elapsed % 2 == 1 ? Color::lightgray : Color::magenta),
 					1.0);
 			}
 		}
 	}
 
+	drawPoint();
+
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
-	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].draw();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].draw();
 
 	Effect::draw();
-
 	Draw::flush();
 
 	// Overlay informations
 	drawFaces();
-	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::postech, 0.5);
-	Draw::number(score[0], WINDOW_WIDTH * 0.15, WINDOW_HEIGHT * 0.91);
-	Draw::drawSB(Rspr::intengrad, WINDOW_WIDTH * 0.85, WINDOW_HEIGHT * 0.91, 0.6, 0.6, Color::kaist, 0.5);
-	Draw::number(score[1], WINDOW_WIDTH * 0.85, WINDOW_HEIGHT * 0.91);
-	Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
-	Draw::bignumber(turnleft, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
 
-	if (turnleft <= 0) {
-		if (score[0] > score[1])
+	drawOverlay();
+
+	//Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
+	//Draw::bignumber(elapsed, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
+
+	if (end) {
+		if (owner == TEAM_POSTECH)
 			Draw::draw(Rspr::winPostech, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
-		else if (score[0] < score[1])
+		else if (owner == TEAM_KAIST)
 			Draw::draw(Rspr::winKaist, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
 		else
 			Draw::draw(Rspr::winDraw, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
@@ -166,7 +202,7 @@ void Game::ruleMove() // rules related to move command
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		// Priority for first team at the even turn, second team otherwise.
-		int ind = (turnleft % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
+		int ind = (elapsed % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
 		Unit& u = unitArray[ind];
 		protocol_command c = Network::getCommandEnum(ind);
 		protocol_state s = u.getState();
@@ -418,43 +454,92 @@ void Game::ruleSpawn() // rules related to spawn
 
 		if (command_kind_spawn(c) && u.getState() == STATE_DEAD)
 		{
-			int& tspawn = spawn[team_to_index(u.getTeam())];
-			tspawn++;
+			//int& tspawn = spawn[team_to_index(u.getTeam())];
+			//tspawn++;
 			u.spawn(command_to_dep(c));
-			if ((tspawn % HERO_DELAY == 0) && (tspawn != 0)) u.setHero(true);
+			//if ((tspawn % HERO_DELAY == 0) && (tspawn != 0)) u.setHero(true);
 		}
 
 	} // end of spawn
 }
 
-void Game::ruleFlag() // rules related to flag
-{
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+void Game::rulePoint() {
+	bool point[2] = { false, false };
+	
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommandEnum(i);
+		if (u.getX() >= POINT_X1 && u.getY() >= POINT_Y1 &&
+			u.getX() <= POINT_X2 && u.getY() <= POINT_Y2) {
+			point[team_to_index(u.getTeam())] = true;
+		}
+	}
 
-		if (c == COMMAND_FLAG && u.getState() == STATE_IDLE)
-		{
-			for (int j = 0; j < FLAG_NUM_MAX; j++)
-			{
-				Flag& f = flagArray[j];
-				if (u.getX() == f.getX() && u.getY() == f.getY())
-				{
-					f.own(u.getTeam());
-					break;
+	for (int i = 0; i < 2; i++) {
+		int j = i == 0 ? 1 : 0;
+
+		if (point[i] && !point[j]) {
+			if (owner == TEAM_NULL) {
+				own[j] = 0;
+				if (own[i] < POINT_TURN_OWN) {
+					// Owning the first point
+					own[i]++;
+				}
+				else {
+					// Owned the first point
+					owner = index_to_team(i);
+					Effect::push(new EffectOwn(GUI_MAP_X, GUI_MAP_Y));
+					Effect::push(new EffectOwnFlag(WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 96.0));
+				}
+			}
+			if (owner == index_to_team(j)) {
+				own[j] = 0;
+				if (own[i] < POINT_TURN_OWN) {
+					// Owning the first point
+					own[i]++;
+				}
+				else {
+					// Owned the first point
+					owner = index_to_team(i);
 				}
 			}
 		}
-	} // end of flag
+
+		if (!point[i]) {
+			if (own[i] > 0)
+				own[i]--;
+		}
+
+		if (owner == index_to_team(i)) {
+			if (win[i] < POINT_TURN_WIN) {
+				// Winning the point
+				win[i]++;
+			}
+			else {
+				if (point[j]) {
+					// Extra time
+					extra = POINT_TURN_EXTRA;
+				}
+				else {
+					if (extra > 0) {
+						// Extra time expiring
+						extra--;
+					}
+					else {
+						// Extra time expired
+						end = true;
+					}
+				}
+			}
+		}
+	}
 }
 
 void Game::turn() {
-	turnleft--;
-	if (turnleft <= 0) return;
+	if (end)
+		return;
+	elapsed++;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].turn();
-	for (int i = 0; i < FLAG_NUM_MAX; i++) flagArray[i].turn();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].turn();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].turn();
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].turn();
@@ -468,24 +553,11 @@ void Game::turn() {
 	ruleCollide();
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].flush();
 
-	ruleFlag();
-
-	score[team_to_index(TEAM_POSTECH)] = 0;
-	score[team_to_index(TEAM_KAIST)] = 0;
-	for (int i = 0; i < UNIT_NUM_MAX; i++)					// score calculating
-	{
-		Unit& u = unitArray[i];
-		protocol_team t = u.getTeam();
-		score[team_to_index(team_invert(t))] += DEATH_PENALTY * u.getDeath();
+	rulePoint();
+	
+	if (Network::getMode() == MODE_SERVER) {
+		makeProtocol();
 	}
-	for (int i = 0; i < FLAG_NUM_MAX; i++)
-	{
-		Flag& f = flagArray[i];
-		protocol_team t = f.getTeam();
-		score[team_to_index(t)] += FLAG_SCORE;
-	}
-
-	if(Network::getMode() == MODE_SERVER) makeProtocol();	// make protocol
 }
 
 void Game::regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun) {

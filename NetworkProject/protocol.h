@@ -65,12 +65,6 @@ typedef struct {
 	int invincible;
 } protocol_unit;
 
-// Flag structure
-typedef struct {
-	protocol_team team;
-	int x, y;
-} protocol_flag;
-
 // Poison, made by CHEM unit
 typedef struct {
 	bool valid;
@@ -96,7 +90,6 @@ typedef struct {
 
 #define CLIENT_NUM_MAX 2
 #define UNIT_NUM_MAX 6
-#define FLAG_NUM_MAX 5
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
 #define MUSHROOM_NUM_MAX 5
@@ -104,12 +97,13 @@ typedef struct {
 // A complete network protocol.
 typedef struct {
 	protocol_unit unit[UNIT_NUM_MAX];
-	protocol_flag flag[FLAG_NUM_MAX];
 	protocol_poison poison[POISON_NUM_MAX];
 	protocol_petal petal[PETAL_NUM_MAX];
 	protocol_mushroom mushroom[MUSHROOM_NUM_MAX];
-	int score[2];
-	int turnleft;
+	int own[2];
+	int win[2];
+	int extra;
+	int elapsed;
 } protocol_data;
 
 // Command enum
@@ -170,7 +164,7 @@ typedef struct {
 #define MODE_SERVER_KEY '9'
 #define MODE_CLIENT_KEY '8'
 
-#define MESSAGE_T0_CLIENT_SIZE sizeof(protocol_data)+1
+#define MESSAGE_T0_CLIENT_SIZE (sizeof(protocol_data)+1)
 #define MESSAGE_TO_SERVER_SIZE 16
 
 #define GAME_START_CHAR 'G'
@@ -180,18 +174,14 @@ typedef struct {
 #define TEAM_KAIST_SPAWN_X 3
 #define TEAM_KAIST_SPAWN_Y 0
 
-#define FLAG1_X 7
-#define FLAG1_Y 1
-#define FLAG2_X 7
-#define FLAG2_Y 4
-#define FLAG3_X 7
-#define FLAG3_Y 7
-#define FLAG4_X 7
-#define FLAG4_Y 10
-#define FLAG5_X 7
-#define FLAG5_Y 13
-
-#define TURN_MAX 5
+#define POINT_X1 (MAP_WIDTH / 2 - 2)
+#define POINT_Y1 (MAP_HEIGHT / 2 - 3)
+#define POINT_X2 (MAP_WIDTH / 2 + 2)
+#define POINT_Y2 (MAP_HEIGHT / 2 + 3)
+#define POINT_TURN_OWN 10
+#define POINT_TURN_WIN 30
+#define POINT_TURN_EXTRA 5
+#define TURN_MAX 300
 
 #define INVALID_POISON_INDEX -1
 #define INVALID_MUSHROOM_INDEX -1
@@ -202,9 +192,6 @@ typedef struct {
 #define POISON_LENGTH 4
 
 #define INVINCIBLE_SPAN 5
-
-#define DEATH_PENALTY 10
-#define FLAG_SCORE 50
 
 #define HERO_DELAY 5
 
@@ -218,6 +205,17 @@ inline int team_to_index(protocol_team t) {
 		return 1;
 	default:
 		return -1;
+	}
+}
+
+inline protocol_team index_to_team(int i) {
+	switch (i) {
+	case 0:
+		return TEAM_POSTECH;
+	case 1:
+		return TEAM_KAIST;
+	default:
+		return TEAM_NULL;
 	}
 }
 
@@ -350,7 +348,7 @@ inline bool command_kind_spawn(protocol_command x) {
 	return x == COMMAND_SPAWN_CSE || x == COMMAND_SPAWN_PHYS || x == COMMAND_SPAWN_LIFE || x == COMMAND_SPAWN_ME || x == COMMAND_SPAWN_CHEM;
 }
 
-// coverting commands
+// converting commands
 inline protocol_direction command_to_direction(protocol_command x) {
 	switch (x) {
 	case COMMAND_MOVE_RIGHT:

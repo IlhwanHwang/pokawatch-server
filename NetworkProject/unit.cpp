@@ -25,7 +25,6 @@ void Unit::init() {
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
 	aniInvincible = false;
-	deadBlind = false;
 }
 
 Unit::Unit(int x, int y, protocol_team team) : Unit(x, y, team, "Unnamed unit") {}
@@ -257,6 +256,9 @@ void Unit::flush() {
 	if (p.health > healthMax) {
 		p.health = healthMax;
 	}
+
+	if (p.stun > 0)
+		p.state = STATE_STUN;
 }
 
 void Unit::postturn() {
@@ -285,16 +287,13 @@ void Unit::update() {
 		moveOffZ = 0.0;
 	}
 	// End of animation by moving
-
-	if (p.state == STATE_DEAD && Gui::isPost())
-		deadBlind = true;
 }
 
 void Unit::draw() const {
 	Sprite* body = &Rspr::error;
 
 	// Nothing is drawn on map unless alive
-	if (p.state == STATE_NULL || deadBlind) {
+	if (p.state == STATE_NULL || p.state == STATE_DEAD) {
 		return;
 	}
 
@@ -324,7 +323,7 @@ void Unit::draw() const {
 	Color c = Color::white;
 
 	// Blinking effect
-	if (p.invincible > 0 || (aniDamaged && Gui::isPost())) {
+	if (p.invincible > 0 || aniDamaged) {
 		c = Gui::aniIndpPhaseCombinate(2, 0.3) == 0 ? Color::gray : Color::white;
 	}
 
@@ -337,37 +336,13 @@ void Unit::draw() const {
 	}
 
 	// Health status
-	int showHealth = Gui::isPost() ? p.health : healthPrevious;
+	int showHealth = p.health;
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
 	for (int i = 0; i < showHealth; i++) {
 		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
 	}
-}
-
-void Flag::turn() {
-
-}
-
-void Flag::update() {
-
-}
-
-void Flag::draw() const {
-	Sprite* f;
-	switch (p.team) {
-	case TEAM_NULL:
-		f = &Rspr::flagNull;
-		break;
-	case TEAM_POSTECH:
-		f = &Rspr::flagPostech;
-		break;
-	case TEAM_KAIST:
-		f = &Rspr::flagKaist;
-		break;
-	}
-	Draw::onmap(*f, (float)p.x, (float)p.y, 0.0);
 }
 
 Poison::Poison() {
