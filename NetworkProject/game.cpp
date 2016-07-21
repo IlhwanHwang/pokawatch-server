@@ -74,9 +74,9 @@ void Game::drawFaces() {
 		xoffset, 
 		xoffset, 
 		xoffset, 
-		ACTUAL_WINDOW_WIDTH - xoffset, 
-		ACTUAL_WINDOW_WIDTH - xoffset,
-		ACTUAL_WINDOW_WIDTH - xoffset };
+		WINDOW_WIDTH - xoffset,
+		WINDOW_WIDTH - xoffset,
+		WINDOW_WIDTH - xoffset };
 	const float y[6] = { GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128, GUI_MAP_Y - 128, GUI_MAP_Y, GUI_MAP_Y + 128 };
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
@@ -97,12 +97,58 @@ void Game::drawFaces() {
 	}
 }
 
-void Game::draw() {		// draw routine
+void Game::drawPoint() {
+	float x = (POINT_X1 + POINT_X2) / 2.0;
+	float y = (POINT_Y1 + POINT_Y2) / 2.0;
+
+	if (owner == TEAM_NULL) {
+		Draw::onmap(Rspr::pointNorm, x, y, 0.0);
+
+		if (own[team_to_index(TEAM_POSTECH)] > 0) {
+			float alpha = (float)(own[team_to_index(TEAM_POSTECH)]) / POINT_TURN_OWN / 2.0;
+			Draw::onmapB(Rspr::pointP, x, y, 0.0, Color::white, alpha);
+		}
+		if (own[team_to_index(TEAM_KAIST)] > 0) {
+			float alpha = (float)(own[team_to_index(TEAM_KAIST)]) / POINT_TURN_OWN / 2.0;
+			Draw::onmapB(Rspr::pointK, x, y, 0.0, Color::white, alpha);
+		}
+	}
+	else {
+		Sprite& spr = owner == TEAM_POSTECH ? Rspr::pointP : Rspr::pointK;
+		Draw::onmap(spr, x, y, 0.0);
+	}
+}
+
+void Game::drawOverlay() {
+	const float flagx = WINDOW_WIDTH * 0.5;
+	const float flagy = WINDOW_HEIGHT - 96.0;
+	if (owner == TEAM_NULL) {
+		Draw::draw(Rspr::flagNull, flagx, flagy);
+	}
+	if (owner == TEAM_POSTECH) {
+		Draw::draw(Rspr::flagP[Gui::aniFullPhaseCombinate(4)], flagx, flagy);
+	}
+	if (owner == TEAM_KAIST) {
+		Draw::draw(Rspr::flagK[Gui::aniFullPhaseCombinate(4)], flagx, flagy);
+	}
+	
+	const float barw = 256.0;
+	const float barpx = flagx - 96.0;
+	const float barpy = flagy;
+	Draw::draw(Rspr::pointBarFrame, barpx - barw / 2.0, barpy);
+	Draw::drawS(Rspr::pointBarP, barpx, barpy, (float)win[team_to_index(TEAM_POSTECH)] / POINT_TURN_WIN, 1.0);
+	const float barkx = flagx + 96.0;
+	const float barky = flagy;
+	Draw::draw(Rspr::pointBarFrame, barkx + barw / 2.0, barky);
+	Draw::drawS(Rspr::pointBarK, barkx, barky, (float)win[team_to_index(TEAM_KAIST)] / POINT_TURN_WIN, 1.0);
+}
+
+void Game::draw() {
 	Draw::draw(Rspr::bg, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
 
 	for (int i = 0; i < MAP_WIDTH; i++) {
 		for (int j = 0; j < MAP_HEIGHT; j++) {
-			if (extra <= 50) {
+			if (extra <= 0) {
 				Draw::onmapB(Rspr::tileLight, i, j, 0.0, (i + j) % 2 == 0 ? Color::white : Color::lightgray, 1.0);
 			}
 			else {
@@ -115,8 +161,7 @@ void Game::draw() {		// draw routine
 		}
 	}
 
-	Draw::onmap(Rspr::pointNorm, (POINT_X1 + POINT_X2) / 2.0, (POINT_Y1 + POINT_Y2) / 2.0, 0.0);
-	Draw::onmapB(Rspr::pointNorm, 0.0, 0.0, 0.0, Color::white, 0.0);
+	drawPoint();
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].draw();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].draw();
@@ -128,8 +173,11 @@ void Game::draw() {		// draw routine
 
 	// Overlay informations
 	drawFaces();
-	Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
-	Draw::bignumber(elapsed, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
+
+	drawOverlay();
+
+	//Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
+	//Draw::bignumber(elapsed, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
 
 	if (end) {
 		if (owner == TEAM_POSTECH)
@@ -418,8 +466,7 @@ void Game::ruleSpawn() // rules related to spawn
 void Game::rulePoint() {
 	bool point[2] = { false, false };
 	
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
 		if (u.getX() >= POINT_X1 && u.getY() >= POINT_Y1 &&
 			u.getX() <= POINT_X2 && u.getY() <= POINT_Y2) {
@@ -440,6 +487,8 @@ void Game::rulePoint() {
 				else {
 					// Owned the first point
 					owner = index_to_team(i);
+					Effect::push(new EffectOwn(GUI_MAP_X, GUI_MAP_Y));
+					Effect::push(new EffectOwnFlag(WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 96.0));
 				}
 			}
 			if (owner == index_to_team(j)) {
@@ -506,7 +555,9 @@ void Game::turn() {
 
 	rulePoint();
 	
-	if(Network::getMode() == MODE_SERVER) makeProtocol();	// make protocol
+	if (Network::getMode() == MODE_SERVER) {
+		makeProtocol();
+	}
 }
 
 void Game::regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun) {

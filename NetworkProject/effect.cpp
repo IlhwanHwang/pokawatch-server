@@ -41,20 +41,13 @@ void Effect::clear() {
 }
 
 void EffectCSEAttack::draw() const {
-	if (Gui::isPost()) {
-		Draw::qonmap(
-			Rspr::attackCSE[
-				Gui::aniPostPhaseCombinate(4)
-			], 
-			0.0, x, y, 0.0);
-	}
+	Draw::qonmap(
+		Rspr::attackCSE[(int)(phase * 4)], 
+		0.0, x, y, 0.0);
 }
 
 void EffectPHYSAttack::draw() const {
-	if (!Gui::isPost())
-		return;
-
-	int ind = Gui::aniPostPhaseCombinate(8) % 4;
+	int ind = (int)(phase * 8) % 4;
 
 	if (horizontal) {
 		Sprite& spr =
@@ -74,4 +67,16 @@ void EffectPHYSAttack::draw() const {
 			Draw::qonmap(spr, 0.0, x, dy, 0.5);
 		}
 	}
+}
+
+void EffectOwn::draw() const {
+	Draw::draw(Rspr::own[(int)(phase * 8)], x, y);
+}
+
+void EffectOwnFlag::draw() const {
+	Draw::draw(Rspr::ownFlag[(int)(phase * 8)], x, y);
+}
+
+void EffectCSEBlink::draw() const {
+	Draw::qonmapSB(Rspr::CSEBlink, -0.1, x, y, 0.0, fliped ? -1.0 : 1.0, 1.0, Color::white, 1.0 - phase);
 }

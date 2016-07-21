@@ -50,7 +50,6 @@ private:
 	bool aniInvincible;
 	bool aniDamaged;
 	bool aniHealed;
-	bool deadBlind;
 	
 	// Members for movement animation
 	float moveOffX, moveOffY, moveOffZ;

@@ -29,6 +29,8 @@ private:
 	static void ruleSpawn();									// rules related to spawn command
 	static void rulePoint();
 	static void drawFaces();
+	static void drawPoint();
+	static void drawOverlay();
 
 public:
 	static void init();											// initialize game

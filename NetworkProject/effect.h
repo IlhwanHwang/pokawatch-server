@@ -16,7 +16,7 @@ protected:
 public:
 	EffectBase(float x, float y) : x(x), y(y), phase(0.0) { };
 	virtual void draw() const = 0;
-	virtual void update() { phase += DELTA_PER_TURN; };
+	virtual void update() { phase += DELTA_ANIMATION; };
 	bool isValid() { return phase < 1.0; }
 };
 
@@ -57,5 +57,25 @@ public:
 			horizontal = true;
 		}
 	};
+	void draw() const;
+};
+
+class EffectOwn : public EffectBase {
+public:
+	EffectOwn(float x, float y) : EffectBase(x, y) {};
+	void draw() const;
+};
+
+class EffectOwnFlag : public EffectBase {
+public:
+	EffectOwnFlag(float x, float y) : EffectBase(x, y) {};
+	void draw() const;
+};
+
+class EffectCSEBlink : public EffectBase {
+protected:
+	bool fliped;
+public:
+	EffectCSEBlink(float x, float y, bool fliped) : EffectBase(x, y), fliped(fliped) {};
 	void draw() const;
 };

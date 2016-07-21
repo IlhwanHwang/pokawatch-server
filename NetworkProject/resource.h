@@ -41,6 +41,7 @@ public:
 	static Sprite attackPHYSPV[4];
 	static Sprite attackPHYSKH[4];
 	static Sprite attackPHYSKV[4];
+	static Sprite CSEBlink;
 	static Sprite attackCSE[4];
 	static Sprite sparkboom[4];
 	static Sprite mushroom;
@@ -52,8 +53,8 @@ public:
 	static Sprite tileDark;
 
 	static Sprite flagNull;
-	static Sprite flagPostech;
-	static Sprite flagKaist;
+	static Sprite flagP[4];
+	static Sprite flagK[4];
 
 	static Sprite number[10];
 	static Sprite bignumber[10];
@@ -70,6 +71,12 @@ public:
 	static Sprite pointNorm;
 	static Sprite pointP;
 	static Sprite pointK;
+	static Sprite pointBarP;
+	static Sprite pointBarK;
+	static Sprite pointBarFrame;
+
+	static Sprite own[8];
+	static Sprite ownFlag[8];
 
 	static Sprite infoMain;
 	static Sprite infoServer;
