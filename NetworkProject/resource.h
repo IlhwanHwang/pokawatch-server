@@ -13,11 +13,16 @@ public:
 	static Sprite temp;
 	static Sprite error;
 
-	static Sprite unitCSE;
-	static Sprite unitCHEM;
-	static Sprite unitME;
-	static Sprite unitLIFE;
-	static Sprite unitPHYS;
+	static Sprite unitCSEP;
+	static Sprite unitCHEMP;
+	static Sprite unitMEP;
+	static Sprite unitLIFEP;
+	static Sprite unitPHYSP;
+	static Sprite unitCSEK;
+	static Sprite unitCHEMK;
+	static Sprite unitMEK;
+	static Sprite unitLIFEK;
+	static Sprite unitPHYSK;
 	static Sprite unitHeart;
 
 	static Sprite faceCSE;

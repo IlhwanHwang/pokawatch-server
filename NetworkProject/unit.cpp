@@ -153,7 +153,6 @@ void Unit::damage(int h) {
 	}
 
 	damaged += h;
-	//p.health -= h;
 	aniDamaged = true;
 }
 
@@ -300,7 +299,24 @@ void Unit::draw() const {
 	}
 
 	// Unit body
-	body = DEP_SELECT(p.dep, &Rspr::unitCSE, &Rspr::unitPHYS, &Rspr::unitLIFE, &Rspr::unitME, &Rspr::unitCHEM);
+	if (p.team == TEAM_POSTECH) {
+		body = DEP_SELECT(
+			p.dep, 
+			&Rspr::unitCSEP, 
+			&Rspr::unitPHYSP, 
+			&Rspr::unitLIFEP, 
+			&Rspr::unitMEP, 
+			&Rspr::unitCHEMP);
+	}
+	if (p.team == TEAM_KAIST) {
+		body = DEP_SELECT(
+			p.dep,
+			&Rspr::unitCSEK,
+			&Rspr::unitPHYSK,
+			&Rspr::unitLIFEK,
+			&Rspr::unitMEK,
+			&Rspr::unitCHEMK);
+	}
 
 	const float drawx = (float)p.x + moveOffX;
 	const float drawy = (float)p.y + moveOffY;

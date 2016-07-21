@@ -74,8 +74,4 @@ void EffectPHYSAttack::draw() const {
 			Draw::qonmap(spr, 0.0, x, dy, 0.5);
 		}
 	}
-
-	std::cout << horizontal << std::endl;
-	std::cout << "x from " << x << " to " << x2 << std::endl;
-	std::cout << "y from " << y << " to " << y2 << std::endl;
 }
