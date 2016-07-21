@@ -78,7 +78,11 @@ void Network::acceptClient()
 	// give their team
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int WhatDo = send(hClntSock[i], (char *)(to_string(i+1)).c_str(), sizeof((char *)(to_string(i+1)).c_str()) - 1, 0);
+		char teamInfo[8];
+		teamInfo[0] = i + '0';
+		teamInfo[1] = '\0';
+
+		int WhatDo = send(hClntSock[i], teamInfo, sizeof(teamInfo) - 1, 0);
 	}
 }
 
@@ -183,6 +187,52 @@ void Network::getProtocolDataFromServer() // Message receving from server
 	*/
 
 }
+void swap(protocol_unit &x, protocol_unit &y)
+{
+	protocol_unit temp;
+	temp = x;
+	x = y;
+	y = temp;
+}
+
+void swap(int &x, int &y)
+{
+	int temp;
+	temp = x;
+	x = y;
+	y = temp;
+}
+
+void Network::convertProtocolData()
+{
+	protocol_data &AI_info = *((protocol_data*)messageToClient);
+
+	if (team == TEAM_KAIST)
+	{
+		for (int i = 0; i < UNIT_NUM_MAX/2; i++)
+			swap(AI_info.unit[i], AI_info.unit[i + (UNIT_NUM_MAX / 2)]);
+
+		for (int i = 0; i < UNIT_NUM_MAX; i++)
+		{
+			AI_info.unit[i].x = (MAP_WIDTH - 1) - AI_info.unit[i].x;
+
+		}
+
+	
+		//for (int i = 0; i < PETAL_NUM_MAX; i++) printf("team %d direction %d valid %d x %d y %d\n", AI_info.petal[i].team, AI_info.petal[i].direction, AI_info.petal[i].valid, AI_info.petal[i].x, AI_info.petal[i].y);
+
+		//for (int i = 0; i < POISON_NUM_MAX; i++) printf("team %d valid %d span %d x %d y %d\n", AI_info.poison[i].team, AI_info.poison[i].valid, AI_info.poison[i].span, AI_info.poison[i].x, AI_info.poison[i].y);
+
+		//for (int i = 0; i < MUSHROOM_NUM_MAX; i++) printf("team %d valid %d x %d y %d\n", AI_info.mushroom[i].team, AI_info.mushroom[i].valid, AI_info.mushroom[i].x, AI_info.mushroom[i].y);
+
+		for (int i = 0; i < TEAM_NUM_MAX; i++) printf("%d\n", AI_info.own[i]);
+
+		for (int i = 0; i < TEAM_NUM_MAX; i++) printf("%d\n", AI_info.win[i]);
+
+		printf("%d\n", AI_info.extra);
+		
+	}
+}
 
 void Network::recieveGameStart()
 {
@@ -213,23 +263,20 @@ void Network::sendToServer(char message[]) // message sending routine
 void Network::turn() // turn routine
 {
 	// in timer each turn this function is called
-	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0 ) // for client when game started 
+	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded() ) // for client when game started 
 	{
 		Network::getProtocolDataFromServer();												// get protocol data of that time
+		Network::convertProtocolData();
+		Ai::ai(*((protocol_data*)messageToClient));
 
 		char toSend[MESSAGE_TO_SERVER_SIZE];
-		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)
-		{
+		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)		
 			toSend[i] = getCommand(i) + '0';
-		}
-		
-		Network::sendToServer(toSend);														// send command
 
-		if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
-			Ai::ai(*((protocol_data*)messageToClient));
+		Network::sendToServer(toSend);														// send command
 	}
 
-	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0) // for server when game started
+	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) // for server when game started
 	{
 		char *protocolToSend;
 		protocolToSend = (char*)(Game::getProtocolPointer());
@@ -269,6 +316,8 @@ void Network::update() // frame turn routine
 
 		teamInfo[strLen] = '\0';
 		setTeam(atoi(teamInfo));
+
+		printf("team : %d", team);
 
 	}// if invalid input, we should give error message*/
 

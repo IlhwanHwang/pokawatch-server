@@ -89,6 +89,7 @@ typedef struct {
 } protocol_mushroom;
 
 #define CLIENT_NUM_MAX 2
+#define TEAM_NUM_MAX 2
 #define UNIT_NUM_MAX 6
 #define POISON_NUM_MAX 30
 #define PETAL_NUM_MAX 12
@@ -100,8 +101,8 @@ typedef struct {
 	protocol_poison poison[POISON_NUM_MAX];
 	protocol_petal petal[PETAL_NUM_MAX];
 	protocol_mushroom mushroom[MUSHROOM_NUM_MAX];
-	int own[2];
-	int win[2];
+	int own[TEAM_NUM_MAX];
+	int win[TEAM_NUM_MAX];
 	int extra;
 	int elapsed;
 } protocol_data;

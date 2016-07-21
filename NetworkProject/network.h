@@ -49,6 +49,7 @@ public:
 	static void makeClientSocket();					// Client socket making routine
 	static void connectToServer() {}					// Client connet to server 
 	static void getProtocolDataFromServer();		// Client message recieving routine
+	static void convertProtocolData();
 	static void recieveGameStart();					// Client message recieving for game start
 	static void sendToServer(char message[]);		// Client message sending routine
 	static void closeClientConnection();			// Client closing routine
@@ -68,6 +69,6 @@ public:
 	static void setCommand(int i, int x) { command[i] = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
 	static void setCharacterSelection(int i, int x) { characterSelection[i] = x; }
-	static void setTeam(int x) { team = x+1; }
+	static void setTeam(int x) { team = x; }
 	
 };
