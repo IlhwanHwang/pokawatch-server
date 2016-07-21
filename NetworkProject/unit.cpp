@@ -346,30 +346,6 @@ void Unit::draw() const {
 	}
 }
 
-void Flag::turn() {
-
-}
-
-void Flag::update() {
-
-}
-
-void Flag::draw() const {
-	Sprite* f;
-	switch (p.team) {
-	case TEAM_NULL:
-		f = &Rspr::flagNull;
-		break;
-	case TEAM_POSTECH:
-		f = &Rspr::flagPostech;
-		break;
-	case TEAM_KAIST:
-		f = &Rspr::flagKaist;
-		break;
-	}
-	Draw::onmap(*f, (float)p.x, (float)p.y, 0.0);
-}
-
 Poison::Poison() {
 	p.valid = false;
 	name = "Poison";

@@ -44,7 +44,7 @@ void Timer::turn() {
 	Gui::turn();
 	Network::turn();
 
-	if(Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0) Game::turn();
+	if(Network::getGameStart()[0] == GAME_START_CHAR && Game::isEnded()) Game::turn();
 }
 
 void Timer::update(int count) {

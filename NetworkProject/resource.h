@@ -67,6 +67,10 @@ public:
 
 	static Sprite kill[4];
 
+	static Sprite pointNorm;
+	static Sprite pointP;
+	static Sprite pointK;
+
 	static Sprite infoMain;
 	static Sprite infoServer;
 	static Sprite infoClient1;

@@ -8,24 +8,26 @@ class Game {											//EVERY THING REALTED TO GAME IS HERE
 
 private:
 	static Unit unitArray[UNIT_NUM_MAX];						// unit array
-	static Flag flagArray[FLAG_NUM_MAX];						// flag array
 	static Poison poisonArray[POISON_NUM_MAX];					// poison array
 	static Petal petalArray[PETAL_NUM_MAX];						// petal array
 	static Mushroom mushroomArray[MUSHROOM_NUM_MAX];			// mushroom array
-	static int score[2];										// score for each team *NOTE THAT ONLY TWO TEAMS are allowded
-	static int turnleft;										// how many game-turn left
+	static protocol_team owner;
+	static int own[2];
+	static int win[2];
+	static int extra;
+	static int elapsed;
 	static protocol_data protocolToSend;						// protocol data
 	static protocol_data *protocolPointer;
 	static int death[2];										// record how many death occured in each team
-	static int spawn[2];										// record how many spawn occured in each team
+
+	static bool end;
 
 	static void ruleMove();										// rules related to move command
 	static void ruleAttack();									// rules related to attack command
 	static void ruleCollide();
 	static void ruleSkill();									// rules related to skill command
 	static void ruleSpawn();									// rules related to spawn command
-	static void ruleFlag();										// rules related to flag command
-
+	static void rulePoint();
 	static void drawFaces();
 
 public:
@@ -61,7 +63,7 @@ public:
 	static int getValidPetalIndex();
 	static int getValidMushroomIndex();
 	static int getDeath(int ind) { return death[ind]; }
-	static int getTurnLeft() { return turnleft; }
-	static int getScore(int ind) { return score[ind]; }
+	static int getElapsed() { return elapsed; }
 	static void setDeath(int ind, int x) { death[ind] = x; }
+	static bool isEnded() { return end; }
 };

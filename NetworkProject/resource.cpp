@@ -60,6 +60,10 @@ Sprite Rspr::winPostech;
 Sprite Rspr::winKaist;
 Sprite Rspr::winDraw;
 
+Sprite Rspr::pointNorm;
+Sprite Rspr::pointP;
+Sprite Rspr::pointK;
+
 Sprite Rspr::infoMain;
 Sprite Rspr::infoServer;
 Sprite Rspr::infoClient1;
@@ -141,6 +145,10 @@ void Resource::postinit() {
 
 	LOAD(bg, "bg").dot();
 	LOAD(intengrad, "intengrad").dot();
+
+	LOAD(pointNorm, "point").dot();
+	LOAD(pointP, "point_p").dot();
+	LOAD(pointK, "point_k").dot();
 
 	LOAD(winPostech, "win_postech").dot();
 	LOAD(winKaist, "win_kaist").dot();
