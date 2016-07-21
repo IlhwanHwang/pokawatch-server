@@ -25,6 +25,7 @@ protocol_data * Game::protocolPointer;
 protocol_team Game::owner;
 int Game::own[2], Game::win[2], Game::extra, Game::elapsed;
 int Game::death[2];
+int Game::order[UNIT_NUM_MAX];
 bool Game::end = false;
 
 void Game::init() // game initialization
@@ -52,6 +53,12 @@ void Game::makeProtocol() // protocol data making routine
 	for (int i = 0; i < PETAL_NUM_MAX; i++) protocolToSend.petal[i] = *(petalArray[i].getProtocol());
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) protocolToSend.mushroom[i] = *(mushroomArray[i].getProtocol());
 	protocolToSend.elapsed= elapsed;
+	protocolToSend.owner = owner;
+	protocolToSend.own[0] = own[0];
+	protocolToSend.own[1] = own[1];
+	protocolToSend.win[0] = win[0];
+	protocolToSend.win[1] = win[1];
+	protocolToSend.extra = extra;
 
 	protocolPointer = &protocolToSend;
 }
@@ -195,23 +202,29 @@ void Game::release() {
 	Draw::setsize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
 }
 
+void Game::rulePriority() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		// Priority for first team at the even turn, second team otherwise.
+		order[i] = (elapsed % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
+	}
+}
+
 void Game::ruleMove() // rules related to move command
 {
 	std::vector<int> movable;
 	std::vector<int> alive;
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		// Priority for first team at the even turn, second team otherwise.
-		int ind = (elapsed % 2 == 0) ? i : (i + UNIT_NUM_MAX / 2) % UNIT_NUM_MAX;
-		Unit& u = unitArray[ind];
-		protocol_command c = Network::getCommand(ind);
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
+		Unit& u = unitArray[i];
+		protocol_command c = Network::getCommand(i);
 		protocol_state s = u.getState();
 
 		if (s != STATE_NULL && s != STATE_DEAD) {
-			alive.push_back(ind);
+			alive.push_back(i);
 
 			if (command_kind_move(c)) {
-				movable.push_back(ind);
+				movable.push_back(i);
 			}
 		}
 	}
@@ -286,8 +299,7 @@ void Game::ruleAttack() // rules related to attack
 	 * CHEM	: Spread chemicals
 	 */
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 		if (command_kind_attack(c)) {
@@ -296,26 +308,51 @@ void Game::ruleAttack() // rules related to attack
 		}
 	}
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
 		Unit& u = unitArray[i];
 
-		if (!state_kind_attack(u.getState()) && u.getDep() != DEP_ME)
+		if (!state_kind_attack(u.getState()) && u.getDep() != DEP_ME && u.getDep() != DEP_CSE)
 			continue;
 
-		protocol_direction d = state_to_direction(u.getState());
-		protocol_team t = u.getTeam();
-		int x = u.getX();
-		int y = u.getY();
-		int dx = direction_to_dx(d);
-		int dy = direction_to_dy(d);
+		const protocol_direction d = state_to_direction(u.getState());
+		const protocol_team t = u.getTeam();
+		const int x = u.getX();
+		const int y = u.getY();
+		const int dx = direction_to_dx(d);
+		const int dy = direction_to_dy(d);
 
 		if (u.getDep() == DEP_CSE) {
-			regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, 3);
-			Effect::push(new EffectCSEAttack(t, (float)x, (float)y));
+			if (state_kind_attack(u.getState())) {
+				bool empty = true;
+				const int jump = CSE_BLINK_LENGTH;
+				const int jx = clamp(x + dx * jump, 0, MAP_WIDTH - 1);
+				const int jy = clamp(y + dy * jump, 0, MAP_HEIGHT - 1);
+
+				for (int j = 0; j < UNIT_NUM_MAX; j++) {
+					if (i == j)
+						continue;
+
+					Unit& other = unitArray[j];
+					if (other.getX() == x + dx * jump && other.getY() == y + dy * jump) {
+						empty = false;
+						break;
+					}
+				}
+
+				if (empty) {
+					Effect::push(new EffectCSEBlink((float)x, (float)y, u.getFliped()));
+					u.setPosition(jx, jy);
+				}
+			}
+
+			if (elapsed % CSE_SPARK_COOLTIME == 0) {
+				regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, CSE_SPARK_STUN);
+				Effect::push(new EffectCSEAttack(t, (float)x, (float)y));
+			}
 		}
 		else if (u.getDep() == DEP_PHYS) {
-			regionDamage(team_invert(t), x, y, x + dx * MAP_WIDTH, y + dy * MAP_HEIGHT, 1);
+			regionDamage(team_invert(t), x, y, x + dx * MAP_WIDTH, y + dy * MAP_HEIGHT, PHYS_WAVE_DAMAGE);
 			Effect::push(
 				new EffectPHYSAttack(
 					t, 
@@ -330,10 +367,10 @@ void Game::ruleAttack() // rules related to attack
 			petalArray[indexForValidPetal].spawn(t, x + dx, y + dy, d);
 		}
 		else if (u.getDep() == DEP_ME) {
-			regionDamage(team_invert(t), x - 1, y - 1, x + 1, y + 1, 1);
+			regionDamage(team_invert(t), x - 1, y - 1, x + 1, y + 1, ME_THORN_DAMAGE);
 		}
 		else if (u.getDep() == DEP_CHEM) {
-			for (int p = 1; p <= POISON_LENGTH; p++)
+			for (int p = 1; p <= CHEM_POISON_LENGTH; p++)
 			{
 				int indexForValidPoison = getValidPoisonIndex();
 				poisonArray[indexForValidPoison].spawn(t, x + dx * p, y + dy * p);
@@ -343,8 +380,8 @@ void Game::ruleAttack() // rules related to attack
 }
 
 void Game::ruleCollide() {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
 		Unit& u = unitArray[i];
 
 		if (!u.isAlive())
@@ -354,36 +391,33 @@ void Game::ruleCollide() {
 		int y = u.getY();
 		protocol_team t = u.getTeam();
 
-		for (int j = 0; j < PETAL_NUM_MAX; j++) // Petals
-		{
+		for (int j = 0; j < PETAL_NUM_MAX; j++) {
 			Petal& p = petalArray[j];
 			if (p.isValid() && x == p.getX() && y == p.getY())
 			{
 				if (p.getTeam() == t) {
-					u.heal(1);
+					u.heal(LIFE_PETAL_HEAL);
 				}
 				else {
-					u.damage(1);
+					u.damage(LIFE_PETAL_DAMAGE);
 				}
 				p.invalidate();
 			}
 		}
 
-		for (int j = 0; j < POISON_NUM_MAX; j++) // Poisons
-		{
+		for (int j = 0; j < POISON_NUM_MAX; j++) {
 			Poison& p = poisonArray[j];
 			if (p.isValid() && t != p.getTeam() && x == p.getX() && y == p.getY())
 			{
-				u.damage(1);
+				u.damage(CHEM_POISON_DAMAGE);
 			}
 		}
 
-		for (int j = 0; j < MUSHROOM_NUM_MAX; j++) // Mushrooms
-		{
+		for (int j = 0; j < MUSHROOM_NUM_MAX; j++) {
 			Mushroom& m = mushroomArray[j];
 			if (m.isValid() && t != m.getTeam() && x == m.getX() && y == m.getY())
 			{
-				u.damage(1);
+				u.damage(CHEM_MUSHROOM_DAMAGE);
 				m.invalidate();
 			}
 		}
@@ -402,8 +436,7 @@ void Game::ruleSkill() // rules related to skill
 	* CHEM	: Spawn a mushroom
 	*/
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 		if (command_kind_skill(c)) {
@@ -412,8 +445,8 @@ void Game::ruleSkill() // rules related to skill
 		}
 	}
 
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
 		Unit& u = unitArray[i];
 		
 		if (!state_kind_skill(u.getState()))
@@ -447,8 +480,8 @@ void Game::ruleSkill() // rules related to skill
 
 void Game::ruleSpawn() // rules related to spawn
 {
-	for (int i = 0; i < UNIT_NUM_MAX; i++)
-	{
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
 		Unit& u = unitArray[i];
 		protocol_command c = Network::getCommand(i);
 
@@ -466,7 +499,8 @@ void Game::ruleSpawn() // rules related to spawn
 void Game::rulePoint() {
 	bool point[2] = { false, false };
 	
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+	for (int k = 0; k < UNIT_NUM_MAX; k++) {
+		const int i = order[k];
 		Unit& u = unitArray[i];
 		if (u.getX() >= POINT_X1 && u.getY() >= POINT_Y1 &&
 			u.getX() <= POINT_X2 && u.getY() <= POINT_Y2) {
@@ -545,6 +579,7 @@ void Game::turn() {
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) mushroomArray[i].turn();
 
 	// things are done by rules
+	rulePriority();
 	ruleMove();
 	ruleSpawn();
 

@@ -135,7 +135,7 @@ void Resource::postinit() {
 	MULTILOAD(buf, attackPHYSKH, 4, "attack_phys_k_h_%d");
 	MULTILOAD(buf, attackPHYSKV, 4, "attack_phys_k_v_%d");
 	MULTILOAD(buf, stun, 4, "stun%d");
-	LOAD(CSEBlink, "blink_cse").dot();
+	LOAD(CSEBlink, "blink_cse").dot().setOffset(20.0, 74.0);
 	MULTILOAD(buf, attackCSE, 4, "attack_cse_%d");
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
 	LOAD(mushroom, "mushroom").dot();

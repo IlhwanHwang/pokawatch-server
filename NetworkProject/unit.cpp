@@ -107,7 +107,14 @@ void Unit::attack(protocol_direction direction) {
 
 	p.state = direction_to_attackstate(direction);
 	flip(direction);
-	p.cooltime = DEP_SELECT(p.dep, 6, 0, 10, 0, 4);
+	p.cooltime = DEP_SELECT(
+		p.dep, 
+		CSE_BLINK_COOLTIME, 
+		PHYS_WAVE_COOLTIME,
+		LIFE_PETAL_COOLTIME,
+		0, 
+		CHEM_POISON_COOLTIME
+	);
 }
 
 void Unit::skill(protocol_direction direction) {
@@ -178,7 +185,7 @@ void Unit::stun(int s) {
 	if (p.state == STATE_NULL)
 		return;	
 
-	p.stun += s;
+	p.stun = p.stun > s ? p.stun : s;
 }
 
 void Unit::kill() {
@@ -364,7 +371,7 @@ void Poison::spawn(protocol_team team, int x, int y) {
 	p.team = team;
 	p.x = x;
 	p.y = y;
-	p.span = 4;
+	p.span = CHEM_POISON_SPAN;
 	p.valid = true;
 }
 

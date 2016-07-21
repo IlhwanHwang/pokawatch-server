@@ -19,9 +19,11 @@ private:
 	static protocol_data protocolToSend;						// protocol data
 	static protocol_data *protocolPointer;
 	static int death[2];										// record how many death occured in each team
+	static int order[UNIT_NUM_MAX];
 
 	static bool end;
 
+	static void rulePriority();
 	static void ruleMove();										// rules related to move command
 	static void ruleAttack();									// rules related to attack command
 	static void ruleCollide();
