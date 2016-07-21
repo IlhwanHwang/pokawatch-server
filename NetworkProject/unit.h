@@ -111,6 +111,7 @@ public:
 	int getDeath() const { return death; }
 	int getOrgX() const { return orgx; }
 	int getOrgY() const { return orgy; }
+	bool getFliped() const { return animationFlip; }
 
 	// bypassing all constraints and animations.
 	// just use it for very exceptional cases.

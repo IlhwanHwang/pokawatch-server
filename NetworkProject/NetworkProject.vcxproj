@@ -171,6 +171,7 @@
     <ClInclude Include="sprite.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="unit.h" />
+    <ClInclude Include="utility.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>

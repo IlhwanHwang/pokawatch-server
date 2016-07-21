@@ -3,7 +3,8 @@
 // protocol definition
 //
 
-#pragma once
+#ifndef PROTOCOL
+#define PROTOCOL
 
 // Protocol definitions. determine which information is contained on network communication.
 // Especially, protocol structure is seen by remote AI program.
@@ -101,6 +102,7 @@ typedef struct {
 	protocol_poison poison[POISON_NUM_MAX];
 	protocol_petal petal[PETAL_NUM_MAX];
 	protocol_mushroom mushroom[MUSHROOM_NUM_MAX];
+	protocol_team owner;
 	int own[TEAM_NUM_MAX];
 	int win[TEAM_NUM_MAX];
 	int extra;
@@ -188,13 +190,32 @@ typedef struct {
 #define INVALID_MUSHROOM_INDEX -1
 #define INVALID_PETAL_INDEX -1
 
-#define BLACKHOLE_DAMAGE 10
-#define ACCIDENT_DAMAGE 10
-#define POISON_LENGTH 4
+#define CSE_BLINK_LENGTH 4
+#define CSE_BLINK_COOLTIME 10
+#define CSE_SPARK_STUN 3
+#define CSE_SPARK_COOLTIME 10
+
+#define PHYS_WAVE_DAMAGE 1
+#define PHYS_WAVE_COOLTIME 4
+#define PHYS_BLACKHOLE_SPAN 3
+#define PHYS_BLACKHOLE_DAMAGE 10
+
+#define LIFE_PETAL_DAMAGE 1
+#define LIFE_PETAL_HEAL 1
+#define LIFE_PETAL_COOLTIME 8
+
+#define ME_THORN_DAMAGE 1
+#define ME_ACCIDENT_DAMAGE 10
+
+#define CHEM_POISON_LENGTH 4
+#define CHEM_POISON_DAMAGE 1
+#define CHEM_POISON_SPAN 4
+#define CHEM_POISON_COOLTIME 6
+#define CHEM_MUSHROOM_DAMAGE 10
 
 #define INVINCIBLE_SPAN 5
 
-#define HERO_DELAY 5
+#define HERO_PERIOD 5
 
 #define ARBITRARY_BIG_NUM 999
 
@@ -450,7 +471,6 @@ inline protocol_direction direction_flip(protocol_direction d) {
 	}
 }
 
-
 inline protocol_direction direction_mirror(protocol_direction d) {
 	switch (d) {
 	case DIRECTION_RIGHT:
@@ -484,9 +504,76 @@ inline protocol_command dep_to_spawncommand(protocol_dep dep) {
 	}
 }
 
+static inline int mirror_x(int x) {
+	return MAP_WIDTH - x - 1;
+}
+
+inline protocol_unit mirror_unit(protocol_unit u) {
+	u.team = team_invert(u.team);
+	if (state_kind_attack(u.state))
+		u.state = direction_to_attackstate(direction_mirror(state_to_direction(u.state)));
+	if (state_kind_skill(u.state))
+		u.state = direction_to_skillstate(direction_mirror(state_to_direction(u.state)));
+	u.x = mirror_x(u.x);
+	return u;
+}
+
+inline protocol_petal mirror_petal(protocol_petal p) {
+	p.team = team_invert(p.team);
+	p.direction = direction_mirror(p.direction);
+	p.x = mirror_x(p.x);
+	return p;
+}
+
+inline protocol_mushroom mirror_mushroom(protocol_mushroom m) {
+	m.team = team_invert(m.team);
+	m.x = mirror_x(m.x);
+	return m;
+}
+
+inline protocol_poison mirror_poison(protocol_poison p) {
+	p.team = team_invert(p.team);
+	p.x = mirror_x(p.x);
+	return p;
+}
+
+inline static void swap(int& x, int& y) {
+	int t = x;
+	x = y;
+	y = t;
+}
+
+inline static void swap(protocol_unit& x, protocol_unit& y) {
+	protocol_unit t = x;
+	x = y;
+	y = t;
+}
+
+inline protocol_data mirror_data(protocol_data d) {
+	d.owner = team_invert(d.owner);
+	swap(d.own[0], d.own[1]);
+	swap(d.win[0], d.win[1]);
+	
+	for (int i = 0; i < UNIT_NUM_MAX; i++)
+		d.unit[i] = mirror_unit(d.unit[i]);
+	for (int i = 0; i < UNIT_NUM_MAX / 2; i++) {
+		swap(d.unit[i], d.unit[i + UNIT_NUM_MAX / 2]);
+	}
+	for (int i = 0; i < PETAL_NUM_MAX; i++)
+		d.petal[i] = mirror_petal(d.petal[i]);
+	for (int i = 0; i < POISON_NUM_MAX; i++)
+		d.poison[i] = mirror_poison(d.poison[i]);
+	for (int i = 0; i < MUSHROOM_NUM_MAX; i++)
+		d.mushroom[i] = mirror_mushroom(d.mushroom[i]);
+
+	return d;
+}
+
 #define DEP_SELECT(dep, s1, s2, s3, s4, s5) \
 	((dep) == DEP_CSE ? (s1) : \
 	((dep) == DEP_PHYS ? (s2) : \
 	((dep) == DEP_LIFE ? (s3) : \
 	((dep) == DEP_ME ? (s4) : (s5) \
 	))))
+
+#endif
