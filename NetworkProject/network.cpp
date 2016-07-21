@@ -161,7 +161,10 @@ void Network::getProtocolDataFromServer() // Message receving from server
 	* every AI should make decision based on this protocol data */
 
 	// for checking recieving data appropriately protocol data is printed
+
 	protocol_data *newData = (protocol_data*)messageToClient;
+
+	/*
 	printf("UNIT INFO\n");
 	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d\nhero : %d cooltime : %d respawn : %d stun : %d\n", newData->unit[i].team, newData->unit[i].dep, newData->unit[i].x, newData->unit[i].y, newData->unit[i].state, newData->unit[i].health, newData->unit[i].hero, newData->unit[i].cooltime, newData->unit[i].respawn, newData->unit[i].stun);
 	printf("FLAG INFO\n");
@@ -177,6 +180,8 @@ void Network::getProtocolDataFromServer() // Message receving from server
 	printf("TURN LEFT\n");
 	printf("%d\n", newData->turnleft);
 	printf("\n");
+	*/
+
 }
 
 void Network::recieveGameStart()
@@ -208,40 +213,43 @@ void Network::sendToServer(char message[]) // message sending routine
 void Network::turn() // turn routine
 {
 	// in timer each turn this function is called
-	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // for client when game started 
+	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0 ) // for client when game started 
 	{
-		char toSend[MESSAGE_TO_SERVER_SIZE];
+		Network::getProtocolDataFromServer();												// get protocol data of that time
 
+		char toSend[MESSAGE_TO_SERVER_SIZE];
 		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)
 		{
 			toSend[i] = getCommand(i) + '0';
 		}
+		
 		Network::sendToServer(toSend);														// send command
-		Network::getProtocolDataFromServer();												// get protocol data of that time
+
+		if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
+			Ai::ai(*((protocol_data*)messageToClient));
 	}
-	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR) // for server when game started
+
+	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR && Game::getTurnLeft() > 0) // for server when game started
 	{
 		char *protocolToSend;
+		protocolToSend = (char*)(Game::getProtocolPointer());
+		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
+		Network::sendToClient(protocolToSend);												// send protocol data to client
+
+
 		//Network::recieveFromClient();		// recieve command from clients;		
 		
 		for (int i = 0; i < CLIENT_NUM_MAX; i++)
 		{
 			int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
 			messageFromClient[i][strLen] = '\0';
-			cout << "내가 받은 것은 이거지" << i << "번쨰 client는" << messageFromClient[i] << endl;
-			cout << "0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
+			cout << i<<"번째 client 0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
 		}
-
-
-		protocolToSend = (char*)(Game::getProtocolPointer());
-		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
-		Network::sendToClient(protocolToSend);												// send protocol data to client
 	}
 }
 
 void Network::update() // frame turn routine
 {
-	
 	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
 	{
 		Network::setMode(MODE_CLIENT);														// set as client 
@@ -262,9 +270,7 @@ void Network::update() // frame turn routine
 		teamInfo[strLen] = '\0';
 		setTeam(atoi(teamInfo));
 
-	}// if invalid input, we should give error message
-
-
+	}// if invalid input, we should give error message*/
 
 	/*if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
 	{
@@ -296,8 +302,8 @@ void Network::update() // frame turn routine
 		Game::release();
 		sendToClient(gameStartMessage);
 		setGameStart(0, GAME_START_CHAR);
-	}*/
 
+	}//*/
 
 	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character
 	{
@@ -308,7 +314,6 @@ void Network::update() // frame turn routine
 			char characterInfo[((UNIT_NUM_MAX) / 2) + 1];
 			for(int i=0; i<(UNIT_NUM_MAX)/2; i++)
 			{
-				//strcpy(characterInfo+i*MESSAGE_TO_SERVER_SIZE, (char *)(to_string(Network::getCharacterSelection(i))).c_str());
 				characterInfo[i] =  Network::getCharacterSelection(i) + '0';
 			}
 
@@ -319,10 +324,5 @@ void Network::update() // frame turn routine
 			printf("GameStart!");
 		}
 
-//		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection() > 0 && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
-		if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR) // after game started by keyboard control send appropriate command
-		{
-			Ai::ai();
-		}
 	}
 }

@@ -35,6 +35,7 @@ public:
 		gameStart[0] = 'N';
 		gameStart[1] = '0' + TEAM_NULL;
 		gameStart[2] = '\0';
+
 		serverIpArg = argv;
 	}
 	static void ErrorHandling(char *message);		// Error handling

@@ -191,7 +191,7 @@ typedef struct {
 #define FLAG5_X 7
 #define FLAG5_Y 13
 
-#define TURN_MAX 300
+#define TURN_MAX 5
 
 #define INVALID_POISON_INDEX -1
 #define INVALID_MUSHROOM_INDEX -1
@@ -450,6 +450,23 @@ inline protocol_direction direction_flip(protocol_direction d) {
 		return DIRECTION_NULL;
 	}
 }
+
+
+inline protocol_direction direction_mirror(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT:
+		return DIRECTION_LEFT;
+	case DIRECTION_UP:
+		return DIRECTION_UP;
+	case DIRECTION_LEFT:
+		return DIRECTION_RIGHT;
+	case DIRECTION_DOWN:
+		return DIRECTION_DOWN;
+	default:
+		return DIRECTION_NULL;
+	}
+}
+
 
 inline protocol_command dep_to_spawncommand(protocol_dep dep) {
 	switch (dep) {

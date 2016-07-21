@@ -188,7 +188,7 @@ void Game::ruleMove() // rules related to move command
 		for (int i = 0; i < movable.size(); i++) {
 			int ind = movable[i];
 			Unit& u = unitArray[ind];
-			protocol_command c = Network::getCommand(ind);
+			protocol_command c = Network::getCommandEnum(ind);
 			protocol_direction d = command_to_direction(c);
 			bool moved = u.move(d);
 			bool duplicated = false;
@@ -253,7 +253,7 @@ void Game::ruleAttack() // rules related to attack
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		if (command_kind_attack(c)) {
 			protocol_direction d = command_to_direction(c);
 			u.attack(d);
@@ -369,7 +369,7 @@ void Game::ruleSkill() // rules related to skill
 	for (int i = 0; i < UNIT_NUM_MAX; i++)
 	{
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		if (command_kind_skill(c)) {
 			protocol_direction d = command_to_direction(c);
 			u.skill(d);

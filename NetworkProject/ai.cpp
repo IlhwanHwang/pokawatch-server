@@ -23,34 +23,49 @@ void Ai::aiInit(void)
 }
 
 
-void Ai::ai(void)
+void Ai::ai(protocol_data AI_info)
 {
+	if (AI_info.turnleft == 5) { move(0, DIRECTION_RIGHT), printf("55555555555555\n"); }
+	else { move(1, DIRECTION_LEFT), move(0, DIRECTION_NULL);}
+
+	/*
 	switch (rand() % 3)
 	{
 	case 0:
-		attack(0, rand() % 4);
-		move(1, rand() % 4);
-		attack(2, rand() % 4);
-
+		attack(0, (protocol_direction)(rand() % 4+1));
+		move(1, (protocol_direction)(rand() % 4 + 1));
+		attack(2, (protocol_direction)(rand() % 4 + 1));
 		break;
 
 	case 1:
-		move(0, rand() % 4);
-		attack(1, rand() % 4);
-		attack(2, rand() % 4);
-
+		move(0, (protocol_direction)(rand() % 4 + 1));
+		attack(1, (protocol_direction)(rand() % 4 + 1));
+		attack(2, (protocol_direction)(rand() % 4 + 1));
 		break;
 
 	case 2:
-		attack(0, rand() % 4);
-		attack(1, rand() % 4);
-		move(2, rand() % 4);
-
+		attack(0, (protocol_direction)(rand() % 4 + 1));
+		attack(1, (protocol_direction)(rand() % 4 + 1));
+		move(2, (protocol_direction)(rand() % 4 + 1));
 		break;
-
 	}
+	*/
 
-
+	printf("UNIT INFO\n");
+	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d\nhero : %d cooltime : %d respawn : %d stun : %d\n", AI_info.unit[i].team, AI_info.unit[i].dep, AI_info.unit[i].x, AI_info.unit[i].y, AI_info.unit[i].state, AI_info.unit[i].health, AI_info.unit[i].hero, AI_info.unit[i].cooltime, AI_info.unit[i].respawn, AI_info.unit[i].stun);
+	printf("FLAG INFO\n");
+	//for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", AI_info.flag[i].team, AI_info.flag[i].x, AI_info.flag[i].y);
+	printf("PETAL INFO\n");
+	//for (int i = 0; i < PETAL_NUM_MAX; i++) printf("team %d direction %d valid %d x %d y %d\n", AI_info.petal[i].team, AI_info.petal[i].direction, AI_info.petal[i].valid, AI_info.petal[i].x, AI_info.petal[i].y);
+	printf("POISON INFO\n");
+	//for (int i = 0; i < POISON_NUM_MAX; i++) printf("team %d valid %d span %d x %d y %d\n", AI_info.poison[i].team, AI_info.poison[i].valid, AI_info.poison[i].span, AI_info.poison[i].x, AI_info.poison[i].y);
+	printf("MUSHROOM INFO\n");
+	//for (int i = 0; i < MUSHROOM_NUM_MAX; i++) printf("team %d valid %d x %d y %d\n", AI_info.mushroom[i].team, AI_info.mushroom[i].valid, AI_info.mushroom[i].x, AI_info.mushroom[i].y);
+	printf("SCORE\n");
+	printf("[POSTECH] %d [KAIST] %d\n", AI_info.score[TEAM_POSTECH - 1], AI_info.score[TEAM_KAIST - 1]);
+	printf("TURN LEFT\n");
+	printf("%d\n", AI_info.turnleft);
+	printf("\n");
 }
 
 void Ai::CharacterInit(int i, int x)
@@ -58,68 +73,35 @@ void Ai::CharacterInit(int i, int x)
 	Network::setCharacterSelection(i,(protocol_dep)x);
 }
 
-void Ai::move(int i, int x)
+void Ai::move(int i, protocol_direction x)
 {
 	if (Network::getTeam() == TEAM_POSTECH)
-	{
-		if(x == 0)	   Network::setCommand(i, COMMAND_MOVE_RIGHT);
-		else if (x == 1) Network::setCommand(i, COMMAND_MOVE_LEFT);
-		else if (x == 2) Network::setCommand(i, COMMAND_MOVE_UP);
-		else if (x == 3) Network::setCommand(i, COMMAND_MOVE_DOWN);
-	}
+		Network::setCommand(i, direction_to_movecommand(x));
 	else
-	{
-		if (x == 0)	   Network::setCommand(i, COMMAND_MOVE_LEFT);
-		else if (x == 1) Network::setCommand(i, COMMAND_MOVE_RIGHT);
-		else if (x == 2) Network::setCommand(i, COMMAND_MOVE_UP);
-		else if (x == 3) Network::setCommand(i, COMMAND_MOVE_DOWN);
-	}
+		Network::setCommand(i, direction_to_movecommand(direction_mirror(x)));
 }
 
-void Ai::attack(int i, int x)
+void Ai::attack(int i, protocol_direction x)
 {
 	if (Network::getTeam() == TEAM_POSTECH)
-	{
-		if (x == 0)	   Network::setCommand(i, COMMAND_ATTACK_RIGHT);
-		else if (x == 1) Network::setCommand(i, COMMAND_ATTACK_LEFT);
-		else if (x == 2) Network::setCommand(i, COMMAND_ATTACK_UP);
-		else if (x == 3) Network::setCommand(i, COMMAND_ATTACK_DOWN);
-	}
+		Network::setCommand(i, direction_to_attackcommand(x));
 	else
-	{
-		if (x == 0)	   Network::setCommand(i , COMMAND_ATTACK_LEFT);
-		else if (x == 1) Network::setCommand(i , COMMAND_ATTACK_RIGHT);
-		else if (x == 2) Network::setCommand(i , COMMAND_ATTACK_UP);
-		else if (x == 3) Network::setCommand(i , COMMAND_ATTACK_DOWN);
-	}
+		Network::setCommand(i, direction_to_attackcommand(direction_mirror(x)));
 }
 
-void Ai::skill(int i, char x)
+void Ai::skill(int i, protocol_direction x)
 {
 	if (Network::getTeam() == TEAM_POSTECH)
-	{
-		if (x == 'r')	   Network::setCommand(i, COMMAND_SKILL_RIGHT);
-		else if (x == 'l') Network::setCommand(i, COMMAND_SKILL_LEFT);
-		else if (x == 'u') Network::setCommand(i, COMMAND_SKILL_UP);
-		else if (x == 'd') Network::setCommand(i, COMMAND_SKILL_DOWN);
-	}
+		Network::setCommand(i, direction_to_skillcommand(x));
 	else
-	{
-		if (x == 'r')	   Network::setCommand(i , COMMAND_SKILL_LEFT);
-		else if (x == 'l') Network::setCommand(i , COMMAND_SKILL_RIGHT);
-		else if (x == 'u') Network::setCommand(i , COMMAND_SKILL_UP);
-		else if (x == 'd') Network::setCommand(i , COMMAND_SKILL_DOWN);
-	}
+		Network::setCommand(i, direction_to_skillcommand(direction_mirror(x)));
 }
 
 void Ai::flag(int i)
 {
 	if (Network::getTeam() == TEAM_POSTECH)
-	{
 		Network::setCommand(i, COMMAND_FLAG);
-	}
 	else
-	{
 		Network::setCommand(i + (UNIT_NUM_MAX) / 2, COMMAND_FLAG);
-	}
 }
+
