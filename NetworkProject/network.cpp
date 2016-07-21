@@ -263,7 +263,7 @@ void Network::update() // frame turn routine
 		{
 			if (Game::getUnit(i).getTeam() == TEAM_POSTECH)
 			{
-				Game::getUnit(i).spawn(DEP_CSE);
+				Game::getUnit(i).spawn(DEP_ME);
 				//Game::getUnit(i).spawn((protocol_dep)(atoi(messageFromClient[i])));
 			}
 			else if ((Game::getUnit(i).getTeam() == TEAM_KAIST))

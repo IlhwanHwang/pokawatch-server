@@ -8,6 +8,7 @@
 #include "resource.h"
 #include "draw.h"
 #include <cmath>
+#include "utility.h"
 
 std::vector<EffectBase*> Effect::pool;
 
@@ -43,7 +44,19 @@ void Effect::clear() {
 void EffectCSEAttack::draw() const {
 	Draw::qonmap(
 		Rspr::attackCSE[(int)(phase * 4)], 
-		0.0, x, y, 0.0);
+		-0.1, x, y, 0.0);
+}
+
+void EffectMEAccidentH::draw() const {
+	Draw::qonmapSB(
+		team == TEAM_POSTECH ? Rspr::MEAccidentPH : Rspr::MEAccidentKH,
+		-0.6, x, y, 0.5, scale, 1.0, Color::white, 1.0 - phase);
+}
+
+void EffectMEAccidentV::draw() const {
+	Draw::qonmapSB(
+		team == TEAM_POSTECH ? Rspr::MEAccidentPV : Rspr::MEAccidentKV,
+		-0.6, x, y, 0.5, 1.0, scale, Color::white, 1.0 - phase);
 }
 
 void EffectPHYSAttack::draw() const {

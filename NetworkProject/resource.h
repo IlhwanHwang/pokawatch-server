@@ -42,6 +42,10 @@ public:
 	static Sprite attackPHYSKH[4];
 	static Sprite attackPHYSKV[4];
 	static Sprite CSEBlink;
+	static Sprite MEAccidentPH;
+	static Sprite MEAccidentPV;
+	static Sprite MEAccidentKH;
+	static Sprite MEAccidentKV;
 	static Sprite attackCSE[4];
 	static Sprite sparkboom[4];
 	static Sprite mushroom;

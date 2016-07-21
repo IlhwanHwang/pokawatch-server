@@ -18,18 +18,22 @@ private:
 	static int elapsed;
 	static protocol_data protocolToSend;						// protocol data
 	static protocol_data *protocolPointer;
-	static int death[2];										// record how many death occured in each team
+	static int death[2];
 	static int order[UNIT_NUM_MAX];
 
 	static bool end;
 
-	static void rulePriority();
-	static void ruleMove();										// rules related to move command
-	static void ruleAttack();									// rules related to attack command
-	static void ruleCollide();
-	static void ruleSkill();									// rules related to skill command
-	static void ruleSpawn();									// rules related to spawn command
-	static void rulePoint();
+	static void rulePriority();	// Setting priority between unit. Even-odd round robin.
+	static void ruleCommand();	// Send commands on units
+	static void ruleMove();		// Move units, including moving attacks or skills.
+	static void ruleAttack();	// Attack.
+	static void ruleCollide();	// Check collision with projectiles.
+	static void ruleSkill();	// Cast skills.
+	static void ruleSpawn();	// Instakill by spawning.
+	static void rulePoint();	// Point conquering.
+	static void ruleFlush();	// Flush all damages and heals.
+	static void ruleAccident(Unit& u);	// ME's accident subroutine.
+
 	static void drawFaces();
 	static void drawPoint();
 	static void drawOverlay();

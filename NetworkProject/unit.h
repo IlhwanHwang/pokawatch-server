@@ -51,6 +51,9 @@ private:
 	bool aniDamaged;
 	bool aniHealed;
 	
+	bool flagRespawned;
+	bool flagDead;
+
 	// Members for movement animation
 	float moveOffX, moveOffY, moveOffZ;
 	protocol_direction moveOffDirection;
@@ -112,6 +115,9 @@ public:
 	int getOrgX() const { return orgx; }
 	int getOrgY() const { return orgy; }
 	bool getFliped() const { return animationFlip; }
+
+	bool checkRespawned() { if (flagRespawned) { flagRespawned = false; return true; } return false; };
+	bool checkDead() { if (flagDead) { flagDead = false; return true; } return false; };
 
 	// bypassing all constraints and animations.
 	// just use it for very exceptional cases.

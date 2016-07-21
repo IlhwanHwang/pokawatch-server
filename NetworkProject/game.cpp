@@ -64,9 +64,6 @@ void Game::makeProtocol() // protocol data making routine
 }
 
 void Game::update() {	// update routine
-	if (end)
-		return;
-
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].update();
 	for (int i = 0; i < POISON_NUM_MAX; i++) poisonArray[i].update();
 	for (int i = 0; i < PETAL_NUM_MAX; i++) petalArray[i].update();
@@ -209,23 +206,38 @@ void Game::rulePriority() {
 	}
 }
 
-void Game::ruleMove() // rules related to move command
-{
+void Game::ruleCommand() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+		protocol_command c = Network::getCommand(i);
+		if (command_kind_skill(c)) {
+			protocol_direction d = command_to_direction(c);
+			u.skill(d);
+		}
+		if (command_kind_attack(c)) {
+			protocol_direction d = command_to_direction(c);
+			u.attack(d);
+		}
+		if (command_kind_spawn(c) && u.getState() == STATE_DEAD)
+		{
+			u.spawn(command_to_dep(c));
+		}
+	}
+}
+
+void Game::ruleMove() {
 	std::vector<int> movable;
-	std::vector<int> alive;
 
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
 		Unit& u = unitArray[i];
+		
+		if (!u.isAlive())
+			continue;
+
 		protocol_command c = Network::getCommand(i);
-		protocol_state s = u.getState();
-
-		if (s != STATE_NULL && s != STATE_DEAD) {
-			alive.push_back(i);
-
-			if (command_kind_move(c)) {
-				movable.push_back(i);
-			}
+		if (command_kind_move(c)) {
+			movable.push_back(i);
 		}
 	}
 
@@ -244,29 +256,15 @@ void Game::ruleMove() // rules related to move command
 
 			if (moved) // control for move
 			{
-				for (int j = 0; j < alive.size(); j++) {
-					if (alive[j] == ind)
+				for (int j = 0; j < UNIT_NUM_MAX; j++) {
+					if (j == ind)
 						continue;
-
-					Unit& other = unitArray[alive[j]];
+					Unit& other = unitArray[j];
+					if (!other.isAlive())
+						continue;
 					if (other.getX() == u.getX() && other.getY() == u.getY()) {
 						duplicated = true;
 						break;
-					}
-				}
-
-				if (!duplicated) // if not duplicated
-				{	
-					for (int j = 0; j < UNIT_NUM_MAX; j++)
-					{
-						if (j == ind)
-							continue;
-
-						Unit& other = unitArray[j];
-						if (other.getOrgX() == u.getX() && other.getOrgY() == u.getY()) {
-							duplicated = true;
-							break;
-						}
 					}
 				}
 			}
@@ -285,6 +283,231 @@ void Game::ruleMove() // rules related to move command
 			}
 		}
 	}
+
+	// Case of CSE's blink
+	{
+		for (int k = 0; k < UNIT_NUM_MAX; k++) {
+			const int i = order[k];
+			Unit& u = unitArray[i];
+
+			if (u.getDep() == DEP_CSE && state_kind_attack(u.getState())) {
+				const protocol_direction d = state_to_direction(u.getState());
+				const protocol_team t = u.getTeam();
+				const int x = u.getX();
+				const int y = u.getY();
+				const int dx = direction_to_dx(d);
+				const int dy = direction_to_dy(d);
+
+				bool empty = true;
+				const int jump = CSE_BLINK_LENGTH;
+				const int jx = clamp(x + dx * jump, 0, MAP_WIDTH - 1);
+				const int jy = clamp(y + dy * jump, 0, MAP_HEIGHT - 1);
+
+				for (int j = 0; j < UNIT_NUM_MAX; j++) {
+					if (i == j)
+						continue;
+
+					Unit& other = unitArray[j];
+					if (!other.isAlive())
+						continue;
+
+					if (other.getX() == x + dx * jump && other.getY() == y + dy * jump) {
+						empty = false;
+						break;
+					}
+				}
+
+				if (empty) {
+					Effect::push(new EffectCSEBlink((float)x, (float)y, u.getFliped()));
+					u.setPosition(jx, jy);
+				}
+			}
+		}
+	}
+
+	// Case of ME's accident
+	{
+		std::vector<Unit*> cand;
+
+		for (int k = 0; k < UNIT_NUM_MAX; k++) {
+			const int i = order[k];
+			Unit& u = unitArray[i];
+			if (!state_kind_skill(u.getState()) || u.getDep() != DEP_ME)
+				continue;
+
+			cand.push_back(&u);
+		}
+
+		if (cand.size() == 1) {
+			ruleAccident(*cand[0]);
+		}
+		else if (cand.size() == 2) {
+			bool between = false;
+			bool aligned = false;
+
+			Unit& u1 = *cand[0];
+			Unit& u2 = *cand[1];
+			protocol_direction d1 = state_to_direction(u1.getState());
+			protocol_direction d2 = state_to_direction(u2.getState());
+			const int x1 = u1.getX();
+			const int y1 = u1.getY();
+			const int x2 = u2.getX();
+			const int y2 = u2.getY();
+
+			if (y1 == y2) { // Same Y
+				aligned = true;
+				for (int i = 0; i < UNIT_NUM_MAX; i++) {
+					Unit& other = unitArray[i];
+					
+					if (!other.isAlive())
+						continue;
+
+					const int bx1 = x1 > x2 ? x2 : x1;
+					const int bx2 = x1 < x2 ? x2 : x1;
+					if (other.getY() == y1 && other.getX() > bx1 && other.getX() < bx2) { // Is in between two
+						between = true;
+						break;
+					}
+				}
+			}
+			if (x1 == x2) { // Same X
+				aligned = true;
+				for (int i = 0; i < UNIT_NUM_MAX; i++) {
+					Unit& other = unitArray[i];
+
+					if (!other.isAlive())
+						continue;
+
+					const int by1 = y1 > y2 ? y1 : y2;
+					const int by2 = y1 < y2 ? y1 : y2;
+					if (other.getX() == x1 && other.getY() > by1 && other.getY() < by2) { // Is in between two
+						between = true;
+						break;
+					}
+				}
+			}
+
+			if (aligned && !between) {
+				const int dx1 = direction_to_dx(d1);
+				const int dy1 = direction_to_dy(d1);
+				if ((x2 - x1) * dx1 > 0 || (y2 - y1) * dy1 > 0) {
+					if (d1 == direction_flip(d2)) {
+						// Coliide each other
+						const int ax1 = (x1 + x2) / 2;
+						const int ay1 = (y1 + y2) / 2;
+						const int ax2 = (x1 + x2 + 1) / 2;
+						const int ay2 = (y1 + y2 + 1) / 2;
+						u1.setPosition(ax1, ay1);
+						u2.setPosition(ax2, ay2);
+						u1.damage(ME_ACCIDENT_DAMAGE);
+						u2.damage(ME_ACCIDENT_DAMAGE);
+
+						switch (d1) {
+						case DIRECTION_RIGHT:
+							Effect::push(new EffectMEAccidentH(u1.getTeam(), ax1, ay1, ax1 - x1, false));
+							Effect::push(new EffectMEAccidentH(u2.getTeam(), ax2, ay2, x2 - ax2, true));
+							break;
+						case DIRECTION_LEFT:
+							Effect::push(new EffectMEAccidentH(u1.getTeam(), ax1, ay1, x1 - ax1, true));
+							Effect::push(new EffectMEAccidentH(u2.getTeam(), ax2, ay2, ax2 - x2, false));
+							break;
+						case DIRECTION_UP:
+							Effect::push(new EffectMEAccidentV(u1.getTeam(), ax1, ay1, ay1 - y1, false));
+							Effect::push(new EffectMEAccidentV(u2.getTeam(), ax2, ay2, y2 - ay2, true));
+							break;
+						case DIRECTION_DOWN:
+							Effect::push(new EffectMEAccidentV(u1.getTeam(), ax1, ay1, y1 - ay1, false));
+							Effect::push(new EffectMEAccidentV(u2.getTeam(), ax2, ay2, ay2 - y2, true));
+							break;
+						}
+					}
+					else {
+						// Reversed priority. The former is heading the latter.
+						ruleAccident(u2);
+						ruleAccident(u1);
+					}
+				}
+				else {
+					// Normal priority
+					ruleAccident(u1);
+					ruleAccident(u2);
+				}
+			}
+		}
+
+		cand.clear();
+	}
+
+	ruleFlush();
+}
+
+void Game::ruleAccident(Unit& u) {
+	const int x = u.getX();
+	const int y = u.getY();
+	const protocol_direction d = state_to_direction(u.getState());
+	const int dx = direction_to_dx(d);
+	const int dy = direction_to_dy(d);
+	int mindist = ARBITRARY_BIG_NUM;
+	Unit* target = nullptr;
+
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& other = unitArray[i];
+
+		if (!other.isAlive())
+			continue;
+
+		if (other.getX() == x && other.getY() == y)
+			continue;
+
+		if (other.getY() == y) {
+			if ((other.getX() - x) * dx > 0) {
+				int dist = (other.getX() - x) * dx;
+				if (mindist > dist) {
+					mindist = dist;
+					target = &other;
+				}
+			}
+		}
+		if (other.getX() == x) {
+			if ((other.getY() - y) * dy > 0) {
+				int dist = (other.getY() - y) * dy;
+				if (mindist > dist) {
+					mindist = dist;
+					target = &other;
+				}
+			}
+		}
+	}
+
+	int ax, ay;
+
+	if (target == nullptr) {
+		ax = clamp(x + dx * MAP_WIDTH, 0, MAP_WIDTH - 1);
+		ay = clamp(y + dy * MAP_HEIGHT, 0, MAP_HEIGHT - 1);
+		u.setPosition(ax, ay);
+	}
+	else {
+		ax = target->getX() - dx;
+		ay = target->getY() - dy;
+		u.setPosition(ax, ay);
+		if (u.getTeam() != target->getTeam())
+			target->damage(ME_ACCIDENT_DAMAGE);
+	}
+
+	switch (d) {
+	case DIRECTION_RIGHT:
+		Effect::push(new EffectMEAccidentH(u.getTeam(), ax, ay, ax - x, false));
+		break;
+	case DIRECTION_LEFT:
+		Effect::push(new EffectMEAccidentH(u.getTeam(), ax, ay, x - ax, true));
+		break;
+	case DIRECTION_UP:
+		Effect::push(new EffectMEAccidentV(u.getTeam(), ax, ay, ay - y, false));
+		break;
+	case DIRECTION_DOWN:
+		Effect::push(new EffectMEAccidentV(u.getTeam(), ax, ay, y - ay, true));
+		break;
+	}
 }
 
 void Game::ruleAttack() // rules related to attack
@@ -298,15 +521,6 @@ void Game::ruleAttack() // rules related to attack
 	 * ME	: Damage 3 X 3 neighbors
 	 * CHEM	: Spread chemicals
 	 */
-
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
-		if (command_kind_attack(c)) {
-			protocol_direction d = command_to_direction(c);
-			u.attack(d);
-		}
-	}
 
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
@@ -323,29 +537,6 @@ void Game::ruleAttack() // rules related to attack
 		const int dy = direction_to_dy(d);
 
 		if (u.getDep() == DEP_CSE) {
-			if (state_kind_attack(u.getState())) {
-				bool empty = true;
-				const int jump = CSE_BLINK_LENGTH;
-				const int jx = clamp(x + dx * jump, 0, MAP_WIDTH - 1);
-				const int jy = clamp(y + dy * jump, 0, MAP_HEIGHT - 1);
-
-				for (int j = 0; j < UNIT_NUM_MAX; j++) {
-					if (i == j)
-						continue;
-
-					Unit& other = unitArray[j];
-					if (other.getX() == x + dx * jump && other.getY() == y + dy * jump) {
-						empty = false;
-						break;
-					}
-				}
-
-				if (empty) {
-					Effect::push(new EffectCSEBlink((float)x, (float)y, u.getFliped()));
-					u.setPosition(jx, jy);
-				}
-			}
-
 			if (elapsed % CSE_SPARK_COOLTIME == 0) {
 				regionStun(team_invert(t), x - 1, y - 1, x + 1, y + 1, CSE_SPARK_STUN);
 				Effect::push(new EffectCSEAttack(t, (float)x, (float)y));
@@ -377,6 +568,8 @@ void Game::ruleAttack() // rules related to attack
 			}
 		}
 	} // end of attack
+
+	ruleFlush();
 }
 
 void Game::ruleCollide() {
@@ -422,6 +615,8 @@ void Game::ruleCollide() {
 			}
 		}
 	}
+
+	ruleFlush();
 }
 
 void Game::ruleSkill() // rules related to skill
@@ -435,15 +630,6 @@ void Game::ruleSkill() // rules related to skill
 	* ME	: Assault to the direction and kill the very first enemy on the way
 	* CHEM	: Spawn a mushroom
 	*/
-
-	for (int i = 0; i < UNIT_NUM_MAX; i++) {
-		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
-		if (command_kind_skill(c)) {
-			protocol_direction d = command_to_direction(c);
-			u.skill(d);
-		}
-	}
 
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
@@ -460,22 +646,38 @@ void Game::ruleSkill() // rules related to skill
 		int dy = direction_to_dy(d);
 
 		if (u.getDep() == DEP_CSE) {
-			regionStun(team_invert(t), x - 3, y - 3, x + 3, y + 3, 5);
+			regionStun(
+				team_invert(t), 
+				x - CSE_STORM_RANGE, 
+				y - CSE_STORM_RANGE, 
+				x + CSE_STORM_RANGE, 
+				y + CSE_STORM_RANGE, 
+				CSE_STORM_STUN
+			);
 		}
 		else if (u.getDep() == DEP_PHYS) {
-			// Not implemented
+			regionDamage(
+				team_invert(t), 
+				x + dx * 2 - 1, 
+				y + dy * 2 - 1, 
+				x + dx * 2 + 1, 
+				y + dy * 2 + 1, 
+				PHYS_BLACKHOLE_DAMAGE
+			);
 		}
 		else if (u.getDep() == DEP_LIFE) {
-			regionHealAll(t, 1);
+			regionHealAll(t, LIFE_BLOSSOM_HEAL);
 		}
 		else if (u.getDep() == DEP_ME) {
-			// Not implemented
+			// ME's skill is implemented in move session
 		}
 		else if (u.getDep() == DEP_CHEM) {
 			int indexForValidMushroom = getValidMushroomIndex();
 			mushroomArray[indexForValidMushroom].spawn(t, x + dx, y + dy);
 		}
 	} // end of skill
+
+	ruleFlush();
 }
 
 void Game::ruleSpawn() // rules related to spawn
@@ -483,17 +685,22 @@ void Game::ruleSpawn() // rules related to spawn
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
 
-		if (command_kind_spawn(c) && u.getState() == STATE_DEAD)
-		{
-			//int& tspawn = spawn[team_to_index(u.getTeam())];
-			//tspawn++;
-			u.spawn(command_to_dep(c));
-			//if ((tspawn % HERO_DELAY == 0) && (tspawn != 0)) u.setHero(true);
+		if (!u.checkRespawned())
+			continue;
+		
+		for (int j = 0; j < UNIT_NUM_MAX; j++) {
+			if (j == i)
+				continue;
+
+			Unit& other = unitArray[j];
+			if (other.getX() == u.getX() && other.getY() == u.getY()) {
+				other.damage(ARBITRARY_BIG_NUM);
+			}
 		}
+	}
 
-	} // end of spawn
+	ruleFlush();
 }
 
 void Game::rulePoint() {
@@ -568,9 +775,27 @@ void Game::rulePoint() {
 	}
 }
 
+void Game::ruleFlush() {
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		Unit& u = unitArray[i];
+
+		u.flush();
+		if (u.checkDead()) {
+			death[team_to_index(u.getTeam())]++;
+			if (death[team_to_index(u.getTeam())] % HERO_PERIOD == 0) {
+				u.setHero(true);
+			}
+		}
+	}
+}
+
 void Game::turn() {
-	if (end)
+	if (end) {
+		for (int i = 0; i < UNIT_NUM_MAX; i++) {
+			unitArray[0].setState(STATE_IDLE);
+		}
 		return;
+	}
 	elapsed++;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].turn();
@@ -580,14 +805,12 @@ void Game::turn() {
 
 	// things are done by rules
 	rulePriority();
+	ruleCommand();
 	ruleMove();
 	ruleSpawn();
-
 	ruleSkill();
 	ruleAttack();
 	ruleCollide();
-	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].flush();
-
 	rulePoint();
 	
 	if (Network::getMode() == MODE_SERVER) {
