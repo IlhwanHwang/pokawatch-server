@@ -10,5 +10,5 @@ public:
 	static void move(int i, protocol_direction x);
 	static void attack(int i, protocol_direction x);
 	static void skill(int i, protocol_direction x);
-	static void flag(int i);
+	static void spawn(int i, protocol_dep x);
 };

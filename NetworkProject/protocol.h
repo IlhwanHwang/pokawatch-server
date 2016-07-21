@@ -399,13 +399,13 @@ inline protocol_dep command_to_dep(protocol_command x) {
 	case COMMAND_SPAWN_CSE:
 		return DEP_CSE;
 	case COMMAND_SPAWN_PHYS:
-		return DEP_CSE;
+		return DEP_PHYS;
 	case COMMAND_SPAWN_LIFE:
-		return DEP_CSE;
+		return DEP_LIFE;
 	case COMMAND_SPAWN_ME:
-		return DEP_CSE;
+		return DEP_ME;
 	case COMMAND_SPAWN_CHEM:
-		return DEP_CSE;
+		return DEP_CHEM;
 	default:
 		return DEP_NULL;
 	}
@@ -451,6 +451,23 @@ inline protocol_command direction_to_skillcommand(protocol_direction d) {
 		return COMMAND_SKILL_LEFT;
 	case DIRECTION_DOWN:
 		return COMMAND_SKILL_DOWN;
+	default:
+		return COMMAND_NULL;
+	}
+}
+
+inline protocol_command spawn_command(protocol_dep d) {
+	switch (d) {
+	case DEP_CSE:
+		return COMMAND_SPAWN_CSE;
+	case DEP_PHYS:
+		return COMMAND_SPAWN_PHYS;
+	case DEP_LIFE:
+		return COMMAND_SPAWN_LIFE;
+	case DEP_CHEM:
+		return COMMAND_SPAWN_CHEM;
+	case DEP_ME:
+		return COMMAND_SPAWN_ME;
 	default:
 		return COMMAND_NULL;
 	}

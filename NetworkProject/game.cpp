@@ -217,7 +217,7 @@ void Game::ruleMove() // rules related to move command
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		protocol_state s = u.getState();
 
 		if (s != STATE_NULL && s != STATE_DEAD) {

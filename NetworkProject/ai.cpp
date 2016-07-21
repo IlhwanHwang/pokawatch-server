@@ -18,13 +18,17 @@ void Ai::aiInit(void)
 {
 	srand(time(NULL));
 	
-	Ai::CharacterInit(0,DEP_CSE);
+	/*Ai::CharacterInit(0,DEP_CSE);
 	Ai::CharacterInit(1, DEP_CHEM);
-	Ai::CharacterInit(2, DEP_LIFE);
+	Ai::CharacterInit(2, DEP_LIFE);*/
 
-	/*Ai::CharacterInit(0, DEP_ME);
+	Ai::CharacterInit(0, DEP_ME);
 	Ai::CharacterInit(1, DEP_PHYS);
-	Ai::CharacterInit(2, DEP_CHEM);*/
+	Ai::CharacterInit(2, DEP_CHEM);
+
+	/*Ai::CharacterInit(0, DEP_PHYS);
+	Ai::CharacterInit(1, DEP_PHYS);
+	Ai::CharacterInit(2, DEP_PHYS);*/
 
 }
 
@@ -100,12 +104,9 @@ void Ai::ai(protocol_data AI_info)
 			if (same_line(AI_info.unit, i)) attack(i, line_direction(AI_info.unit, i));
 			else move(i, near_direction(AI_info.unit, i));
 		}
-	}
-	*/
-
-
+	}*/
 	
-	switch (rand() % 3)
+	/*switch (rand() % 3)
 	{
 	case 0:
 		attack(0, (protocol_direction)(rand() % 4+1));
@@ -124,8 +125,17 @@ void Ai::ai(protocol_data AI_info)
 		attack(1, (protocol_direction)(rand() % 4 + 1));
 		move(2, (protocol_direction)(rand() % 4 + 1));
 		break;
+	}*/
+
+	for (int i = 0; i < (UNIT_NUM_MAX / 2); i++)
+	{
+		attack(i, DIRECTION_UP);
 	}
-	
+
+	for (int i = 0; i < (UNIT_NUM_MAX / 2); i++)
+	{
+		if (AI_info.unit[i].state == STATE_DEAD) spawn(i, DEP_PHYS);
+	}
 
 	printf("UNIT INFO\n");
 	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d\nhero : %d cooltime : %d respawn : %d stun : %d\n", AI_info.unit[i].team, AI_info.unit[i].dep, AI_info.unit[i].x, AI_info.unit[i].y, AI_info.unit[i].state, AI_info.unit[i].health, AI_info.unit[i].hero, AI_info.unit[i].cooltime, AI_info.unit[i].respawn, AI_info.unit[i].stun);
@@ -182,4 +192,10 @@ void Ai::skill(int i, protocol_direction x)
 		Network::setCommand(i, direction_to_skillcommand(x));
 	else
 		Network::setCommand(i, direction_to_skillcommand(direction_mirror(x)));
+}
+
+void Ai::spawn(int i, protocol_dep x)
+{
+	Network::setCommand(i, spawn_command(x));
+	printf("»£\\nhi? : %d   %d \n\n\n\n\n\n", x, spawn_command(x));
 }

@@ -49,7 +49,7 @@ public:
 	static void makeClientSocket();					// Client socket making routine
 	static void connectToServer() {}					// Client connet to server 
 	static void getProtocolDataFromServer();		// Client message recieving routine
-	static void convertProtocolData();
+
 	static void recieveGameStart();					// Client message recieving for game start
 	static void sendToServer(char message[]);		// Client message sending routine
 	static void closeClientConnection();			// Client closing routine
@@ -58,7 +58,7 @@ public:
 	static void turn();								// Per turn routine for network
 
 	//getter and setter
-	static protocol_command getCommandEnum(int index) {return index>=(UNIT_NUM_MAX/2) ? (protocol_command)(messageFromClient[1][index- (UNIT_NUM_MAX / 2)] - '0') : (protocol_command)(messageFromClient[0][index] - '0'); }
+	static protocol_command getCommandEnum(int index) {return index >= (UNIT_NUM_MAX / 2) ? (protocol_command)(messageFromClient[1][index - (UNIT_NUM_MAX / 2)] - '0') : (protocol_command)((messageFromClient[0][index] - '0')); }
 	static int getMode() { return mode; }
 	static int getCommand(int i) { return command[i]; }
 	static int getCharacterSelection(int i) { return characterSelection[i]; }

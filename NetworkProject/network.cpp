@@ -187,52 +187,6 @@ void Network::getProtocolDataFromServer() // Message receving from server
 	*/
 
 }
-void swap(protocol_unit &x, protocol_unit &y)
-{
-	protocol_unit temp;
-	temp = x;
-	x = y;
-	y = temp;
-}
-
-void swap(int &x, int &y)
-{
-	int temp;
-	temp = x;
-	x = y;
-	y = temp;
-}
-
-void Network::convertProtocolData()
-{
-	protocol_data &AI_info = *((protocol_data*)messageToClient);
-
-	if (team == TEAM_KAIST)
-	{
-		for (int i = 0; i < UNIT_NUM_MAX/2; i++)
-			swap(AI_info.unit[i], AI_info.unit[i + (UNIT_NUM_MAX / 2)]);
-
-		for (int i = 0; i < UNIT_NUM_MAX; i++)
-		{
-			AI_info.unit[i].x = (MAP_WIDTH - 1) - AI_info.unit[i].x;
-
-		}
-
-	
-		//for (int i = 0; i < PETAL_NUM_MAX; i++) printf("team %d direction %d valid %d x %d y %d\n", AI_info.petal[i].team, AI_info.petal[i].direction, AI_info.petal[i].valid, AI_info.petal[i].x, AI_info.petal[i].y);
-
-		//for (int i = 0; i < POISON_NUM_MAX; i++) printf("team %d valid %d span %d x %d y %d\n", AI_info.poison[i].team, AI_info.poison[i].valid, AI_info.poison[i].span, AI_info.poison[i].x, AI_info.poison[i].y);
-
-		//for (int i = 0; i < MUSHROOM_NUM_MAX; i++) printf("team %d valid %d x %d y %d\n", AI_info.mushroom[i].team, AI_info.mushroom[i].valid, AI_info.mushroom[i].x, AI_info.mushroom[i].y);
-
-		for (int i = 0; i < TEAM_NUM_MAX; i++) printf("%d\n", AI_info.own[i]);
-
-		for (int i = 0; i < TEAM_NUM_MAX; i++) printf("%d\n", AI_info.win[i]);
-
-		printf("%d\n", AI_info.extra);
-		
-	}
-}
 
 void Network::recieveGameStart()
 {
@@ -266,8 +220,9 @@ void Network::turn() // turn routine
 	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded() ) // for client when game started 
 	{
 		Network::getProtocolDataFromServer();												// get protocol data of that time
-		Network::convertProtocolData();
-		Ai::ai(*((protocol_data*)messageToClient));
+
+		if(team==TEAM_POSTECH) Ai::ai(*((protocol_data*)messageToClient));
+		else Ai::ai(mirror_data(*((protocol_data*)messageToClient)));
 
 		char toSend[MESSAGE_TO_SERVER_SIZE];
 		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)		
@@ -319,6 +274,20 @@ void Network::update() // frame turn routine
 
 		printf("team : %d", team);
 
+		Ai::aiInit();
+
+		char characterInfo[((UNIT_NUM_MAX) / 2) + 1];
+		for (int i = 0; i<(UNIT_NUM_MAX) / 2; i++)
+		{
+			characterInfo[i] = Network::getCharacterSelection(i) + '0';
+		}
+
+		sendToServer(characterInfo);
+		printf("character chosen\n");
+
+		Network::recieveGameStart();
+		printf("GameStart!");
+
 	}// if invalid input, we should give error message*/
 
 	/*if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
@@ -356,21 +325,9 @@ void Network::update() // frame turn routine
 
 	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character
 	{
-		if (Network::getMode() == MODE_CLIENT && Network::getCharacterSelection(0) == 0)			// mapping for key and characters
+		if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] != GAME_START_CHAR)			// mapping for key and characters
 		{
-			Ai::aiInit();
-
-			char characterInfo[((UNIT_NUM_MAX) / 2) + 1];
-			for(int i=0; i<(UNIT_NUM_MAX)/2; i++)
-			{
-				characterInfo[i] =  Network::getCharacterSelection(i) + '0';
-			}
-
-			sendToServer(characterInfo);
-			printf("character chosen\n");
-
-			Network::recieveGameStart();
-			printf("GameStart!");
+			
 		}
 
 	}
