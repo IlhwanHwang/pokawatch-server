@@ -209,7 +209,7 @@ void Game::rulePriority() {
 void Game::ruleCommand() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) {
 		Unit& u = unitArray[i];
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		if (command_kind_skill(c)) {
 			protocol_direction d = command_to_direction(c);
 			u.skill(d);
@@ -235,7 +235,7 @@ void Game::ruleMove() {
 		if (!u.isAlive())
 			continue;
 
-		protocol_command c = Network::getCommand(i);
+		protocol_command c = Network::getCommandEnum(i);
 		if (command_kind_move(c)) {
 			movable.push_back(i);
 		}
