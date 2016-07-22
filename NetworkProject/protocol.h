@@ -153,8 +153,6 @@ typedef struct {
 
 #define RESPAWN_COOLTIME 10
 
-//socket [x] is mapped to unit number [x]
-
 //NETWORK PROTOCOL
 
 #define PORT_STRING "2222"
@@ -164,6 +162,7 @@ typedef struct {
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
 #define MODE_CLIENT 8
+#define MODE_SINGLE 1
 #define MODE_SERVER_KEY '9'
 #define MODE_CLIENT_KEY '8'
 

@@ -248,10 +248,46 @@ void Network::turn() // turn routine
 			cout << i<<"¹øÂ° client 0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
 		}
 	}
+
+	if (Network::getMode() == MODE_SINGLE && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) // for server when game started
+	{
+		protocol_command c;
+
+		if (Key::keyCheckOn('d')) c = (COMMAND_MOVE_RIGHT);
+		if (Key::keyCheckOn('w')) c = (COMMAND_MOVE_UP);
+		if (Key::keyCheckOn('a')) c = (COMMAND_MOVE_LEFT);
+		if (Key::keyCheckOn('s')) c = (COMMAND_MOVE_DOWN);
+
+		if (Key::keyCheckOn('d') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_RIGHT);
+		if (Key::keyCheckOn('w') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_UP);
+		if (Key::keyCheckOn('a') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_LEFT);
+		if (Key::keyCheckOn('s') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_DOWN);
+
+		if (Key::keyCheckOn('d') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_RIGHT);
+		if (Key::keyCheckOn('w') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_UP);
+		if (Key::keyCheckOn('a') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_LEFT);
+		if (Key::keyCheckOn('s') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_DOWN);
+
+		if (Key::keyCheckOn('1')) c = (COMMAND_SPAWN_CSE);
+		if (Key::keyCheckOn('2')) c = (COMMAND_SPAWN_PHYS);
+		if (Key::keyCheckOn('3')) c = (COMMAND_SPAWN_LIFE);
+		if (Key::keyCheckOn('4')) c = (COMMAND_SPAWN_ME);
+		if (Key::keyCheckOn('5')) c = (COMMAND_SPAWN_CHEM);
+
+		if (Key::keyCheckPressed('l')) c = COMMAND_FLAG;
+
+		messageFromClient[0][0] = c + '0';
+		//messageFromClient[0][1] = c + '0';
+		//messageFromClient[0][2] = c + '0';
+		//messageFromClient[1][0] = c + '0';
+		//messageFromClient[1][1] = c + '0';
+		//messageFromClient[1][2] = c + '0';
+	}
 }
 
 void Network::update() // frame turn routine
 {
+	/*
 	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
 	{
 		Network::setMode(MODE_CLIENT);														// set as client 
@@ -321,6 +357,33 @@ void Network::update() // frame turn routine
 		sendToClient(gameStartMessage);
 		setGameStart(0, GAME_START_CHAR);
 
+	}//*/
+
+	if (Network::getMode() == MODE_NOTHING)		// mode selection (SINGLE)
+	{
+		char gameStartMessage[2];
+		gameStartMessage[0] = GAME_START_CHAR;
+		gameStartMessage[1] = '\0';
+
+		Draw::naivefill(Rspr::infoServer);
+		glutSwapBuffers();
+
+		Network::setMode(MODE_SINGLE);
+		printf("mode - single chosen\n");
+		Network::makeServerSocket();														// server socket made
+		printf("socket made \n");
+		printf("accepted\n");
+
+		for (int i = 0; i < UNIT_NUM_MAX / 2; i++)												// spawn units
+		{
+			for (int j = 0; j < CLIENT_NUM_MAX; j++)
+			{
+				Game::getUnit(((UNIT_NUM_MAX) / 2) * j + i).spawn(DEP_PHYS);
+			}
+		}
+
+		Game::release();
+		setGameStart(0, GAME_START_CHAR);
 	}//*/
 
 	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character

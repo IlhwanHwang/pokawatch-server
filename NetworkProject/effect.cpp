@@ -9,6 +9,7 @@
 #include "draw.h"
 #include <cmath>
 #include "utility.h"
+#include "spline.h"
 
 std::vector<EffectBase*> Effect::pool;
 
@@ -83,7 +84,7 @@ void EffectPHYSAttack::draw() const {
 }
 
 void EffectOwn::draw() const {
-	Draw::draw(Rspr::own[(int)(phase * 8)], x, y);
+	Draw::drawSB(Rspr::ownPoint, x, y, lerp(1.0, 1.2, Spline::sqr(phase)), lerp(1.0, 1.2, Spline::sqr(phase)), Color::white, 1.0 - phase);
 }
 
 void EffectOwnFlag::draw() const {
@@ -92,4 +93,16 @@ void EffectOwnFlag::draw() const {
 
 void EffectCSEBlink::draw() const {
 	Draw::qonmapSB(Rspr::CSEBlink, -0.1, x, y, 0.0, fliped ? -1.0 : 1.0, 1.0, Color::white, 1.0 - phase);
+}
+
+void EffectDeath::draw() const {
+	Draw::qonmap(
+		team == TEAM_POSTECH ? Rspr::deathP[(int)(phase * 8)] : Rspr::deathK[(int)(phase * 8)],
+		200.0, x, y, 0.5);
+}
+
+void EffectBlackhole::draw() const {
+	Draw::qonmap(
+		team == TEAM_POSTECH ? Rspr::PHYSBlackholeP[(int)(phase * 8)] : Rspr::PHYSBlackholeP[(int)(phase * 8)],
+		100.0, x, y, 0.5);
 }

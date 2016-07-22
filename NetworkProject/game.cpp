@@ -148,6 +148,7 @@ void Game::drawOverlay() {
 }
 
 void Game::draw() {
+	Gui::drawPre();
 	Draw::draw(Rspr::bg, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
 
 	for (int i = 0; i < MAP_WIDTH; i++) {
@@ -177,7 +178,6 @@ void Game::draw() {
 
 	// Overlay informations
 	drawFaces();
-
 	drawOverlay();
 
 	//Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
@@ -664,6 +664,7 @@ void Game::ruleSkill() // rules related to skill
 				y + dy * 2 + 1, 
 				PHYS_BLACKHOLE_DAMAGE
 			);
+			Effect::push(new EffectBlackhole(t, x + dx * 2, y + dy * 2));
 		}
 		else if (u.getDep() == DEP_LIFE) {
 			regionHealAll(t, LIFE_BLOSSOM_HEAL);
@@ -728,6 +729,7 @@ void Game::rulePoint() {
 				else {
 					// Owned the first point
 					owner = index_to_team(i);
+					Gui::shake(2.0);
 					Effect::push(new EffectOwn(GUI_MAP_X, GUI_MAP_Y));
 					Effect::push(new EffectOwnFlag(WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 96.0));
 				}
@@ -782,6 +784,8 @@ void Game::ruleFlush() {
 		u.flush();
 		if (u.checkDead()) {
 			death[team_to_index(u.getTeam())]++;
+			Effect::push(new EffectDeath(u.getTeam(), u.getX(), u.getY()));
+			Gui::shake(1.0);
 			if (death[team_to_index(u.getTeam())] % HERO_PERIOD == 0) {
 				u.setHero(true);
 			}

@@ -17,6 +17,8 @@ GLuint Shader::defPosy;
 GLuint Shader::defWidth;
 GLuint Shader::defHeight;
 GLuint Shader::defFlip;
+GLuint Shader::defOffX;
+GLuint Shader::defOffY;
 GLuint Shader::vboCanonical;
 GLuint Shader::vbo4thPlane;
 
@@ -33,6 +35,8 @@ void Shader::init() {
 	defWidth = glGetUniformLocation(shdDefault, "width");
 	defHeight = glGetUniformLocation(shdDefault, "height");
 	defFlip = glGetUniformLocation(shdDefault, "flip");
+	defOffX = glGetUniformLocation(shdDefault, "offx");
+	defOffY = glGetUniformLocation(shdDefault, "offy");
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -110,4 +114,10 @@ void Shader::draw
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+}
+
+void Shader::setOffset(float x, float y) {
+	useDefault();
+	glUniform1f(defOffX, x);
+	glUniform1f(defOffY, y);
 }

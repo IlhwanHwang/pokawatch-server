@@ -96,6 +96,7 @@ public:
 class EffectOwnFlag : public EffectBase {
 public:
 	EffectOwnFlag(float x, float y) : EffectBase(x, y) {};
+	void update() { phase += DELTA_PER_TURN; }
 	void draw() const;
 };
 
@@ -104,5 +105,19 @@ protected:
 	bool fliped;
 public:
 	EffectCSEBlink(float x, float y, bool fliped) : EffectBase(x, y), fliped(fliped) {};
+	void draw() const;
+};
+
+class EffectDeath : public EffectTeam {
+public:
+	EffectDeath(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
+	void update() { phase += DELTA_PER_TURN; }
+	void draw() const;
+};
+
+class EffectBlackhole : public EffectTeam {
+public:
+	EffectBlackhole(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
+	void update() { phase += DELTA_PER_TURN; }
 	void draw() const;
 };

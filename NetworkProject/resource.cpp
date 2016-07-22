@@ -19,7 +19,8 @@ Sprite Rspr::unitCHEMK;
 Sprite Rspr::unitMEK;
 Sprite Rspr::unitLIFEK;
 Sprite Rspr::unitPHYSK;
-Sprite Rspr::unitHeart;
+Sprite Rspr::unitHeartP;
+Sprite Rspr::unitHeartK;
 
 Sprite Rspr::faceCSE;
 Sprite Rspr::faceCHEM;
@@ -37,6 +38,8 @@ Sprite Rspr::attackPHYSPH[4];
 Sprite Rspr::attackPHYSPV[4];
 Sprite Rspr::attackPHYSKH[4];
 Sprite Rspr::attackPHYSKV[4];
+Sprite Rspr::PHYSBlackholeP[8];
+Sprite Rspr::PHYSBlackholeK[8];
 Sprite Rspr::CSEBlink;
 Sprite Rspr::MEAccidentPH;
 Sprite Rspr::MEAccidentPV;
@@ -45,6 +48,9 @@ Sprite Rspr::MEAccidentKV;
 Sprite Rspr::attackCSE[4];
 Sprite Rspr::sparkboom[4];
 Sprite Rspr::mushroom;
+
+Sprite Rspr::deathP[8];
+Sprite Rspr::deathK[8];
 
 Sprite Rspr::hero;
 Sprite Rspr::stun[4];
@@ -72,7 +78,7 @@ Sprite Rspr::pointBarP;
 Sprite Rspr::pointBarK;
 Sprite Rspr::pointBarFrame;
 
-Sprite Rspr::own[8];
+Sprite Rspr::ownPoint;
 Sprite Rspr::ownFlag[8];
 
 Sprite Rspr::infoMain;
@@ -120,7 +126,8 @@ void Resource::postinit() {
 	LOAD(unitMEK, "body_me_k").dot().setOffset(30.0, 70.0);
 	LOAD(unitLIFEK, "body_life_k").dot().setOffset(20.0, 74.0);
 	LOAD(unitPHYSK, "body_phys_k").dot().setOffset(20.0, 74.0);
-	LOAD(unitHeart, "heart").dot();
+	LOAD(unitHeartP, "heart_p").dot();
+	LOAD(unitHeartK, "heart_k").dot();
 
 	LOAD(faceCSE, "face_cse");
 	LOAD(faceCHEM, "face_chem");
@@ -138,6 +145,8 @@ void Resource::postinit() {
 	MULTILOAD(buf, attackPHYSPV, 4, "attack_phys_p_v_%d");
 	MULTILOAD(buf, attackPHYSKH, 4, "attack_phys_k_h_%d");
 	MULTILOAD(buf, attackPHYSKV, 4, "attack_phys_k_v_%d");
+	MULTILOAD(buf, PHYSBlackholeP, 8, "blackhole_p_%d");
+	MULTILOAD(buf, PHYSBlackholeK, 8, "blackhole_k_%d");
 	MULTILOAD(buf, stun, 4, "stun%d");
 	LOAD(CSEBlink, "blink_cse").dot().setOffset(20.0, 74.0);
 	LOAD(MEAccidentPH, "me_accident_p_h").dot().setOffset(120.0, 40.0);
@@ -148,6 +157,8 @@ void Resource::postinit() {
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
 	LOAD(mushroom, "mushroom").dot();
 
+	MULTILOAD(buf, deathP, 8, "death_p_%d");
+	MULTILOAD(buf, deathK, 8, "death_k_%d");
 	LOAD(hero, "hero").dot().setOffset(30.0, 50.0);
 
 	LOAD(tileLight, "tile_light").dot();
@@ -169,7 +180,7 @@ void Resource::postinit() {
 	LOAD(pointBarK, "point_bar_k").dot().setOffset(0.0, 16.0);
 	LOAD(pointBarFrame, "point_bar_frame").dot();
 
-	MULTILOAD(buf, own, 8, "own_%d");
+	LOAD(ownPoint, "own_point").dot();
 	MULTILOAD(buf, ownFlag, 8, "own_flag_%d");
 
 	LOAD(winPostech, "win_postech").dot();

@@ -354,7 +354,7 @@ void Unit::draw() const {
 	float ddx = 16 / GUI_CELL_WIDTH;
 	float dx = -(float)(showHealth - 1) / 2.0 * ddx;
 	for (int i = 0; i < showHealth; i++) {
-		Draw::qonmap(Rspr::unitHeart, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
+		Draw::qonmap(p.team == TEAM_POSTECH ? Rspr::unitHeartP : Rspr::unitHeartK, 0.1, drawx + dx, drawy, moveOffZ + 1.5);
 		dx += ddx;
 	}
 }

@@ -25,12 +25,15 @@ private:
 	static float animationPostPhase; // phase from the end of the movement to the end of the turn
 	static float animationFullPhase; // phase from the begin to the end of the turn
 	static float animationIndpPhase; // phase independent from turn flow
+	static float shakePhase;
+	static float shakeMagnitude;
 	static int imin(int a, int b) { return a > b ? b : a; }
 public:
 	static float unitX(float x) { return GUI_MAP_X + (x - (MAP_WIDTH - 1) / 2.0) * GUI_CELL_WIDTH; }
 	static float unitY(float y) { return GUI_MAP_Y + (y - (MAP_HEIGHT - 1) / 2.0) * GUI_CELL_HEIGHT; }
 	static void turn();
 	static void update();
+	static void drawPre();
 	static float aniPhase() { return animationPhase; }
 	static float aniPostPhase() { return animationPostPhase; }
 	static float aniFullPhase() { return animationFullPhase; }
@@ -40,4 +43,5 @@ public:
 	static int aniFullPhaseCombinate(int num) { return imin((int)(animationFullPhase * num), num - 1); }
 	static int aniIndpPhaseCombinate(int num, float rate) { return (int)(animationIndpPhase * rate) % num; }
 	static bool isPost() { return animationPhase >= 1.0; }
+	static void shake(float m) { shakeMagnitude = shakeMagnitude > m ? shakeMagnitude : m; shakePhase = 1.0; }
 };

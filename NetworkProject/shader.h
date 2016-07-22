@@ -16,6 +16,8 @@ private:
 	static GLuint defWidth;
 	static GLuint defHeight;
 	static GLuint defFlip;
+	static GLuint defOffX;
+	static GLuint defOffY;
 	static GLuint vboCanonical; // rectangle (-1.0, -1.0, 1.0, 1.0)
 	static GLuint vbo4thPlane; // rectangle (0.0, 0.0, 1.0, 1.0)
 
@@ -25,4 +27,5 @@ public:
 	static void draw4thPlane();
 	static void useDefault() { glUseProgram(shdDefault); }
 	static void draw(GLuint buf, int flip, float x, float y, float w, float h, float r, float g, float b, float a);
+	static void setOffset(float x, float y);
 };

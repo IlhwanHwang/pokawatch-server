@@ -23,7 +23,8 @@ public:
 	static Sprite unitMEK;
 	static Sprite unitLIFEK;
 	static Sprite unitPHYSK;
-	static Sprite unitHeart;
+	static Sprite unitHeartP;
+	static Sprite unitHeartK;
 
 	static Sprite faceCSE;
 	static Sprite faceCHEM;
@@ -41,6 +42,8 @@ public:
 	static Sprite attackPHYSPV[4];
 	static Sprite attackPHYSKH[4];
 	static Sprite attackPHYSKV[4];
+	static Sprite PHYSBlackholeP[8];
+	static Sprite PHYSBlackholeK[8];
 	static Sprite CSEBlink;
 	static Sprite MEAccidentPH;
 	static Sprite MEAccidentPV;
@@ -49,6 +52,9 @@ public:
 	static Sprite attackCSE[4];
 	static Sprite sparkboom[4];
 	static Sprite mushroom;
+
+	static Sprite deathP[8];
+	static Sprite deathK[8];
 
 	static Sprite hero;
 	static Sprite stun[4];
@@ -79,7 +85,7 @@ public:
 	static Sprite pointBarK;
 	static Sprite pointBarFrame;
 
-	static Sprite own[8];
+	static Sprite ownPoint;
 	static Sprite ownFlag[8];
 
 	static Sprite infoMain;

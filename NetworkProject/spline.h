@@ -17,4 +17,5 @@ public:
 	static float accandfric(float x) { return sigmoid(powf(x, HAISTNESS)); } // faster enter and slower exit
 	static float jump(float x) { return sinf(x * M_PI); } // jump
 	static float accjump(float x) { return jump(powf(x, HAISTNESS)); } // faster jump and slower land
+	static float sqr(float x) { return 1.0 - (1.0 - x) * (1.0 - x);  }
 };

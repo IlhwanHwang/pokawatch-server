@@ -62,7 +62,7 @@ void Timer::update(int count) {
 
 	Network::update();
 
-	if (Network::getMode() == MODE_SERVER) {
+	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_SINGLE) {
 		Game::update();
 		Game::draw();
 	}
