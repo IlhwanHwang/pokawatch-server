@@ -5,10 +5,14 @@
 
 #pragma once
 
-float clamp(float x, float m, float M) {
+inline float clamp(float x, float m, float M) {
 	return x > M ? M : (x < m ? m : x);
 }
 
-int clamp(int x, int m, int M) {
+inline int clamp(int x, int m, int M) {
 	return x > M ? M : (x < m ? m : x);
+}
+
+inline float lerp(float a, float b, float x) {
+	return (b * x) + (a * (1.0 - x));
 }

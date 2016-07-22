@@ -87,6 +87,9 @@ public:
 	static void qonmapB(Sprite& spr, float depth, float x, float y, float z, Color& c, float alpha) {
 		qonmapSB(spr, depth, x, y, z, 1.0, 1.0, c, alpha);
 	}
+	static void qonmapS(Sprite& spr, float depth, float x, float y, float z, float sx, float sy) {
+		qdrawSB(spr, depth - y, Gui::unitX(x), Gui::unitY(y + z), sx, sy, Color::white, 1.0);
+	}
 	static void qonmap(Sprite& spr, float depth, float x, float y, float z) {
 		qonmapSB(spr, depth, x, y, z, 1.0, 1.0, Color::white, 1.0);
 	}

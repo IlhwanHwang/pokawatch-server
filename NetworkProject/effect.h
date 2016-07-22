@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "protocol.h"
+#include "gui.h"
 
 class EffectBase {
 protected:
@@ -56,6 +57,32 @@ public:
 		if (y == y2) {
 			horizontal = true;
 		}
+	};
+	void draw() const;
+};
+
+class EffectMEAccidentH : public EffectTeam {
+protected:
+	float scale;
+	protocol_direction d;
+public:
+	EffectMEAccidentH(protocol_team t, float x, float y, int length, bool flip) : d(d), EffectTeam(t, x, y) {
+		scale = (float)length / 120.0 * GUI_CELL_WIDTH;
+		if (flip)
+			scale *= -1.0;
+	};
+	void draw() const;
+};
+
+class EffectMEAccidentV : public EffectTeam {
+protected:
+	float scale;
+	protocol_direction d;
+public:
+	EffectMEAccidentV(protocol_team t, float x, float y, int length, bool flip) : d(d), EffectTeam(t, x, y) {
+		scale = (float)length / 120.0 * GUI_CELL_HEIGHT;
+		if (flip)
+			scale *= -1.0;
 	};
 	void draw() const;
 };

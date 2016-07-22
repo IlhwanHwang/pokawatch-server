@@ -22,6 +22,7 @@ void Unit::init() {
 	p.y = orgy;
 	p.invincible = INVINCIBLE_SPAN; // Invincible for a while after spawning
 	p.state = STATE_IDLE;
+	//p.hero = true;
 
 	animationFlip = p.x > MAP_WIDTH / 2 ? true : false;
 	aniInvincible = false;
@@ -38,6 +39,9 @@ Unit::Unit(int x, int y, protocol_team team, const char* name) {
 	p.x = orgx;
 	p.y = orgy;
 	death = 0;
+
+	flagRespawned = false;
+	flagDead = false;
 
 	this->name = name;
 }
@@ -196,7 +200,7 @@ void Unit::kill() {
 	p.respawn = RESPAWN_COOLTIME;
 	p.hero = false;
 	death++;
-	Game::setDeath(team_to_index(p.team), Game::getDeath(team_to_index(p.team)) + 1);
+	flagDead = true;
 }
 
 void Unit::turninit() {
@@ -222,6 +226,7 @@ void Unit::turn() {
 		else {
 			if (p.dep != DEP_NULL) {
 				init();
+				flagRespawned = true;
 			}
 		}
 	}
@@ -255,6 +260,8 @@ void Unit::flush() {
 		return;
 
 	p.health += healed - damaged;
+	healed = 0;
+	damaged = 0;
 
 	if (p.health <= 0) {
 		kill();
@@ -420,7 +427,7 @@ void Petal::spawn(protocol_team team, int x, int y, protocol_direction direction
 	p.team = team;
 	p.x = x;
 	p.y = y;
-	p.direction = direction;
+	p.direction = direction_flip(direction);
 	p.valid = true;
 }
 
