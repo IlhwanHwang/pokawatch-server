@@ -86,7 +86,7 @@ protocol_direction line_direction(protocol_unit *u, int me)
 void Ai::ai(protocol_data AI_info)
 {
 
-	/*for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)
+	for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)
 	{
 		if (AI_info.unit[i].dep == DEP_ME)
 		{
@@ -104,7 +104,7 @@ void Ai::ai(protocol_data AI_info)
 			if (same_line(AI_info.unit, i)) attack(i, line_direction(AI_info.unit, i));
 			else move(i, near_direction(AI_info.unit, i));
 		}
-	}*/
+	}
 	
 	/*switch (rand() % 3)
 	{
@@ -127,10 +127,12 @@ void Ai::ai(protocol_data AI_info)
 		break;
 	}*/
 
-	for (int i = 0; i < (UNIT_NUM_MAX / 2); i++)
+	/*for (int i = 0; i < (UNIT_NUM_MAX / 2); i++)
 	{
-		attack(i, DIRECTION_UP);
-	}
+		attack(i, DIRECTION_RIGHT);
+	}*/
+
+	printf("my team is %d\n\n", Network::getTeam());
 
 	for (int i = 0; i < (UNIT_NUM_MAX / 2); i++)
 	{

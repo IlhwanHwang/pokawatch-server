@@ -69,6 +69,6 @@ public:
 	static void setCommand(int i, int x) { command[i] = x; }
 	static void setGameStart(int index, char x) { gameStart[index] = x; }
 	static void setCharacterSelection(int i, int x) { characterSelection[i] = x; }
-	static void setTeam(int x) { team = x; }
+	static void setTeam(int x) { team = x+1; }
 	
 };
