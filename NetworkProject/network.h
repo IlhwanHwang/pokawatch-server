@@ -28,16 +28,7 @@ private:
 
 public:
 
-	static void init(char * argv)								// initiate network state
-	{
-		mode = MODE_NOTHING;
-		for(int i=0; i<UNIT_NUM_MAX; i++) characterSelection[i] = 0;
-		gameStart[0] = 'N';
-		gameStart[1] = '0' + TEAM_NULL;
-		gameStart[2] = '\0';
-
-		serverIpArg = argv;
-	}
+	static void init(char * argv);								// initiate network state
 	static void ErrorHandling(char *message);		// Error handling
 
 	static void makeServerSocket();					// Server socket making routine

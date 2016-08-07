@@ -224,7 +224,6 @@ void Network::turn() // turn routine
 		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
 		Network::sendToClient(protocolToSend);												// send protocol data to client
 
-
 		//Network::recieveFromClient();		// recieve command from clients;		
 		
 		for (int i = 0; i < CLIENT_NUM_MAX; i++)
@@ -238,36 +237,40 @@ void Network::turn() // turn routine
 
 void Network::update() // frame turn routine
 {
-	if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
+}
+
+void Network::init(char * argv) {
+	for (int i = 0; i<UNIT_NUM_MAX; i++) characterSelection[i] = 0;
+	gameStart[0] = 'N';
+	gameStart[1] = '0' + TEAM_NULL;
+	gameStart[2] = '\0';
+
+	char gameStartMessage[2];
+	gameStartMessage[0] = GAME_START_CHAR;
+	gameStartMessage[1] = '\0';
+
+	Draw::naivefill(Rspr::infoServer);
+	glutSwapBuffers();
+
+	Network::setMode(MODE_SERVER);														// set as server
+	printf("mode - server chosn\n");
+	Network::makeServerSocket();														// server socket made
+	printf("socket made \n");
+	Network::acceptClient();															// accepting client
+	printf("accepted\n");
+	Network::recieveFromClient();														// recieve spawn information
+
+	for (int i = 0; i < UNIT_NUM_MAX / 2; i++)												// spawn units
 	{
-		char gameStartMessage[2];
-		gameStartMessage[0] = GAME_START_CHAR;
-		gameStartMessage[1] = '\0';
-
-		Draw::naivefill(Rspr::infoServer);
-		glutSwapBuffers();
-
-		Network::setMode(MODE_SERVER);														// set as server
-		printf("mode - server chosn\n");
-		Network::makeServerSocket();														// server socket made
-		printf("socket made \n");
-		Network::acceptClient();															// accepting client
-		printf("accepted\n");
-		Network::recieveFromClient();														// recieve spawn information
-
-		for (int i = 0; i < UNIT_NUM_MAX/2; i++)												// spawn units
+		for (int j = 0; j < CLIENT_NUM_MAX; j++)
 		{
-			for (int j = 0; j < CLIENT_NUM_MAX; j++)
-			{
-				Game::getUnit(((UNIT_NUM_MAX)/2) * j + i).spawn((protocol_dep)(messageFromClient[j][i]-'0'));
-				cout<<messageFromClient<<"was came"<<endl;
-				cout<<j<<"팀의"<<i<<"번쨰 캐릭터에 해당하는"<<messageFromClient[j][i]-'0'<<endl;
-			}
+			Game::getUnit(((UNIT_NUM_MAX) / 2) * j + i).spawn((protocol_dep)(messageFromClient[j][i] - '0'));
+			cout << messageFromClient << "was came" << endl;
+			cout << j << "팀의" << i << "번쨰 캐릭터에 해당하는" << messageFromClient[j][i] - '0' << endl;
 		}
+	}
 
-		Game::release();
-		sendToClient(gameStartMessage);
-		setGameStart(0, GAME_START_CHAR);
-
-	}//*/
+	Game::release();
+	sendToClient(gameStartMessage);
+	setGameStart(0, GAME_START_CHAR);
 }
