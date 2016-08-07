@@ -217,20 +217,6 @@ void Network::sendToServer(char message[]) // message sending routine
 void Network::turn() // turn routine
 {
 	// in timer each turn this function is called
-	if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded() ) // for client when game started 
-	{
-		Network::getProtocolDataFromServer();												// get protocol data of that time
-
-		if(team==TEAM_POSTECH) Ai::ai(*((protocol_data*)messageToClient));
-		else Ai::ai(mirror_data(*((protocol_data*)messageToClient)));
-
-		char toSend[MESSAGE_TO_SERVER_SIZE];
-		for (int i = 0; i < (UNIT_NUM_MAX) / 2; i++)		
-			toSend[i] = getCommand(i) + '0';
-
-		Network::sendToServer(toSend);														// send command
-	}
-
 	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) // for server when game started
 	{
 		char *protocolToSend;
@@ -248,85 +234,11 @@ void Network::turn() // turn routine
 			cout << i<<"번째 client 0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
 		}
 	}
-
-	if (Network::getMode() == MODE_SINGLE && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) // for server when game started
-	{
-		protocol_command c;
-
-		if (Key::keyCheckOn('d')) c = (COMMAND_MOVE_RIGHT);
-		if (Key::keyCheckOn('w')) c = (COMMAND_MOVE_UP);
-		if (Key::keyCheckOn('a')) c = (COMMAND_MOVE_LEFT);
-		if (Key::keyCheckOn('s')) c = (COMMAND_MOVE_DOWN);
-
-		if (Key::keyCheckOn('d') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_RIGHT);
-		if (Key::keyCheckOn('w') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_UP);
-		if (Key::keyCheckOn('a') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_LEFT);
-		if (Key::keyCheckOn('s') && Key::keyCheckOn('j')) c = (COMMAND_ATTACK_DOWN);
-
-		if (Key::keyCheckOn('d') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_RIGHT);
-		if (Key::keyCheckOn('w') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_UP);
-		if (Key::keyCheckOn('a') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_LEFT);
-		if (Key::keyCheckOn('s') && Key::keyCheckOn('k')) c = (COMMAND_SKILL_DOWN);
-
-		if (Key::keyCheckOn('1')) c = (COMMAND_SPAWN_CSE);
-		if (Key::keyCheckOn('2')) c = (COMMAND_SPAWN_PHYS);
-		if (Key::keyCheckOn('3')) c = (COMMAND_SPAWN_LIFE);
-		if (Key::keyCheckOn('4')) c = (COMMAND_SPAWN_ME);
-		if (Key::keyCheckOn('5')) c = (COMMAND_SPAWN_CHEM);
-
-		if (Key::keyCheckPressed('l')) c = COMMAND_FLAG;
-
-		messageFromClient[0][0] = c + '0';
-		//messageFromClient[0][1] = c + '0';
-		//messageFromClient[0][2] = c + '0';
-		//messageFromClient[1][0] = c + '0';
-		//messageFromClient[1][1] = c + '0';
-		//messageFromClient[1][2] = c + '0';
-	}
 }
 
 void Network::update() // frame turn routine
 {
-	/*
-	if (Network::getMode() == MODE_NOTHING)		// mode selection (CLIENT)
-	{
-		Network::setMode(MODE_CLIENT);														// set as client 
-		printf("mode- client chose\n");
-		Network::makeClientSocket();														// client socket made
-		Network::connectToServer();															// connect to server
-		// 팀정보 받아서 저장하기.
-
-		int strLen;																			// 팀 정보 저장
-		char teamInfo[8];
-		strLen = recv(hSocket, teamInfo, sizeof(teamInfo) - 1, 0); // data recieving
-		
-		if (strLen == -1)
-		{
-			Network::ErrorHandling("read() error");
-		}
-
-		teamInfo[strLen] = '\0';
-		setTeam(atoi(teamInfo));
-
-		printf("team : %d", team);
-
-		Ai::aiInit();
-
-		char characterInfo[((UNIT_NUM_MAX) / 2) + 1];
-		for (int i = 0; i<(UNIT_NUM_MAX) / 2; i++)
-		{
-			characterInfo[i] = Network::getCharacterSelection(i) + '0';
-		}
-
-		sendToServer(characterInfo);
-		printf("character chosen\n");
-
-		Network::recieveGameStart();
-		printf("GameStart!");
-
-	}// if invalid input, we should give error message*/
-
-	/*if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
+	if (Network::getMode() == MODE_NOTHING)		// mode selection (SERVER)
 	{
 		char gameStartMessage[2];
 		gameStartMessage[0] = GAME_START_CHAR;
@@ -358,40 +270,4 @@ void Network::update() // frame turn routine
 		setGameStart(0, GAME_START_CHAR);
 
 	}//*/
-
-	if (Network::getMode() == MODE_NOTHING)		// mode selection (SINGLE)
-	{
-		char gameStartMessage[2];
-		gameStartMessage[0] = GAME_START_CHAR;
-		gameStartMessage[1] = '\0';
-
-		Draw::naivefill(Rspr::infoServer);
-		glutSwapBuffers();
-
-		Network::setMode(MODE_SINGLE);
-		printf("mode - single chosen\n");
-		Network::makeServerSocket();														// server socket made
-		printf("socket made \n");
-		printf("accepted\n");
-
-		for (int i = 0; i < UNIT_NUM_MAX / 2; i++)												// spawn units
-		{
-			for (int j = 0; j < CLIENT_NUM_MAX; j++)
-			{
-				Game::getUnit(((UNIT_NUM_MAX) / 2) * j + i).spawn(DEP_PHYS);
-			}
-		}
-
-		Game::release();
-		setGameStart(0, GAME_START_CHAR);
-	}//*/
-
-	if (Network::getMode() == MODE_SERVER || Network::getMode() == MODE_CLIENT)				// after mode selected client should decide character
-	{
-		if (Network::getMode() == MODE_CLIENT && Network::getGameStart()[0] != GAME_START_CHAR)			// mapping for key and characters
-		{
-			
-		}
-
-	}
 }
