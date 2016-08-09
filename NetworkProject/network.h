@@ -33,7 +33,7 @@ public:
 
 	static void makeServerSocket();					// Server socket making routine
 	static void acceptClient();						// Server accept client
-	static void sendToClient(char *messageToClient);// Server message sending routine
+	static void sendToClient(char *messageToClient, size_t length);// Server message sending routine
 	static void recieveFromClient();				// Server message recieving routine
 	static void closeServerConnection();			// Server closing routine
 	

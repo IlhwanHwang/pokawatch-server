@@ -31,7 +31,7 @@ void main(int argc, char **argv)
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(INFO_WINDOW_WIDTH, INFO_WINDOW_HEIGHT);
+	glutInitWindowSize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
 
 	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);

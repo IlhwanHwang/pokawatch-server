@@ -427,7 +427,7 @@ void Petal::spawn(protocol_team team, int x, int y, protocol_direction direction
 	p.team = team;
 	p.x = x;
 	p.y = y;
-	p.direction = direction_flip(direction);
+	p.direction = direction;
 	p.valid = true;
 }
 
@@ -450,8 +450,8 @@ void Petal::update() {
 	if (!p.valid)
 		return;
 
-	float dx = (float)direction_to_dx(p.direction);
-	float dy = (float)direction_to_dy(p.direction);
+	float dx = (float)direction_to_dx(direction_flip(p.direction));
+	float dy = (float)direction_to_dy(direction_flip(p.direction));
 
 	float mag = 1.0 - Spline::accandfric(Gui::aniPhase());
 	dx *= mag;

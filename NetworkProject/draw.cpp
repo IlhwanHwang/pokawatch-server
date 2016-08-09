@@ -35,6 +35,7 @@ void Draw::init() {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glutReshapeFunc(Draw::setsize);
 
 	glViewport(0, 0, w, h);
 }
@@ -53,16 +54,20 @@ void DrawRequest::draw() const {
 }
 
 void Draw::refresh() {
+	/*
 	if (w != glutGet(GLUT_WINDOW_WIDTH) || h != glutGet(GLUT_WINDOW_HEIGHT))
 		glutReshapeWindow(w, h);
 
 	glViewport(0, 0, w, h);
+	*/
 }
 
 void Draw::setsize(int _w, int _h) { 
 	w = _w;
 	h = _h;
-	glutReshapeWindow(w, h);
+	//glutReshapeWindow(w, h);
+
+	glViewport(0, 0, w, h);
 	glutPostRedisplay();
 }
 

@@ -63,6 +63,14 @@ void Network::makeServerSocket() // Server Socket making routine
 	// Listeing for client
 	if (listen(hServSock, CLIENT_NUM_MAX) == SOCKET_ERROR) ErrorHandling("listen() error");
 
+	u_long iMode = 1;
+	if (ioctlsocket(hServSock, FIONBIO, &iMode)) {
+		cout << "IOCTLSOCKET error" << endl;
+	}
+	else {
+		cout << "IOCTLSOCKET succeeded" << endl;
+	}
+
 	printf("Server Listen\n");
 }
 
@@ -72,8 +80,11 @@ void Network::acceptClient()
 	for (int i = 0; i < CLIENT_NUM_MAX; i++) szClntAddr[i] = sizeof(clntAddr[i]);
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
-		if (hClntSock[i] == INVALID_SOCKET) ErrorHandling("accept() error");
+		while (1) {
+			hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr[i]);
+			if (hClntSock[i] != INVALID_SOCKET)
+				break;
+		}
 	}
 	// give their team
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
@@ -86,11 +97,11 @@ void Network::acceptClient()
 	}
 }
 
-void Network::sendToClient(char *messageToClient) // Message sending routine of client side
+void Network::sendToClient(char *messageToClient, size_t length) // Message sending routine of client side
 {
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int WhatDo = send(hClntSock[i], messageToClient, MESSAGE_T0_CLIENT_SIZE - 1, 0);
+		int WhatDo = send(hClntSock[i], messageToClient, length, 0);
 	}
 }
 
@@ -98,8 +109,13 @@ void Network::recieveFromClient() // Message recieving routine of server side
 {
 	for (int i = 0; i < CLIENT_NUM_MAX; i++)
 	{
-		int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
-		messageFromClient[i][strLen] = '\0';
+		while (1) {
+			int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
+			if (strLen != -1) {
+				messageFromClient[i][strLen] = '\0';
+				break;
+			}
+		}
 	}
 }
 
@@ -168,24 +184,6 @@ void Network::getProtocolDataFromServer() // Message receving from server
 
 	protocol_data *newData = (protocol_data*)messageToClient;
 
-	/*
-	printf("UNIT INFO\n");
-	for (int i = 0; i < UNIT_NUM_MAX; i++) printf("team %d dep %d x : %d y : %d state : %d health : %d\nhero : %d cooltime : %d respawn : %d stun : %d\n", newData->unit[i].team, newData->unit[i].dep, newData->unit[i].x, newData->unit[i].y, newData->unit[i].state, newData->unit[i].health, newData->unit[i].hero, newData->unit[i].cooltime, newData->unit[i].respawn, newData->unit[i].stun);
-	printf("FLAG INFO\n");
-	for (int i = 0; i < FLAG_NUM_MAX; i++) printf("team %d x : %d y : %d\n", newData->flag[i].team, newData->flag[i].x, newData->flag[i].y);
-	printf("PETAL INFO\n");
-	for (int i = 0; i < PETAL_NUM_MAX; i++) printf("team %d direction %d valid %d x %d y %d\n", newData->petal[i].team, newData->petal[i].direction, newData->petal[i].valid, newData->petal[i].x, newData->petal[i].y);
-	printf("POISON INFO\n");
-	for (int i = 0; i < POISON_NUM_MAX; i++) printf("team %d valid %d span %d x %d y %d\n", newData->poison[i].team, newData->poison[i].valid, newData->poison[i].span, newData->poison[i].x, newData->poison[i].y);
-	printf("MUSHROOM INFO\n");
-	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) printf("team %d valid %d x %d y %d\n", newData->mushroom[i].team, newData->mushroom[i].valid, newData->mushroom[i].x, newData->mushroom[i].y);
-	printf("SCORE\n");
-	printf("[POSTECH] %d [KAIST] %d\n", newData->score[TEAM_POSTECH - 1], newData->score[TEAM_KAIST - 1]);
-	printf("TURN LEFT\n");
-	printf("%d\n", newData->turnleft);
-	printf("\n");
-	*/
-
 }
 
 void Network::recieveGameStart()
@@ -216,22 +214,21 @@ void Network::sendToServer(char message[]) // message sending routine
 
 void Network::turn() // turn routine
 {
-	// in timer each turn this function is called
-	if (Network::getMode() == MODE_SERVER && Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) // for server when game started
-	{
-		char *protocolToSend;
-		protocolToSend = (char*)(Game::getProtocolPointer());
-		protocolToSend[MESSAGE_T0_CLIENT_SIZE] = '\0';
-		Network::sendToClient(protocolToSend);												// send protocol data to client
-
-		//Network::recieveFromClient();		// recieve command from clients;		
-		
+	if (Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) {
+		cout << "Turn reached" << endl;
 		for (int i = 0; i < CLIENT_NUM_MAX; i++)
 		{
 			int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
-			messageFromClient[i][strLen] = '\0';
-			cout << i<<"¹øÂ° client 0 : " << messageFromClient[i][0] << " 1 : " << messageFromClient[i][1] << " 2: " << messageFromClient[i][2] << endl;
+			if (strLen == -1) {
+				cout << "Client " << i << " didn't respond" << endl;
+			}
+			else {
+				messageFromClient[i][strLen] = '\0';
+				cout << "Client " << i << " had a message: " << messageFromClient[i] << endl;
+			}
 		}
+		Game::turn();
+		sendToClient((char*)Game::getProtocolPointer(), sizeof(protocol_data));
 	}
 }
 
@@ -240,7 +237,7 @@ void Network::update() // frame turn routine
 }
 
 void Network::init(char * argv) {
-	for (int i = 0; i<UNIT_NUM_MAX; i++) characterSelection[i] = 0;
+	for (int i = 0; i < UNIT_NUM_MAX; i++) characterSelection[i] = 0;
 	gameStart[0] = 'N';
 	gameStart[1] = '0' + TEAM_NULL;
 	gameStart[2] = '\0';
@@ -249,16 +246,13 @@ void Network::init(char * argv) {
 	gameStartMessage[0] = GAME_START_CHAR;
 	gameStartMessage[1] = '\0';
 
-	Draw::naivefill(Rspr::infoServer);
-	glutSwapBuffers();
-
-	Network::setMode(MODE_SERVER);														// set as server
+	setMode(MODE_SERVER);														// set as server
 	printf("mode - server chosn\n");
-	Network::makeServerSocket();														// server socket made
+	makeServerSocket();														// server socket made
 	printf("socket made \n");
-	Network::acceptClient();															// accepting client
+	acceptClient();															// accepting client
 	printf("accepted\n");
-	Network::recieveFromClient();														// recieve spawn information
+	recieveFromClient();														// recieve spawn information
 
 	for (int i = 0; i < UNIT_NUM_MAX / 2; i++)												// spawn units
 	{
@@ -271,6 +265,6 @@ void Network::init(char * argv) {
 	}
 
 	Game::release();
-	sendToClient(gameStartMessage);
+	sendToClient(gameStartMessage, 2);
 	setGameStart(0, GAME_START_CHAR);
 }

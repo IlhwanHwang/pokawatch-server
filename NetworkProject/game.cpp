@@ -526,6 +526,9 @@ void Game::ruleAttack() // rules related to attack
 		const int i = order[k];
 		Unit& u = unitArray[i];
 
+		if (!u.isAlive())
+			continue;
+
 		if (!state_kind_attack(u.getState()) && u.getDep() != DEP_ME && u.getDep() != DEP_CSE)
 			continue;
 
@@ -710,6 +713,10 @@ void Game::rulePoint() {
 	for (int k = 0; k < UNIT_NUM_MAX; k++) {
 		const int i = order[k];
 		Unit& u = unitArray[i];
+
+		if (!u.isAlive())
+			continue;
+
 		if (u.getX() >= POINT_X1 && u.getY() >= POINT_Y1 &&
 			u.getX() <= POINT_X2 && u.getY() <= POINT_Y2) {
 			point[team_to_index(u.getTeam())] = true;
@@ -794,12 +801,18 @@ void Game::ruleFlush() {
 }
 
 void Game::turn() {
+	if (elapsed >= TURN_MAX) {
+		end = true;
+	}
+	
 	if (end) {
 		for (int i = 0; i < UNIT_NUM_MAX; i++) {
-			unitArray[0].setState(STATE_IDLE);
+			unitArray[i].setState(STATE_IDLE);
+			unitArray[i].moveOffDiscard();
 		}
 		return;
 	}
+
 	elapsed++;
 
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].turn();
