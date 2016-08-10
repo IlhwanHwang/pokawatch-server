@@ -87,12 +87,6 @@ public:
 
 	static Sprite ownPoint;
 	static Sprite ownFlag[8];
-
-	static Sprite infoMain;
-	static Sprite infoServer;
-	static Sprite infoClient1;
-	static Sprite infoClient2;
-	static Sprite infoClient3;
 };
 
 class Resource {

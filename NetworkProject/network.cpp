@@ -188,9 +188,6 @@ void Network::getProtocolDataFromServer() // Message receving from server
 
 void Network::recieveGameStart()
 {
-	Draw::naivefill(Rspr::infoClient2);
-	glutSwapBuffers();
-
 	int strLen;
 	strLen = recv(hSocket, gameStart, sizeof(gameStart) - 1, 0); // data recieving
 	if (strLen == -1)
@@ -247,11 +244,10 @@ void Network::init(char * argv) {
 	gameStartMessage[1] = '\0';
 
 	setMode(MODE_SERVER);														// set as server
-	printf("mode - server chosn\n");
 	makeServerSocket();														// server socket made
-	printf("socket made \n");
+	printf("Socket made \n");
 	acceptClient();															// accepting client
-	printf("accepted\n");
+	printf("Client accepted\n");
 	recieveFromClient();														// recieve spawn information
 
 	for (int i = 0; i < UNIT_NUM_MAX / 2; i++)												// spawn units
@@ -259,8 +255,6 @@ void Network::init(char * argv) {
 		for (int j = 0; j < CLIENT_NUM_MAX; j++)
 		{
 			Game::getUnit(((UNIT_NUM_MAX) / 2) * j + i).spawn((protocol_dep)(messageFromClient[j][i] - '0'));
-			cout << messageFromClient << "was came" << endl;
-			cout << j << "팀의" << i << "번쨰 캐릭터에 해당하는" << messageFromClient[j][i] - '0' << endl;
 		}
 	}
 

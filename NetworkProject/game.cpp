@@ -593,6 +593,7 @@ void Game::ruleCollide() {
 			{
 				if (p.getTeam() == t) {
 					u.heal(LIFE_PETAL_HEAL);
+					u.destun();
 				}
 				else {
 					u.damage(LIFE_PETAL_DAMAGE);
@@ -670,7 +671,13 @@ void Game::ruleSkill() // rules related to skill
 			Effect::push(new EffectBlackhole(t, x + dx * 2, y + dy * 2));
 		}
 		else if (u.getDep() == DEP_LIFE) {
-			regionHealAll(t, LIFE_BLOSSOM_HEAL);
+			for (int j = 0; j < UNIT_NUM_MAX; j++) {
+				Unit& other = unitArray[j];
+				if (other.getTeam() == t) {
+					other.heal(LIFE_BLOSSOM_HEAL);
+					other.destun();
+				}
+			}
 		}
 		else if (u.getDep() == DEP_ME) {
 			// ME's skill is implemented in move session

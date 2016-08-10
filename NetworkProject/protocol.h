@@ -264,6 +264,8 @@ inline int direction_to_dx(protocol_direction d) {
 		return -1;
 	case DIRECTION_DOWN:
 		return 0;
+	default:
+		return 0;
 	}
 }
 
@@ -277,6 +279,8 @@ inline int direction_to_dy(protocol_direction d) {
 		return 0;
 	case DIRECTION_DOWN:
 		return -1;
+	default:
+		return 0;
 	}
 }
 

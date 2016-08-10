@@ -36,7 +36,7 @@ void main(int argc, char **argv)
 	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
-	glutCreateWindow("CNH - Network Project");
+	glutCreateWindow("2016 PKWar AI <Pokawatch>");
 
 	glewExperimental = GL_TRUE;
 	glewInit();

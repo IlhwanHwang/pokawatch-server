@@ -42,6 +42,7 @@ Unit::Unit(int x, int y, protocol_team team, const char* name) {
 
 	flagRespawned = false;
 	flagDead = false;
+	flagUnstun = false;
 
 	this->name = name;
 }
@@ -192,6 +193,11 @@ void Unit::stun(int s) {
 	p.stun = p.stun > s ? p.stun : s;
 }
 
+void Unit::destun() {
+	flagUnstun = true;
+}
+
+
 void Unit::kill() {
 	if (p.state == STATE_DEAD)
 		return;
@@ -270,6 +276,9 @@ void Unit::flush() {
 	if (p.health > healthMax) {
 		p.health = healthMax;
 	}
+
+	if (flagUnstun)
+		p.stun = 0;
 
 	if (p.stun > 0)
 		p.state = STATE_STUN;

@@ -81,12 +81,6 @@ Sprite Rspr::pointBarFrame;
 Sprite Rspr::ownPoint;
 Sprite Rspr::ownFlag[8];
 
-Sprite Rspr::infoMain;
-Sprite Rspr::infoServer;
-Sprite Rspr::infoClient1;
-Sprite Rspr::infoClient2;
-Sprite Rspr::infoClient3;
-
 #define RESOURCE_LOCATION "images\\"
 
 // Macro to load multiple consecutive images at once
@@ -101,13 +95,6 @@ Sprite Rspr::infoClient3;
 #define LOAD(res, filename) Rspr::res.load(RESOURCE_LOCATION filename ".png")
 
 void Resource::init() {
-	char buf[100];
-
-	LOAD(infoMain, "info_main").setOffset(0.0, 240.0);
-	LOAD(infoServer, "info_server").setOffset(0.0, 240.0);
-	LOAD(infoClient1, "info_client1").setOffset(0.0, 240.0);
-	LOAD(infoClient2, "info_client2").setOffset(0.0, 240.0);
-	LOAD(infoClient3, "info_client3").setOffset(0.0, 240.0);
 }
 
 void Resource::postinit() {
