@@ -14,6 +14,9 @@
 #include "draw.h"
 #include "resource.h"
 
+#define SCENARIO_SINGLE
+//#define SCENARIO_SERVER
+
 using namespace std;
 
 SOCKET Network::hServSock;														// Server socket variable of server/client side
@@ -213,6 +216,7 @@ void Network::turn() // turn routine
 {
 	if (Network::getGameStart()[0] == GAME_START_CHAR && !Game::isEnded()) {
 		cout << "Turn reached" << endl;
+#ifdef SCENARIO_SERVER
 		for (int i = 0; i < CLIENT_NUM_MAX; i++)
 		{
 			int strLen = recv(hClntSock[i], messageFromClient[i], MESSAGE_TO_SERVER_SIZE - 1, 0);
@@ -224,6 +228,61 @@ void Network::turn() // turn routine
 				cout << "Client " << i << " had a message: " << messageFromClient[i] << endl;
 			}
 		}
+#endif
+#ifdef SCENARIO_SINGLE
+		for (int i = 0; i < CLIENT_NUM_MAX; i++) {
+			for (int j = 0; j < UNIT_PER_TEAM; j++) {
+				Unit& u = Game::getUnit(UNIT_PER_TEAM * i + j);
+				protocol_command c;
+
+				if (u.isAlive()) {
+					bool own = u.getX() > POINT_X1 && u.getX() < POINT_X2;
+					if (u.getDep() == DEP_CSE) {
+						if (own)
+							c = COMMAND_NULL;
+						else
+							c = (i == 0 ? COMMAND_MOVE_RIGHT : COMMAND_MOVE_LEFT);
+					}
+					else {
+						if (rand() % 4 && !own)
+							c = (i == 0 ? COMMAND_MOVE_RIGHT : COMMAND_MOVE_LEFT);
+						else
+							c = (i == 0 ? COMMAND_ATTACK_RIGHT : COMMAND_ATTACK_LEFT);
+					}
+				}
+				else {
+					switch (rand() % 3) {
+					case 0: c = COMMAND_SPAWN_PHYS; break;
+					case 1: c = COMMAND_SPAWN_LIFE; break;
+					case 2: c = COMMAND_SPAWN_CHEM; break;
+					}
+				}
+				messageFromClient[i][j] = (char)c + '0';
+			}
+		}
+		/*
+		char c_command;
+		protocol_direction d = DIRECTION_NULL;
+		protocol_command c = COMMAND_NULL;
+
+		if (Key::keyCheckOn('W')) d = DIRECTION_UP;
+		if (Key::keyCheckOn('A')) d = DIRECTION_LEFT;
+		if (Key::keyCheckOn('S')) d = DIRECTION_DOWN;
+		if (Key::keyCheckOn('D')) d = DIRECTION_RIGHT;
+
+		if (Key::keyCheckOn('J')) c = direction_to_attackcommand(d);
+		else if (Key::keyCheckOn('K')) c = direction_to_skillcommand(d);
+		else c = direction_to_movecommand(d);
+
+		if (Key::keyCheckOn('1')) c = COMMAND_SPAWN_CSE;
+		if (Key::keyCheckOn('2')) c = COMMAND_SPAWN_PHYS;
+		if (Key::keyCheckOn('3')) c = COMMAND_SPAWN_ME;
+		if (Key::keyCheckOn('4')) c = COMMAND_SPAWN_LIFE;
+		if (Key::keyCheckOn('5')) c = COMMAND_SPAWN_CHEM;
+
+		messageFromClient[0][0] = (char)c + '0';
+		*/
+#endif
 		Game::turn();
 		sendToClient((char*)Game::getProtocolPointer(), sizeof(protocol_data));
 	}
@@ -244,6 +303,8 @@ void Network::init(char * argv) {
 	gameStartMessage[1] = '\0';
 
 	setMode(MODE_SERVER);														// set as server
+
+#ifdef SCENARIO_SERVER
 	makeServerSocket();														// server socket made
 	printf("Socket made \n");
 	acceptClient();															// accepting client
@@ -260,5 +321,18 @@ void Network::init(char * argv) {
 
 	Game::release();
 	sendToClient(gameStartMessage, 2);
+#endif 
+
+#ifdef SCENARIO_SINGLE
+	for (int i = 0; i < UNIT_PER_TEAM; i++)												// spawn units
+	{
+		for (int j = 0; j < CLIENT_NUM_MAX; j++)
+		{
+			Game::getUnit(UNIT_PER_TEAM * j + i).spawn((protocol_dep)(rand() % DEP_CHEM + 1));
+		}
+	}
+	Game::release();
+#endif
+
 	setGameStart(0, GAME_START_CHAR);
 }

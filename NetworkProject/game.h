@@ -21,7 +21,8 @@ private:
 	static int death[2];
 	static int order[UNIT_NUM_MAX];
 
-	static bool end;
+	static bool ended;
+	static bool started;
 
 	static void rulePriority();	// Setting priority between unit. Even-odd round robin.
 	static void ruleCommand();	// Send commands on units
@@ -40,6 +41,7 @@ private:
 
 public:
 	static void init();											// initialize game
+	static void start();
 	static void makeProtocol();									// protocol data making routine									
 	static void update();										// frame interval routine
 	static void turn();											// turn routine
@@ -73,5 +75,6 @@ public:
 	static int getDeath(int ind) { return death[ind]; }
 	static int getElapsed() { return elapsed; }
 	static void setDeath(int ind, int x) { death[ind] = x; }
-	static bool isEnded() { return end; }
+	static bool isEnded() { return ended; }
+	static bool isStarted() { return started; }
 };

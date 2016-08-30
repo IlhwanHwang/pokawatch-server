@@ -6,12 +6,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <string>
-#include <winsock2.h>
-#include <windows.h>
 
 #include "shader.h"
 #include "timer.h"
@@ -24,6 +20,9 @@
 #include "draw.h"
 #include "resource.h"
 #include "gui.h"
+#include "audio.h"
+
+#include <irrKlang.h>
 
 void main(int argc, char **argv)
 {
@@ -47,8 +46,9 @@ void main(int argc, char **argv)
 	Shader::init();
 	Network::init(NULL);
 	Resource::init();
+	Audio::init();
 
-	Timer::init(FRAME_INTERVAL, FRAME_PER_TURN);
+	Timer::init(1, 30);
 
 	glutMainLoop();
 }

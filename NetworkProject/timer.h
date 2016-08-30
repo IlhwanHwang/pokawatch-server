@@ -10,6 +10,8 @@ class Timer {
 private:
 	static int frameInterval;
 	static int framePerTurn;
+	static bool turnWait;
+	static float turnWaitPhase;
 
 public:
 	static void init(int, int); // Initialize timer with interval and frame per turn value.
@@ -18,4 +20,5 @@ public:
 
 	static int getFrameInterval() { return frameInterval; }
 	static int getFramePerTurn() { return framePerTurn; }
+	static float getDeltaPerTurn() { return 1.0 / framePerTurn; }
 };

@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "effect.h"
 #include "utility.h"
+#include "audio.h"
 
 Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(0, MAP_HEIGHT / 2 - 1, TEAM_POSTECH),
@@ -15,7 +16,6 @@ Unit Game::unitArray[UNIT_NUM_MAX] = {					// initialize of units
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 - 1, TEAM_KAIST),
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2, TEAM_KAIST),
 	Unit(MAP_WIDTH - 1, MAP_HEIGHT / 2 + 1, TEAM_KAIST)
-
 };
 Poison Game::poisonArray[POISON_NUM_MAX];
 Petal Game::petalArray[PETAL_NUM_MAX];
@@ -26,7 +26,8 @@ protocol_team Game::owner;
 int Game::own[2], Game::win[2], Game::extra, Game::elapsed;
 int Game::death[2];
 int Game::order[UNIT_NUM_MAX];
-bool Game::end = false;
+bool Game::ended = false;
+bool Game::started = false;
 
 void Game::init() // game initialization
 {
@@ -39,11 +40,16 @@ void Game::init() // game initialization
 	elapsed = 0;
 	death[0] = 0;
 	death[1] = 0;
-	end = false;
+	ended = false;
 
 	glutDisplayFunc(draw);
 
 	makeProtocol();
+}
+
+void Game::start() {
+	started = true;
+	Audio::start();
 }
 
 void Game::makeProtocol() // protocol data making routine
@@ -52,7 +58,7 @@ void Game::makeProtocol() // protocol data making routine
 	for (int i = 0; i < POISON_NUM_MAX; i++) protocolToSend.poison[i] = *(poisonArray[i].getProtocol());
 	for (int i = 0; i < PETAL_NUM_MAX; i++) protocolToSend.petal[i] = *(petalArray[i].getProtocol());
 	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) protocolToSend.mushroom[i] = *(mushroomArray[i].getProtocol());
-	protocolToSend.elapsed= elapsed;
+	protocolToSend.elapsed = elapsed;
 	protocolToSend.owner = owner;
 	protocolToSend.own[0] = own[0];
 	protocolToSend.own[1] = own[1];
@@ -183,7 +189,7 @@ void Game::draw() {
 	//Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
 	//Draw::bignumber(elapsed, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
 
-	if (end) {
+	if (ended) {
 		if (owner == TEAM_POSTECH)
 			Draw::draw(Rspr::winPostech, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
 		else if (owner == TEAM_KAIST)
@@ -774,6 +780,7 @@ void Game::rulePoint() {
 			else {
 				if (point[j]) {
 					// Extra time
+					Audio::extra();
 					extra = POINT_TURN_EXTRA;
 				}
 				else {
@@ -783,7 +790,7 @@ void Game::rulePoint() {
 					}
 					else {
 						// Extra time expired
-						end = true;
+						ended = true;
 					}
 				}
 			}
@@ -809,10 +816,10 @@ void Game::ruleFlush() {
 
 void Game::turn() {
 	if (elapsed >= TURN_MAX) {
-		end = true;
+		ended = true;
 	}
 	
-	if (end) {
+	if (ended) {
 		for (int i = 0; i < UNIT_NUM_MAX; i++) {
 			unitArray[i].setState(STATE_IDLE);
 			unitArray[i].moveOffDiscard();

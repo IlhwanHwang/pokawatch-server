@@ -17,6 +17,8 @@
 #define GUI_MAP_X (WINDOW_WIDTH / 2.0)
 #define GUI_MAP_Y (WINDOW_HEIGHT / 2.0 - 48.0)
 
+#define ANIMATION_SPAN_RATE 0.5
+
 // Gui module defines various graphical values
 // Such as animation phase, map size, and so on.
 class Gui {

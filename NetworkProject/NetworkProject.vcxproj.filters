@@ -80,6 +80,9 @@
     <ClInclude Include="ai.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -128,6 +131,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ai.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="audio.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

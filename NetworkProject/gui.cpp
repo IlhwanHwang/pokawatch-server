@@ -5,6 +5,7 @@
 
 #include "gui.h"
 #include "shader.h"
+#include "timer.h"
 
 float Gui::animationPhase = 0.0;
 float Gui::animationPostPhase = 0.0;
@@ -21,19 +22,28 @@ void Gui::turn() {
 
 void Gui::update() {
 	if (animationPhase < 1.0) {
-		animationPhase += DELTA_ANIMATION;
+		animationPhase += Timer::getDeltaPerTurn() / ANIMATION_SPAN_RATE;
 	}
-	else {
-		animationPostPhase += DELTA_POSTANIMATION;
+	else if (animationPostPhase < 1.0) {
+		animationPostPhase += Timer::getDeltaPerTurn() / (1.0 - ANIMATION_SPAN_RATE);
 		animationPhase = 1.0;
 	}
+	else {
+		animationPhase = 1.0;
+		animationPostPhase = 1.0;
+	}
 
-	animationFullPhase += DELTA_PER_TURN;
+	if (animationFullPhase < 1.0) {
+		animationFullPhase += Timer::getDeltaPerTurn();
+	}
+	else {
+		animationFullPhase = 1.0;
+	}
 
 	animationIndpPhase += 1.0;
 
 	if (shakePhase > 0.0) {
-		shakePhase -= DELTA_PER_TURN;
+		shakePhase -= Timer::getDeltaPerTurn();
 	}
 	else {
 		shakePhase = 0.0;

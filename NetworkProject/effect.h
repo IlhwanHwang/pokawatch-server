@@ -9,6 +9,7 @@
 #include <vector>
 #include "protocol.h"
 #include "gui.h"
+#include "timer.h"
 
 class EffectBase {
 protected:
@@ -17,7 +18,7 @@ protected:
 public:
 	EffectBase(float x, float y) : x(x), y(y), phase(0.0) { };
 	virtual void draw() const = 0;
-	virtual void update() { phase += DELTA_ANIMATION; };
+	virtual void update() { phase += Timer::getDeltaPerTurn(); };
 	bool isValid() { return phase < 1.0; }
 };
 
@@ -96,7 +97,7 @@ public:
 class EffectOwnFlag : public EffectBase {
 public:
 	EffectOwnFlag(float x, float y) : EffectBase(x, y) {};
-	void update() { phase += DELTA_PER_TURN; }
+	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
 
@@ -111,13 +112,13 @@ public:
 class EffectDeath : public EffectTeam {
 public:
 	EffectDeath(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
-	void update() { phase += DELTA_PER_TURN; }
+	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
 
 class EffectBlackhole : public EffectTeam {
 public:
 	EffectBlackhole(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
-	void update() { phase += DELTA_PER_TURN; }
+	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };

@@ -29,7 +29,6 @@ void Ai::aiInit(void)
 	/*Ai::CharacterInit(0, DEP_PHYS);
 	Ai::CharacterInit(1, DEP_PHYS);
 	Ai::CharacterInit(2, DEP_PHYS);*/
-
 }
 
 int ab(int x)

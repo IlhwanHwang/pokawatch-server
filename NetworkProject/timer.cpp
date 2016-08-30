@@ -24,12 +24,14 @@
 #include "shader.h"
 #include "debug.h"
 #include "resource.h"
+#include "audio.h"
 
 using namespace std;
 
 int Timer::frameInterval;
 int Timer::framePerTurn;
-
+bool Timer::turnWait = false;
+float Timer::turnWaitPhase = 0.0;
 
 void Timer::init(int interval, int perturn) {
 	frameInterval = interval;
@@ -48,8 +50,22 @@ void Timer::turn() {
 void Timer::update(int count) {
 	glutTimerFunc(frameInterval, update, count + 1);
 
-	if (count % framePerTurn == 0) {
-		turn();
+	Audio::update();
+
+	if (!Game::isStarted()) {
+		if (Key::keyCheckPressed(32)) {
+			Game::start();
+		}
+	}
+	else {
+		if (turnWait) {
+			if (Key::keyCheckPressed(32))
+				turn();
+		}
+		else {
+			if (Audio::isTurn() && !Game::isEnded())
+				turn();
+		}
 	}
 
 	Gui::update();
