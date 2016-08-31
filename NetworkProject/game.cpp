@@ -132,6 +132,7 @@ void Game::drawPoint() {
 void Game::drawOverlay() {
 	const float flagx = WINDOW_WIDTH * 0.5;
 	const float flagy = WINDOW_HEIGHT - 96.0;
+	
 	if (owner == TEAM_NULL) {
 		Draw::draw(Rspr::flagNull, flagx, flagy);
 	}
@@ -142,6 +143,11 @@ void Game::drawOverlay() {
 		Draw::draw(Rspr::flagK[Gui::aniFullPhaseCombinate(4)], flagx, flagy);
 	}
 	
+	for (int i = 0; i < 2; i++) {
+		if (own[i] > 0)
+			Draw::draw((i == 0 ? Rspr::ownGaugeP : Rspr::ownGaugeK)[own[i] - 1], WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 150.0);
+	}
+
 	const float barw = 256.0;
 	const float barpx = flagx - 96.0;
 	const float barpy = flagy;
@@ -749,6 +755,7 @@ void Game::rulePoint() {
 				else {
 					// Owned the first point
 					owner = index_to_team(i);
+					own[i] = 0;
 					Gui::shake(2.0);
 					Effect::push(new EffectOwn(GUI_MAP_X, GUI_MAP_Y));
 					Effect::push(new EffectOwnFlag(WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 96.0));
@@ -763,6 +770,7 @@ void Game::rulePoint() {
 				else {
 					// Owned the first point
 					owner = index_to_team(i);
+					own[i] = 0;
 				}
 			}
 		}

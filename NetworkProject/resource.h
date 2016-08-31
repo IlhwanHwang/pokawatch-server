@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sprite.h"
+#include <irrKlang.h>
 
 // Every resource is saved on static context
 class Rspr {
@@ -87,10 +88,18 @@ public:
 
 	static Sprite ownPoint;
 	static Sprite ownFlag[8];
+	static Sprite ownGaugeP[5];
+	static Sprite ownGaugeK[5];
+};
+
+class Rsfx {
+public:
+	static irrklang::ISoundSource* death;
 };
 
 class Resource {
 public:
 	static void init();
+	static void initSfx();
 	static void postinit();
 };

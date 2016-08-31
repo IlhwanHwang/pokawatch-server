@@ -260,18 +260,20 @@ void Network::turn() // turn routine
 				messageFromClient[i][j] = (char)c + '0';
 			}
 		}
-		/*
+		
 		char c_command;
 		protocol_direction d = DIRECTION_NULL;
 		protocol_command c = COMMAND_NULL;
+		Unit& u = Game::getUnit(0);
+		u.setHero(true);
 
-		if (Key::keyCheckOn('W')) d = DIRECTION_UP;
-		if (Key::keyCheckOn('A')) d = DIRECTION_LEFT;
-		if (Key::keyCheckOn('S')) d = DIRECTION_DOWN;
-		if (Key::keyCheckOn('D')) d = DIRECTION_RIGHT;
+		if (Key::keyCheckOn('w')) d = DIRECTION_UP;
+		if (Key::keyCheckOn('a')) d = DIRECTION_LEFT;
+		if (Key::keyCheckOn('s')) d = DIRECTION_DOWN;
+		if (Key::keyCheckOn('d')) d = DIRECTION_RIGHT;
 
-		if (Key::keyCheckOn('J')) c = direction_to_attackcommand(d);
-		else if (Key::keyCheckOn('K')) c = direction_to_skillcommand(d);
+		if (Key::keyCheckOn('j')) c = direction_to_attackcommand(d);
+		else if (Key::keyCheckOn('k')) c = direction_to_skillcommand(d);
 		else c = direction_to_movecommand(d);
 
 		if (Key::keyCheckOn('1')) c = COMMAND_SPAWN_CSE;
@@ -281,7 +283,7 @@ void Network::turn() // turn routine
 		if (Key::keyCheckOn('5')) c = COMMAND_SPAWN_CHEM;
 
 		messageFromClient[0][0] = (char)c + '0';
-		*/
+		
 #endif
 		Game::turn();
 		sendToClient((char*)Game::getProtocolPointer(), sizeof(protocol_data));
@@ -331,6 +333,7 @@ void Network::init(char * argv) {
 			Game::getUnit(UNIT_PER_TEAM * j + i).spawn((protocol_dep)(rand() % DEP_CHEM + 1));
 		}
 	}
+	Game::getUnit(0).spawn(DEP_CSE);
 	Game::release();
 #endif
 

@@ -5,6 +5,7 @@
 
 #include "resource.h"
 #include <string>
+#include "audio.h"
 
 Sprite Rspr::temp;
 Sprite Rspr::error;
@@ -80,21 +81,33 @@ Sprite Rspr::pointBarFrame;
 
 Sprite Rspr::ownPoint;
 Sprite Rspr::ownFlag[8];
+Sprite Rspr::ownGaugeP[5];
+Sprite Rspr::ownGaugeK[5];
 
-#define RESOURCE_LOCATION "images\\"
+irrklang::ISoundSource* Rsfx::death;
+
+#define RESOURCE_IMG_LOCATION "images\\"
+#define RESOURCE_SFX_LOCATION "sounds\\"
 
 // Macro to load multiple consecutive images at once
 #define MULTILOAD(buf, res, num, filename) \
 	for (int i = 0; i < num; i++) \
 	{ \
-		sprintf(buf, RESOURCE_LOCATION filename ".png", i); \
+		sprintf(buf, RESOURCE_IMG_LOCATION filename ".png", i); \
 		Rspr::res[i].load(buf).dot(); \
 	}
 
 // Single image load macro
-#define LOAD(res, filename) Rspr::res.load(RESOURCE_LOCATION filename ".png")
+#define LOAD(res, filename) Rspr::res.load(RESOURCE_IMG_LOCATION filename ".png")
+
+// Single SFX load macro
+#define LOADSFX(res, filename) Rsfx::res = Audio::getEngine()->addSoundSourceFromFile(RESOURCE_SFX_LOCATION filename ".wav", irrklang::ESM_AUTO_DETECT, true)
 
 void Resource::init() {
+}
+
+void Resource::initSfx() {
+	LOADSFX(death, "death");
 }
 
 void Resource::postinit() {
@@ -169,6 +182,8 @@ void Resource::postinit() {
 
 	LOAD(ownPoint, "own_point").dot();
 	MULTILOAD(buf, ownFlag, 8, "own_flag_%d");
+	MULTILOAD(buf, ownGaugeP, 5, "own_gauge_p_%d");
+	MULTILOAD(buf, ownGaugeK, 5, "own_gauge_k_%d");
 
 	LOAD(winPostech, "win_postech").dot();
 	LOAD(winKaist, "win_kaist").dot();

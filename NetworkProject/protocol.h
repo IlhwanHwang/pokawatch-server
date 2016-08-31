@@ -172,7 +172,7 @@ typedef struct {
 #define POINT_Y1 (MAP_HEIGHT / 2 - 3)
 #define POINT_X2 (MAP_WIDTH / 2 + 2)
 #define POINT_Y2 (MAP_HEIGHT / 2 + 3)
-#define POINT_TURN_OWN 10
+#define POINT_TURN_OWN 5
 #define POINT_TURN_WIN 30
 #define POINT_TURN_EXTRA 5
 #define TURN_MAX 300

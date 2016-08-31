@@ -70,3 +70,7 @@ bool Audio::isTurn() {
 	else
 		return false;
 }
+
+void Audio::play(irrklang::ISoundSource* sfx) {
+	engine->play2D(sfx);
+}

@@ -16,10 +16,13 @@ private:
 	static bool isextra;
 	static bool isturn;
 	static irrklang::ik_u32 lastPlayPosition;
+
 public:
 	static void init();
 	static void start();
 	static void update();
 	static void extra();
 	static bool isTurn();
+	static irrklang::ISoundEngine* getEngine() { return engine; }
+	static void play(irrklang::ISoundSource* sfx);
 };
