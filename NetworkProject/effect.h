@@ -122,3 +122,10 @@ public:
 	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
+
+class EffectStorm : public EffectBase {
+public:
+	EffectStorm(float x, float y) : EffectBase(x, y) {};
+	void update() { phase += Timer::getDeltaPerTurn(); }
+	void draw() const;
+};

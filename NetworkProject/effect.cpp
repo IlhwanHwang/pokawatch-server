@@ -106,3 +106,9 @@ void EffectBlackhole::draw() const {
 		team == TEAM_POSTECH ? Rspr::PHYSBlackholeP[(int)(phase * 8)] : Rspr::PHYSBlackholeP[(int)(phase * 8)],
 		100.0, x, y, 0.5);
 }
+
+void EffectStorm::draw() const {
+	for (int i = -CSE_STORM_RANGE; i <= CSE_STORM_RANGE; i++)
+		for (int j = -CSE_STORM_RANGE; j <= CSE_STORM_RANGE; j++)
+			Draw::qonmap(Rspr::sparkboom[(int)(phase * 4)], 0.0, x + i, y + j, 0.0);
+}

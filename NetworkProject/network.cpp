@@ -237,25 +237,17 @@ void Network::turn() // turn routine
 
 				if (u.isAlive()) {
 					bool own = u.getX() > POINT_X1 && u.getX() < POINT_X2;
-					if (u.getDep() == DEP_CSE) {
-						if (own)
-							c = COMMAND_NULL;
-						else
-							c = (i == 0 ? COMMAND_MOVE_RIGHT : COMMAND_MOVE_LEFT);
-					}
+					if (!own)
+						c = ((u.getX() - (POINT_X1 + POINT_X2) / 2) < 0 ? COMMAND_MOVE_RIGHT : COMMAND_MOVE_LEFT);
 					else {
-						if (rand() % 4 && !own)
-							c = (i == 0 ? COMMAND_MOVE_RIGHT : COMMAND_MOVE_LEFT);
+						if (rand() % 4)
+							c = direction_to_movecommand(random_direction());
 						else
-							c = (i == 0 ? COMMAND_ATTACK_RIGHT : COMMAND_ATTACK_LEFT);
+							c = direction_to_attackcommand(random_direction());
 					}
 				}
 				else {
-					switch (rand() % 3) {
-					case 0: c = COMMAND_SPAWN_PHYS; break;
-					case 1: c = COMMAND_SPAWN_LIFE; break;
-					case 2: c = COMMAND_SPAWN_CHEM; break;
-					}
+					c = dep_to_spawncommand(random_dep());
 				}
 				messageFromClient[i][j] = (char)c + '0';
 			}
@@ -265,7 +257,6 @@ void Network::turn() // turn routine
 		protocol_direction d = DIRECTION_NULL;
 		protocol_command c = COMMAND_NULL;
 		Unit& u = Game::getUnit(0);
-		u.setHero(true);
 
 		if (Key::keyCheckOn('w')) d = DIRECTION_UP;
 		if (Key::keyCheckOn('a')) d = DIRECTION_LEFT;
@@ -333,7 +324,8 @@ void Network::init(char * argv) {
 			Game::getUnit(UNIT_PER_TEAM * j + i).spawn((protocol_dep)(rand() % DEP_CHEM + 1));
 		}
 	}
-	Game::getUnit(0).spawn(DEP_CSE);
+	Game::getUnit(0).spawn(DEP_CHEM);
+	Game::getUnit(0).setHero(true);
 	Game::release();
 #endif
 

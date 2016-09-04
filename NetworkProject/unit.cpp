@@ -271,6 +271,7 @@ void Unit::flush() {
 
 	if (p.health <= 0) {
 		kill();
+		return;
 	}
 
 	if (p.health > healthMax) {

@@ -6,6 +6,9 @@
 #ifndef PROTOCOL
 #define PROTOCOL
 
+#include <iostream>
+#include <string>
+
 // Protocol definitions. determine which information is contained on network communication.
 // Especially, protocol structure is seen by remote AI program.
 
@@ -589,5 +592,145 @@ inline protocol_data mirror_data(protocol_data d) {
 	((dep) == DEP_LIFE ? (s3) : \
 	((dep) == DEP_ME ? (s4) : (s5) \
 	))))
+
+inline std::string string_team(protocol_team t) {
+	switch (t) {
+	case TEAM_POSTECH: return "POSTECH";
+	case TEAM_KAIST: return "KAIST";
+	default: return "UNKNOWN";
+	}
+}
+
+inline std::string string_dep(protocol_dep d) {
+	switch (d) {
+	case DEP_CSE: return "CSE";
+	case DEP_PHYS: return "PHYS";
+	case DEP_ME: return "ME";
+	case DEP_LIFE: return "LIFE";
+	case DEP_CHEM: return "CHEM";
+	default: return "UNKNOWN";
+	}
+}
+
+inline std::string string_state(protocol_state s) {
+	switch (s) {
+	case STATE_IDLE: return "idle";
+	case STATE_DEAD: return "dead";
+	case STATE_ATTACK_RIGHT: return "attack to right";
+	case STATE_ATTACK_UP: return "attack to up";
+	case STATE_ATTACK_LEFT: return "attack to left";
+	case STATE_ATTACK_DOWN: return "attack to down";
+	case STATE_SKILL_RIGHT: return "skill to right";
+	case STATE_SKILL_UP: return "skill to up";
+	case STATE_SKILL_LEFT: return "skill to left";
+	case STATE_SKILL_DOWN: return "skill to down";
+	case STATE_STUN: return "stun";
+	default: return "unknown";
+	}
+}
+
+inline std::string string_direction(protocol_direction d) {
+	switch (d) {
+	case DIRECTION_RIGHT: return "right";
+	case DIRECTION_UP: return "up";
+	case DIRECTION_LEFT: return "left";
+	case DIRECTION_DOWN: return "down";
+	default: return "unknown";
+	}
+}
+
+inline void print_unit(const protocol_unit& u) {
+	std::cout << "Team: " << string_team(u.team) << " / ";
+	std::cout << "Department: " << string_dep(u.dep) << std::endl;
+	std::cout << "Position: (" << u.x << "," << u.y << ")" << " / ";
+	std::cout << "State: " << string_state(u.state) << std::endl;
+	std::cout << "Health: " << u.health << " / ";
+	std::cout << "Cooltime: " << u.cooltime << " / ";
+	std::cout << "Respawn: " << u.respawn << " / ";
+	std::cout << "Stun: " << u.stun << " / ";
+	std::cout << "Invincible: " << u.invincible << " / ";
+	std::cout << "Hero: " << (u.hero ? "yes" : "no") << std::endl;
+}
+
+inline void print_petal(const protocol_petal& p) {
+	std::cout << "Team: " << string_team(p.team) << " / ";
+	std::cout << "Position: (" << p.x << "," << p.y << ")" << " / ";
+	std::cout << "Direction: " << string_direction(p.direction) << std::endl;
+}
+
+inline void print_poison(const protocol_poison& p) {
+	std::cout << "Team: " << string_team(p.team) << " / ";
+	std::cout << "Position: (" << p.x << "," << p.y << ")" << " / ";
+	std::cout << "Span: " << p.span << std::endl;
+}
+
+inline void print_mushroom(const protocol_mushroom& m) {
+	std::cout << "Team: " << string_team(m.team) << " / ";
+	std::cout << "Position: (" << m.x << "," << m.y << ")" << " / ";
+}
+
+inline void print_data(const protocol_data& d) {
+	std::cout << "==MATCH TURN " << d.elapsed << "==" << std::endl;
+	std::cout << "Owning team: " << string_team(d.owner) << std::endl;
+	std::cout << "Owning turns: " << d.own[0] << " vs " << d.own[1] << std::endl;
+	std::cout << "Winning turns: " << d.win[0] << " vs " << d.win[1] << std::endl;
+	std::cout << "Extra turns: " << d.extra << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "==UNIT==" << std::endl;
+	for (int i = 0; i < UNIT_NUM_MAX; i++) {
+		std::cout << "*Unit " << i << std::endl;
+		print_unit(d.unit[i]);
+	}
+	std::cout << std::endl;
+
+	std::cout << "==PETAL==" << std::endl;
+	for (int i = 0; i < PETAL_NUM_MAX; i++) {
+		if (d.petal[i].valid) {
+			std::cout << "Petal " << i;
+			print_petal(d.petal[i]);
+		}
+	}
+	std::cout << std::endl;
+
+	std::cout << "==POISON==" << std::endl;
+	for (int i = 0; i < POISON_NUM_MAX; i++) {
+		if (d.poison[i].valid) {
+			std::cout << "Poison " << i;
+			print_poison(d.poison[i]);
+		}
+	}
+	std::cout << std::endl;
+
+	std::cout << "==MUSHROOM==" << std::endl;
+	for (int i = 0; i < MUSHROOM_NUM_MAX; i++) {
+		if (d.mushroom[i].valid) {
+			std::cout << "Mushroom " << i;
+			print_mushroom(d.mushroom[i]);
+		}
+	}
+	std::cout << std::endl;
+	std::cout << "==END OF TURN " << d.elapsed << "==" << std::endl;
+	std::cout << std::endl;
+}
+
+inline protocol_direction random_direction() {
+	switch (rand() % 4) {
+	case 0: return DIRECTION_RIGHT;
+	case 1: return DIRECTION_UP;
+	case 2: return DIRECTION_LEFT;
+	case 3: return DIRECTION_DOWN;
+	}
+}
+
+inline protocol_dep random_dep() {
+	switch (rand() % 5) {
+	case 0: return DEP_CSE;
+	case 1: return DEP_PHYS;
+	case 2: return DEP_ME;
+	case 3: return DEP_LIFE;
+	case 4: return DEP_CHEM;
+	}
+}
 
 #endif

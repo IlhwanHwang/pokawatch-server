@@ -670,6 +670,7 @@ void Game::ruleSkill() // rules related to skill
 				y + CSE_STORM_RANGE, 
 				CSE_STORM_STUN
 			);
+			Effect::push(new EffectStorm(x, y));
 		}
 		else if (u.getDep() == DEP_PHYS) {
 			regionDamage(
