@@ -203,7 +203,6 @@ void Unit::kill() {
 		return;
 
 	p.state = STATE_DEAD;
-	p.respawn = RESPAWN_COOLTIME;
 	p.hero = false;
 	death++;
 	flagDead = true;
@@ -476,6 +475,13 @@ void Petal::draw() const {
 		return;
 
 	Draw::qonmap(Rspr::petal, 0.0, p.x + moveOffX, p.y + moveOffY, 0.5);
+}
+
+void Petal::stepback() {
+	int dx = direction_to_dx(direction_flip(p.direction));
+	int dy = direction_to_dy(direction_flip(p.direction));
+	p.x += dx;
+	p.y += dy;
 }
 
 Mushroom::Mushroom() {

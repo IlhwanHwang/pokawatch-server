@@ -52,6 +52,10 @@ void Timer::update(int count) {
 
 	Audio::update();
 
+	if (Key::keyCheckPressed('1')) {
+		turnWait = !turnWait;
+	}
+
 	if (!Game::isStarted()) {
 		if (Key::keyCheckPressed(32)) {
 			Game::start();
@@ -61,6 +65,7 @@ void Timer::update(int count) {
 		if (turnWait) {
 			if (Key::keyCheckPressed(32))
 				turn();
+			Audio::discardTurn();
 		}
 		else {
 			if (Audio::isTurn() && !Game::isEnded())

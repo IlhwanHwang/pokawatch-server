@@ -14,8 +14,8 @@
 #include "draw.h"
 #include "resource.h"
 
-#define SCENARIO_SINGLE
-//#define SCENARIO_SERVER
+//#define SCENARIO_SINGLE
+#define SCENARIO_SERVER
 
 using namespace std;
 
@@ -41,11 +41,8 @@ void Network::ErrorHandling(char *message)  //Error handling routine
 	exit(1);
 }
 
-void Network::makeServerSocket() // Server Socket making routine
+void Network::makeServerSocket(int port) // Server Socket making routine
 {
-	string portString = PORT_STRING;
-	char * port = (char*)portString.c_str();
-
 	WSADATA wsaData;
 
 	// Load Winsock 2.2 DLL
@@ -58,7 +55,7 @@ void Network::makeServerSocket() // Server Socket making routine
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons(atoi(port));
+	servAddr.sin_port = htons(port);
 
 	// Allocate address of server
 	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) ErrorHandling("bind() error");
@@ -134,7 +131,7 @@ void Network::closeServerConnection() //server cosing routine
 void Network::makeClientSocket() // Client socket making routine
 {
 	string servIpString = serverIpArg;
-	string portNumString = PORT_STRING;
+	string portNumString = "2222";
 	char * servIp = (char*)servIpString.c_str();
 	char * portNum = (char*)portNumString.c_str();
 
@@ -248,6 +245,7 @@ void Network::turn() // turn routine
 				}
 				else {
 					c = dep_to_spawncommand(random_dep());
+					//c = COMMAND_SPAWN_ME;
 				}
 				messageFromClient[i][j] = (char)c + '0';
 			}
@@ -285,7 +283,7 @@ void Network::update() // frame turn routine
 {
 }
 
-void Network::init(char * argv) {
+void Network::init(const char * portArg) {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) characterSelection[i] = 0;
 	gameStart[0] = 'N';
 	gameStart[1] = '0' + TEAM_NULL;
@@ -298,7 +296,7 @@ void Network::init(char * argv) {
 	setMode(MODE_SERVER);														// set as server
 
 #ifdef SCENARIO_SERVER
-	makeServerSocket();														// server socket made
+	makeServerSocket(atoi(portArg));														// server socket made
 	printf("Socket made \n");
 	acceptClient();															// accepting client
 	printf("Client accepted\n");
@@ -322,6 +320,7 @@ void Network::init(char * argv) {
 		for (int j = 0; j < CLIENT_NUM_MAX; j++)
 		{
 			Game::getUnit(UNIT_PER_TEAM * j + i).spawn((protocol_dep)(rand() % DEP_CHEM + 1));
+			//Game::getUnit(UNIT_PER_TEAM * j + i).spawn(DEP_ME);
 		}
 	}
 	Game::getUnit(0).spawn(DEP_CHEM);

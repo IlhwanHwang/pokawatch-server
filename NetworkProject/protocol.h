@@ -147,36 +147,27 @@ typedef struct {
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
 
-#define RESPAWN_COOLTIME 10
+#define RESPAWN_COOLTIME_MIN 8
+#define RESPAWN_COOLTIME_MAX 12
 
 //NETWORK PROTOCOL
-
-#define PORT_STRING "2222"
-#define SERV_IP_STRING "141.223.85.241"
 
 #define MODE_NOTHING 7
 #define MODE_SERVER 9
 #define MODE_CLIENT 8
 #define MODE_SINGLE 1
-#define MODE_SERVER_KEY '9'
-#define MODE_CLIENT_KEY '8'
 
 #define MESSAGE_T0_CLIENT_SIZE (sizeof(protocol_data)+1)
 #define MESSAGE_TO_SERVER_SIZE 16
 
 #define GAME_START_CHAR 'G'
 
-#define TEAM_POSTECH_SPAWN_X 0
-#define TEAM_POSTECH_SPAWN_Y 0
-#define TEAM_KAIST_SPAWN_X 3
-#define TEAM_KAIST_SPAWN_Y 0
-
 #define POINT_X1 (MAP_WIDTH / 2 - 2)
 #define POINT_Y1 (MAP_HEIGHT / 2 - 3)
 #define POINT_X2 (MAP_WIDTH / 2 + 2)
 #define POINT_Y2 (MAP_HEIGHT / 2 + 3)
 #define POINT_TURN_OWN 5
-#define POINT_TURN_WIN 30
+#define POINT_TURN_WIN 32
 #define POINT_TURN_EXTRA 5
 #define TURN_MAX 300
 
@@ -195,7 +186,7 @@ typedef struct {
 #define PHYS_WAVE_COOLTIME 4
 #define PHYS_BLACKHOLE_DAMAGE 10
 
-#define LIFE_PETAL_DAMAGE 1
+#define LIFE_PETAL_DAMAGE 2
 #define LIFE_PETAL_HEAL 1
 #define LIFE_PETAL_COOLTIME 8
 #define LIFE_BLOSSOM_HEAL 10

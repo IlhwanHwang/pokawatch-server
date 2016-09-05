@@ -68,7 +68,6 @@ public:
 	static Sprite flagK[4];
 
 	static Sprite number[10];
-	static Sprite bignumber[10];
 
 	static Sprite bg;
 	static Sprite intengrad;
@@ -90,6 +89,9 @@ public:
 	static Sprite ownFlag[8];
 	static Sprite ownGaugeP[5];
 	static Sprite ownGaugeK[5];
+
+	static Sprite turnWaitPlay;
+	static Sprite turnWaitWait;
 };
 
 class Rsfx {

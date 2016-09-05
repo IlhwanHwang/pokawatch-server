@@ -148,6 +148,13 @@ void Game::drawOverlay() {
 			Draw::draw((i == 0 ? Rspr::ownGaugeP : Rspr::ownGaugeK)[own[i] - 1], WINDOW_WIDTH * 0.5, WINDOW_HEIGHT - 150.0);
 	}
 
+	if (Timer::getTurnWait()) {
+		Draw::draw(Rspr::turnWaitWait, 30.0, 30.0);
+	}
+	else {
+		Draw::draw(Rspr::turnWaitPlay, 30.0, 30.0);
+	}
+
 	const float barw = 256.0;
 	const float barpx = flagx - 96.0;
 	const float barpy = flagy;
@@ -263,6 +270,8 @@ void Game::ruleMove() {
 			Unit& u = unitArray[ind];
 			protocol_command c = Network::getCommandEnum(ind);
 			protocol_direction d = command_to_direction(c);
+			int orgx = u.getX();
+			int orgy = u.getY();
 			bool moved = u.move(d);
 			bool duplicated = false;
 
@@ -292,6 +301,15 @@ void Game::ruleMove() {
 				movable.erase(movable.begin() + i);
 				i--;
 				changed = true; // keep looping
+
+				for (int j = 0; j < PETAL_NUM_MAX; j++) {
+					Petal& p = petalArray[j];
+					if (!p.isValid())
+						continue;
+					if (p.getX() == orgx && p.getY() == orgy && p.getDirection() == direction_flip(d)) {
+						p.stepback();
+					}
+				}
 			}
 		}
 	}
@@ -573,7 +591,9 @@ void Game::ruleAttack() // rules related to attack
 			petalArray[indexForValidPetal].spawn(t, x + dx, y + dy, d);
 		}
 		else if (u.getDep() == DEP_ME) {
-			regionDamage(team_invert(t), x - 1, y - 1, x + 1, y + 1, ME_THORN_DAMAGE);
+			//regionDamage(team_invert(t), x - 1, y - 1, x + 1, y + 1, ME_THORN_DAMAGE);
+			regionDamage(team_invert(t), x - 1, y, x + 1, y, ME_THORN_DAMAGE);
+			regionDamage(team_invert(t), x, y - 1, x, y + 1, ME_THORN_DAMAGE);
 		}
 		else if (u.getDep() == DEP_CHEM) {
 			for (int p = 1; p <= CHEM_POISON_LENGTH; p++)
@@ -814,8 +834,17 @@ void Game::ruleFlush() {
 		u.flush();
 		if (u.checkDead()) {
 			death[team_to_index(u.getTeam())]++;
+
+			int res;
+			res = RESPAWN_COOLTIME_MAX - RESPAWN_COOLTIME_MIN;
+			res *= win[team_to_index(u.getTeam())];
+			res /= POINT_TURN_WIN;
+			res += RESPAWN_COOLTIME_MIN;
+			u.setRespawn(res);
+
 			Effect::push(new EffectDeath(u.getTeam(), u.getX(), u.getY()));
 			Gui::shake(1.0);
+
 			if (death[team_to_index(u.getTeam())] % HERO_PERIOD == 0) {
 				u.setHero(true);
 			}
@@ -847,10 +876,10 @@ void Game::turn() {
 	rulePriority();
 	ruleCommand();
 	ruleMove();
+	ruleCollide();
 	ruleSpawn();
 	ruleSkill();
 	ruleAttack();
-	ruleCollide();
 	rulePoint();
 	
 	if (Network::getMode() == MODE_SERVER) {

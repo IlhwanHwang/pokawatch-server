@@ -63,7 +63,6 @@ Sprite Rspr::flagP[4];
 Sprite Rspr::flagK[4];
 
 Sprite Rspr::number[10];
-Sprite Rspr::bignumber[10];
 
 Sprite Rspr::bg;
 Sprite Rspr::intengrad;
@@ -83,6 +82,9 @@ Sprite Rspr::ownPoint;
 Sprite Rspr::ownFlag[8];
 Sprite Rspr::ownGaugeP[5];
 Sprite Rspr::ownGaugeK[5];
+
+Sprite Rspr::turnWaitPlay;
+Sprite Rspr::turnWaitWait;
 
 irrklang::ISoundSource* Rsfx::death;
 
@@ -168,7 +170,6 @@ void Resource::postinit() {
 	MULTILOAD(buf, flagK, 4, "flag_k_%d");
 
 	MULTILOAD(buf, number, 10, "num_%d");
-	MULTILOAD(buf, bignumber, 10, "bignum%d");
 
 	LOAD(bg, "bg").dot();
 	LOAD(intengrad, "intengrad").dot();
@@ -188,4 +189,7 @@ void Resource::postinit() {
 	LOAD(winPostech, "win_postech").dot();
 	LOAD(winKaist, "win_kaist").dot();
 	LOAD(winDraw, "win_draw").dot();
+
+	LOAD(turnWaitPlay, "turnwait_play").dot();
+	LOAD(turnWaitWait, "turnwait_wait").dot();
 }

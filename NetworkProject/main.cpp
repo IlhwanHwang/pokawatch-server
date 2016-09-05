@@ -44,7 +44,10 @@ void main(int argc, char **argv)
 	Key::init();
 	Game::init();
 	Shader::init();
-	Network::init(NULL);
+	if (argc == 1)
+		Network::init("2222");
+	else
+		Network::init(argv[1]);
 	Resource::init();
 	Audio::init();
 

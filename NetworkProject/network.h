@@ -28,10 +28,10 @@ private:
 
 public:
 
-	static void init(char * argv);								// initiate network state
+	static void init(const char * argv);								// initiate network state
 	static void ErrorHandling(char *message);		// Error handling
 
-	static void makeServerSocket();					// Server socket making routine
+	static void makeServerSocket(int port);					// Server socket making routine
 	static void acceptClient();						// Server accept client
 	static void sendToClient(char *messageToClient, size_t length);// Server message sending routine
 	static void recieveFromClient();				// Server message recieving routine

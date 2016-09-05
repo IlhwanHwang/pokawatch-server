@@ -99,5 +99,4 @@ public:
 
 	// Draw digits
 	static void number(int num, float x, float y);
-	static void bignumber(int num, float x, float y);
 };

@@ -23,6 +23,7 @@ public:
 	static void update();
 	static void extra();
 	static bool isTurn();
+	static void discardTurn() { isturn = false; }
 	static irrklang::ISoundEngine* getEngine() { return engine; }
 	static void play(irrklang::ISoundSource* sfx);
 };

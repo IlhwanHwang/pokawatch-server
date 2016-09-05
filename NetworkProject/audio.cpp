@@ -56,7 +56,7 @@ void Audio::update() {
 
 	irrklang::ik_u32 pos = bgm->getPlayPosition();
 
-	if (lastPlayPosition + 500 < pos) {
+	while (lastPlayPosition + 500 < pos) {
 		lastPlayPosition += 500;
 		isturn = true;
 	}

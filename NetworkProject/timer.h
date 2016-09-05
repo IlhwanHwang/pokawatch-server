@@ -21,4 +21,5 @@ public:
 	static int getFrameInterval() { return frameInterval; }
 	static int getFramePerTurn() { return framePerTurn; }
 	static float getDeltaPerTurn() { return 1.0 / framePerTurn; }
+	static bool getTurnWait() { return turnWait; }
 };

@@ -169,6 +169,7 @@ public:
 	void draw() const;
 
 	void invalidate() { p.valid = false; }
+	void stepback();
 
 	const protocol_petal* getProtocol() const { return &p; }
 
