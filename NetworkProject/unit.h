@@ -95,8 +95,8 @@ public:
 
 	void turninit();
 	void turn();
+	void turnpost();
 	void flush();
-	void postturn();
 	void update();
 	void draw() const;
 
@@ -127,9 +127,9 @@ public:
 	void setState(protocol_state state) { p.state = state; }
 	void setHealth(int health) { p.health = health; }
 	void setHero(bool hero) { p.hero = hero; }
-	void setCooltime(int cooltime) { p.cooltime = cooltime; }
-	void setRespawn(int respawn) { p.respawn = respawn; }
-	void setStun(int stun) { p.stun = stun; }
+	void setCooltime(int cooltime) { p.cooltime = cooltime + 1; }
+	void setRespawn(int respawn) { p.respawn = respawn + 1; }
+	void setStun(int stun) { p.stun = stun + 1; }
 };
 
 class Poison : public Object {

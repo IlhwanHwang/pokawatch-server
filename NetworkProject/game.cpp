@@ -892,6 +892,8 @@ void Game::turn() {
 	ruleAttack();
 	rulePoint();
 	
+	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].turnpost();
+
 	if (Network::getMode() == MODE_SERVER) {
 		makeProtocol();
 	}

@@ -14,8 +14,8 @@
 #include "draw.h"
 #include "resource.h"
 
-#define SCENARIO_SINGLE
-//#define SCENARIO_SERVER
+//#define SCENARIO_SINGLE
+#define SCENARIO_SERVER
 
 using namespace std;
 
@@ -316,6 +316,7 @@ void Network::init(const char * portArg) {
 
 	Game::release();
 	sendToClient(gameStartMessage, 2);
+	sendToClient((char*)Game::getProtocolPointer(), sizeof(protocol_data));
 #endif 
 
 #ifdef SCENARIO_SINGLE

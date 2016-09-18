@@ -18,6 +18,7 @@ void Unit::init() {
 	healthPrevious = p.health;
 	p.stun = 0;
 	p.cooltime = 0;
+	p.respawn = 0;
 	p.x = orgx;
 	p.y = orgy;
 	p.invincible = INVINCIBLE_SPAN; // Invincible for a while after spawning
@@ -112,14 +113,14 @@ void Unit::attack(protocol_direction direction) {
 
 	p.state = direction_to_attackstate(direction);
 	flip(direction);
-	p.cooltime = DEP_SELECT(
-		p.dep, 
-		CSE_BLINK_COOLTIME, 
+	setCooltime(DEP_SELECT(
+		p.dep,
+		CSE_BLINK_COOLTIME,
 		PHYS_WAVE_COOLTIME,
 		LIFE_PETAL_COOLTIME,
-		0, 
+		0,
 		CHEM_POISON_COOLTIME
-	);
+	));
 }
 
 void Unit::skill(protocol_direction direction) {
@@ -222,13 +223,15 @@ void Unit::turn() {
 		return;
 
 	turninit();
+}
 
+void Unit::turnpost() {
 	if (p.state == STATE_DEAD) {
 		p.health = 0;
 		if (p.respawn > 0) {
 			p.respawn--;
 		}
-		else {
+		if (p.respawn <= 0) {
 			if (p.dep != DEP_NULL) {
 				init();
 				flagRespawned = true;
@@ -282,9 +285,6 @@ void Unit::flush() {
 
 	if (p.stun > 0)
 		p.state = STATE_STUN;
-}
-
-void Unit::postturn() {
 }
 
 void Unit::update() {
@@ -398,7 +398,7 @@ void Poison::turn() {
 	if (p.span > 0) {
 		p.span--;
 	}
-	else {
+	if (p.span <= 0) {
 		p.valid = false;
 	}
 }
