@@ -51,6 +51,14 @@ Sprite& Sprite::setOffset(float ofx, float ofy) {
 	return (*this);
 }
 
+Sprite& Sprite::setSize(unsigned uw, unsigned uh) {
+	this->uw = uw;
+	this->uh = uh;
+	w = (float)uw;
+	h = (float)uh;
+	return (*this);
+}
+
 Sprite& Sprite::dot() {
 	w *= 2.0;
 	h *= 2.0;

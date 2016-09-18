@@ -78,6 +78,9 @@ public:
 	static void qdrawSB(Sprite& spr, float depth, float x, float y, float sx, float sy, Color& c, float alpha) {
 		req.push(DrawRequest(spr, depth, x, y, sx, sy, c, alpha));
 	}
+	static void qdrawB(Sprite& spr, float depth, float x, float y, Color& c, float alpha) {
+		qdrawSB(spr, depth, x, y, 1.0, 1.0, c, alpha);
+	}
 	static void qdraw(Sprite& spr, float depth, float x, float y) {
 		qdrawSB(spr, depth, x, y, 1.0, 1.0, Color::white, 1.0);
 	}

@@ -26,13 +26,14 @@ void Effect::draw() {
 void Effect::update() {
 	for (int i = 0; i < pool.size(); i++) {
 		pool[i]->update();
-		if (!pool[i]->isValid()) {
+		if (pool[i]->isExpired()) {
 			delete pool[i];
 			pool.erase(pool.begin() + i);
 			i--;
 		}
 	}
 }
+
 
 void Effect::clear() {
 	for (int i = 0; i < pool.size(); i++) {
@@ -111,4 +112,31 @@ void EffectStorm::draw() const {
 	for (int i = -CSE_STORM_RANGE; i <= CSE_STORM_RANGE; i++)
 		for (int j = -CSE_STORM_RANGE; j <= CSE_STORM_RANGE; j++)
 			Draw::qonmap(Rspr::sparkboom[(int)(phase * 4)], 0.0, x + i, y + j, 0.0);
+}
+
+void EffectWin::draw() const {
+	float s = 1.0;
+	s *= (1.0 - phase);
+	s *= s;
+	s *= s;
+	s += 1.0;
+
+	float a = 1.0;
+	a *= (1.0 - phase);
+	a *= a;
+	a = 1.0 - a;
+
+	Draw::qdrawB(
+		Rspr::wholedim, 999.0, 0.0, WINDOW_HEIGHT, Color::black, a * 0.6
+	);
+	Draw::qdrawSB(
+		team == TEAM_POSTECH ? Rspr::winPostech : (team == TEAM_KAIST ? Rspr::winKaist : Rspr::winDraw),
+		1000.0, WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, s, s, Color::white, phase
+	);
+}
+
+void EffectBlossom::draw() const {
+	Draw::qonmap(
+		Rspr::LIFEBlossom[(int)(phase * 8)],
+		0.1, x, y, 1.0);
 }

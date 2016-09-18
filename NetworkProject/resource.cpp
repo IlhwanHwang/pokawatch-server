@@ -4,6 +4,7 @@
 //
 
 #include "resource.h"
+#include "gui.h"
 #include <string>
 #include "audio.h"
 
@@ -49,6 +50,7 @@ Sprite Rspr::MEAccidentKV;
 Sprite Rspr::attackCSE[4];
 Sprite Rspr::sparkboom[4];
 Sprite Rspr::mushroom;
+Sprite Rspr::LIFEBlossom[8];
 
 Sprite Rspr::deathP[8];
 Sprite Rspr::deathK[8];
@@ -61,11 +63,12 @@ Sprite Rspr::tileDark;
 Sprite Rspr::flagNull;
 Sprite Rspr::flagP[4];
 Sprite Rspr::flagK[4];
+Sprite Rspr::extra[2];
 
 Sprite Rspr::number[10];
 
 Sprite Rspr::bg;
-Sprite Rspr::intengrad;
+Sprite Rspr::wholedim;
 
 Sprite Rspr::winPostech;
 Sprite Rspr::winKaist;
@@ -158,6 +161,7 @@ void Resource::postinit() {
 	MULTILOAD(buf, attackCSE, 4, "attack_cse_%d");
 	MULTILOAD(buf, sparkboom, 4, "sparkboom%d");
 	LOAD(mushroom, "mushroom").dot();
+	MULTILOAD(buf, LIFEBlossom, 8, "blossom_%d");
 
 	MULTILOAD(buf, deathP, 8, "death_p_%d");
 	MULTILOAD(buf, deathK, 8, "death_k_%d");
@@ -168,11 +172,12 @@ void Resource::postinit() {
 	LOAD(flagNull, "flag_null").dot();
 	MULTILOAD(buf, flagP, 4, "flag_p_%d");
 	MULTILOAD(buf, flagK, 4, "flag_k_%d");
+	MULTILOAD(buf, extra, 2, "extra_%d");
 
 	MULTILOAD(buf, number, 10, "num_%d");
 
 	LOAD(bg, "bg").dot();
-	LOAD(intengrad, "intengrad").dot();
+	LOAD(wholedim, "2pixel").setSize(WINDOW_WIDTH, WINDOW_HEIGHT).setOffset(0.0, 0.0);
 
 	LOAD(pointNorm, "point").dot();
 	LOAD(pointP, "point_p").dot();

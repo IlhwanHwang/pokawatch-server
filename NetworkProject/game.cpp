@@ -28,6 +28,7 @@ int Game::death[2];
 int Game::order[UNIT_NUM_MAX];
 bool Game::ended = false;
 bool Game::started = false;
+protocol_team Game::winner = TEAM_NULL;
 
 void Game::init() // game initialization
 {
@@ -155,6 +156,15 @@ void Game::drawOverlay() {
 		Draw::draw(Rspr::turnWaitPlay, 30.0, 30.0);
 	}
 
+	if (extra > 0) {
+		const float sep = 32.0;
+		float dx = WINDOW_WIDTH * 0.5 - sep * (extra - 1) * 0.5;
+		for (int i = 0; i < extra; i++) {
+			Draw::draw(Rspr::extra[Gui::aniIndpPhaseCombinate(2, 0.5)], dx, WINDOW_HEIGHT - 20.0);
+			dx += sep;
+		}
+	}
+
 	const float barw = 256.0;
 	const float barpx = flagx - 96.0;
 	const float barpy = flagy;
@@ -198,24 +208,21 @@ void Game::draw() {
 	// Overlay informations
 	drawFaces();
 	drawOverlay();
-
-	//Draw::drawB(Rspr::intengrad, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91, Color::black, 1.0);
-	//Draw::bignumber(elapsed, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.91);
-
-	if (ended) {
-		if (owner == TEAM_POSTECH)
-			Draw::draw(Rspr::winPostech, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
-		else if (owner == TEAM_KAIST)
-			Draw::draw(Rspr::winKaist, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
-		else
-			Draw::draw(Rspr::winDraw, WINDOW_WIDTH * 0.5, WINDOW_HEIGHT * 0.5);
-	}
 }
 
 void Game::release() {
 	for (int i = 0; i < UNIT_NUM_MAX; i++) unitArray[i].release();
 	Resource::postinit();
 	Draw::setsize(ACTUAL_WINDOW_WIDTH, ACTUAL_WINDOW_HEIGHT);
+}
+
+void Game::end(protocol_team winner) {
+	if (ended)
+		return;
+
+	Effect::push(new EffectWin(winner));
+	Game::winner = winner;
+	ended = true;
 }
 
 void Game::rulePriority() {
@@ -709,6 +716,7 @@ void Game::ruleSkill() // rules related to skill
 				if (other.getTeam() == t) {
 					other.heal(LIFE_BLOSSOM_HEAL);
 					other.destun();
+					Effect::push(new EffectBlossom(other.getX(), other.getY()));
 				}
 			}
 		}
@@ -785,13 +793,14 @@ void Game::rulePoint() {
 			if (owner == index_to_team(j)) {
 				own[j] = 0;
 				if (own[i] < POINT_TURN_OWN) {
-					// Owning the first point
+					// Owning the point
 					own[i]++;
 				}
 				else {
-					// Owned the first point
+					// Owned the point
 					owner = index_to_team(i);
 					own[i] = 0;
+					extra = 0;
 				}
 			}
 		}
@@ -813,13 +822,14 @@ void Game::rulePoint() {
 					extra = POINT_TURN_EXTRA;
 				}
 				else {
-					if (extra > 0) {
+					if (extra > 1) {
 						// Extra time expiring
 						extra--;
 					}
 					else {
 						// Extra time expired
-						ended = true;
+						extra = 0;
+						end(owner);
 					}
 				}
 			}
@@ -854,7 +864,7 @@ void Game::ruleFlush() {
 
 void Game::turn() {
 	if (elapsed >= TURN_MAX) {
-		ended = true;
+		end(owner);
 	}
 	
 	if (ended) {

@@ -15,11 +15,13 @@ class EffectBase {
 protected:
 	float phase;
 	float x, y;
+	bool expired;
 public:
-	EffectBase(float x, float y) : x(x), y(y), phase(0.0) { };
+	EffectBase(float x, float y) : x(x), y(y), phase(0.0), expired(false) { };
 	virtual void draw() const = 0;
-	virtual void update() { phase += Timer::getDeltaPerTurn(); };
-	bool isValid() { return phase < 1.0; }
+	virtual void update() { phase += Timer::getDeltaPerTurn(); if (phase >= 1.0) expire(); };
+	virtual void expire() { expired = true; }
+	virtual bool isExpired() { return expired; }
 };
 
 class Effect {
@@ -97,7 +99,6 @@ public:
 class EffectOwnFlag : public EffectBase {
 public:
 	EffectOwnFlag(float x, float y) : EffectBase(x, y) {};
-	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
 
@@ -112,20 +113,32 @@ public:
 class EffectDeath : public EffectTeam {
 public:
 	EffectDeath(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
-	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
 
 class EffectBlackhole : public EffectTeam {
 public:
 	EffectBlackhole(protocol_team t, float x, float y) : EffectTeam(t, x, y) {};
-	void update() { phase += Timer::getDeltaPerTurn(); }
 	void draw() const;
 };
 
 class EffectStorm : public EffectBase {
 public:
 	EffectStorm(float x, float y) : EffectBase(x, y) {};
-	void update() { phase += Timer::getDeltaPerTurn(); }
+	void draw() const;
+};
+
+class EffectWin : public EffectBase {
+protected:
+	protocol_team team;
+public:
+	EffectWin(protocol_team t) : EffectBase(0.0, 0.0) { team = t; };
+	void update() { if (phase < 1.0) phase += Timer::getDeltaPerTurn() * 1.5; else phase = 1.0; }
+	void draw() const;
+};
+
+class EffectBlossom : public EffectBase {
+public:
+	EffectBlossom(float x, float y) : EffectBase(x, y) {};
 	void draw() const;
 };

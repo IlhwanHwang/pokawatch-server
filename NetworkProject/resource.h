@@ -53,6 +53,7 @@ public:
 	static Sprite attackCSE[4];
 	static Sprite sparkboom[4];
 	static Sprite mushroom;
+	static Sprite LIFEBlossom[8];
 
 	static Sprite deathP[8];
 	static Sprite deathK[8];
@@ -66,11 +67,12 @@ public:
 	static Sprite flagNull;
 	static Sprite flagP[4];
 	static Sprite flagK[4];
+	static Sprite extra[2];
 
 	static Sprite number[10];
 
 	static Sprite bg;
-	static Sprite intengrad;
+	static Sprite wholedim;
 
 	static Sprite winPostech;
 	static Sprite winKaist;

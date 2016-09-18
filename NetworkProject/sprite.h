@@ -20,6 +20,7 @@ public:
 	// It is for code readibility, see 'resource.cpp' for example
 	Sprite& load(const char* fn); // Load external png file
 	Sprite& setOffset(float x, float y); // Set offset of sprite
+	Sprite& setSize(unsigned w, unsigned h); // Set size of sprite
 	Sprite& dot(); // Specify dot style image, it simply magnifies image by 2.
 	GLuint getBuf(int i) const { return buf; } // Get sprite's texture buffer location
 	float getW() const { return w; }

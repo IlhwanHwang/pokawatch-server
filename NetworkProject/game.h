@@ -23,6 +23,7 @@ private:
 
 	static bool ended;
 	static bool started;
+	static protocol_team winner;
 
 	static void rulePriority();	// Setting priority between unit. Even-odd round robin.
 	static void ruleCommand();	// Send commands on units
@@ -47,6 +48,7 @@ public:
 	static void turn();											// turn routine
 	static void draw();											// draw routine
 	static void release();
+	static void end(protocol_team winner);
 
 	static void regionApply(protocol_team t, int x1, int y1, int x2, int y2, int damage, int heal, int stun);
 	static void regionDamage(protocol_team t, int x1, int y1, int x2, int y2, int h) {

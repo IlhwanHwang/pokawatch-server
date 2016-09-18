@@ -14,8 +14,8 @@
 #include "draw.h"
 #include "resource.h"
 
-//#define SCENARIO_SINGLE
-#define SCENARIO_SERVER
+#define SCENARIO_SINGLE
+//#define SCENARIO_SERVER
 
 using namespace std;
 
@@ -281,6 +281,10 @@ void Network::turn() // turn routine
 
 void Network::update() // frame turn routine
 {
+#ifdef SCENARIO_SINGLE
+	if (Key::keyCheckPressed('q'))
+		Game::end(TEAM_POSTECH);
+#endif
 }
 
 void Network::init(const char * portArg) {
@@ -323,7 +327,7 @@ void Network::init(const char * portArg) {
 			//Game::getUnit(UNIT_PER_TEAM * j + i).spawn(DEP_ME);
 		}
 	}
-	Game::getUnit(0).spawn(DEP_CHEM);
+	Game::getUnit(0).spawn(DEP_PHYS);
 	Game::getUnit(0).setHero(true);
 	Game::release();
 #endif
